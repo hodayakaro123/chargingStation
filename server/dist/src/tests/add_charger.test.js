@@ -24,12 +24,13 @@ const testUser = {
     email: "tom@user.com",
     password: "123456",
     phoneNumber: "0541234567",
+    selectedChargingStations: [],
     token: "",
     _id: "",
 };
 const newChargingStation = {
     latitude: 40.7128,
-    longitude: -74.0060,
+    longitude: -74.006,
     price: 10,
     rating: 4.5,
     picture: "http://example.com/picture.jpg",
@@ -64,27 +65,59 @@ beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
     yield mongoose_1.default.connection.close();
 }));
+let chargerId;
 describe("add charging station Test Suite", () => {
-    let chargingStationId;
     test("should add a new charging station", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .post("/addChargingStation/addCharger")
             .set("authorization", `JWT ${testUser.token}`)
             .send(newChargingStation);
         expect(response.status).toBe(201);
-        chargingStationId = response.body.chargingStation._id;
+        chargerId = response.body.chargingStation._id;
     }));
-    test("should add a comment to the charging station", () => __awaiter(void 0, void 0, void 0, function* () {
-        const newComment = {
-            text: "Could be a better station!!!!",
+    test("should get a charging station by ID", () => __awaiter(void 0, void 0, void 0, function* () {
+        const getResponse = yield (0, supertest_1.default)(app).get(`/addChargingStation/getChargerById/${chargerId}`);
+        expect(getResponse.status).toBe(200);
+    }));
+    test("should update charger details", () => __awaiter(void 0, void 0, void 0, function* () {
+        const updatedDetails = {
+            latitude: 41.1234,
+            longitude: -75.1234,
+            price: 15,
+            rating: 4.8,
+            picture: "http://example.com/newpicture.jpg",
+            description: "Updated charging station description",
         };
-        const commentResponse = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/addComment/${chargingStationId}`)
+        const updateResponse = yield (0, supertest_1.default)(app)
+            .put(`/addChargingStation/updateCharger/${chargerId}`)
             .set("authorization", `JWT ${testUser.token}`)
-            .send(newComment);
-        expect(commentResponse.status).toBe(201);
-        expect(commentResponse.body.message).toBe("Comment added successfully");
-        expect(commentResponse.body.chargingStation.comments).toContainEqual(expect.objectContaining(newComment));
+            .send(updatedDetails);
+        expect(updateResponse.status).toBe(200);
+        expect(updateResponse.body.message).toBe("Charging station updated successfully");
+        expect(updateResponse.body.chargingStation).toMatchObject(updatedDetails);
+    }));
+    test("should add a selected charging station to the user's list", () => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield (0, supertest_1.default)(app)
+            .post(`/addChargingStation/addSelectedChargingStation/${testUser._id}/${chargerId}`)
+            .set("authorization", `JWT ${testUser.token}`);
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("Charging station added to user's list successfully");
+    }));
+    test("should get all chargers by user ID", () => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addChargingStation/getChargersByUserId/chargers/${testUser._id}`)
+            .set("authorization", `JWT ${testUser.token}`);
+        expect(response.status).toBe(200);
+        expect(response.body.chargers).toBeInstanceOf(Array);
+        expect(response.body.chargers.length).toBeGreaterThan(0);
+    }));
+    test("should delete a comment from the charging station", () => __awaiter(void 0, void 0, void 0, function* () {
+        expect(chargerId).toBeDefined();
+        const deleteResponse = yield (0, supertest_1.default)(app)
+            .delete(`/addChargingStation/deleteChargerById/${chargerId}`)
+            .set("authorization", `JWT ${testUser.token}`);
+        expect(deleteResponse.status).toBe(200);
+        expect(deleteResponse.body.message).toBe("Comment deleted successfully");
     }));
 });
-//# sourceMappingURL=add_chargnig.test.js.map
+//# sourceMappingURL=add_charger.test.js.map

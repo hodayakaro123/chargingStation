@@ -4,6 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
+const commentSchema = new mongoose_1.default.Schema({
+    text: {
+        type: String,
+        required: true,
+    },
+});
 const chargingSchema = new mongoose_1.default.Schema({
     latitude: {
         type: Number,
@@ -30,16 +36,13 @@ const chargingSchema = new mongoose_1.default.Schema({
         required: false,
     },
     comments: {
-        type: [String],
+        type: [commentSchema],
         default: [],
     },
     userId: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "Users",
     },
-    // const testComment = {
-    //     comment: "This is a great charging station!", // The comment text you want to add
-    //   };
 });
 const chargingModel = mongoose_1.default.model("Charging", chargingSchema);
 exports.default = chargingModel;

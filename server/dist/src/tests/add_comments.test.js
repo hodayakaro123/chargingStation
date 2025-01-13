@@ -18,6 +18,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const user_model_1 = __importDefault(require("../models/user_model"));
 const add_charging_model_1 = __importDefault(require("../models/add_charging_model"));
 let app;
+let comment1Id;
 const testUser = {
     firstName: "Tom2",
     lastName: "Guter",
@@ -79,12 +80,40 @@ describe("add charging station Test Suite", () => {
             text: "Could be a better station!!!!",
         };
         const commentResponse = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/addComment/${chargingStationId}`)
+            .post(`/addComments/addComment/${chargingStationId}`)
             .set("authorization", `JWT ${testUser.token}`)
             .send(newComment);
         expect(commentResponse.status).toBe(201);
         expect(commentResponse.body.message).toBe("Comment added successfully");
         expect(commentResponse.body.chargingStation.comments).toContainEqual(expect.objectContaining(newComment));
+        comment1Id = commentResponse.body.chargingStation.comments[0]._id;
+    }));
+    test("should get a comment by ID from the charging station", () => __awaiter(void 0, void 0, void 0, function* () {
+        expect(comment1Id).toBeDefined();
+        const getResponse = yield (0, supertest_1.default)(app)
+            .get(`/addComments/getComment/${chargingStationId}/${comment1Id}`)
+            .set("authorization", `JWT ${testUser.token}`);
+        expect(getResponse.status).toBe(200);
+        expect(getResponse.body.message).toBe("Comment retrieved successfully");
+    }));
+    test("should update a comment on the charging station", () => __awaiter(void 0, void 0, void 0, function* () {
+        const updatedComment = {
+            text: "Updated comment text",
+        };
+        const updateResponse = yield (0, supertest_1.default)(app)
+            .put(`/addComments/updateComment/${chargingStationId}/${comment1Id}`)
+            .set("authorization", `JWT ${testUser.token}`)
+            .send(updatedComment);
+        expect(updateResponse.status).toBe(200);
+        expect(updateResponse.body.message).toBe("Comment updated successfully");
+    }));
+    test("should delete a comment from the charging station", () => __awaiter(void 0, void 0, void 0, function* () {
+        expect(comment1Id).toBeDefined();
+        const deleteResponse = yield (0, supertest_1.default)(app)
+            .delete(`/addComments/deleteComment/${chargingStationId}/${comment1Id}`)
+            .set("authorization", `JWT ${testUser.token}`);
+        expect(deleteResponse.status).toBe(200);
+        expect(deleteResponse.body.message).toBe("Comment deleted successfully");
     }));
 });
-//# sourceMappingURL=add_chargnig.test.js.map
+//# sourceMappingURL=add_comments.test.js.map

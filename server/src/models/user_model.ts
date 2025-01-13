@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  selectedChargingStations: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Charging",
+    default: [],
+  },
   refreshTokens: {
     type: [String],
     default: [],
