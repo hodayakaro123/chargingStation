@@ -1,5 +1,12 @@
 import mongoose from "mongoose";
 
+const commentSchema = new mongoose.Schema({
+    text: {
+        type: String,
+        required: true,
+    },
+});
+
 const chargingSchema = new mongoose.Schema({
 
     latitude: {
@@ -27,16 +34,14 @@ const chargingSchema = new mongoose.Schema({
         required: false,
     },
     comments: {
-        type: [String],
+        type: [commentSchema],
         default: [],
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Users",
     },
-    // const testComment = {
-    //     comment: "This is a great charging station!", // The comment text you want to add
-    //   };
+
 });
 
 const chargingModel = mongoose.model("Charging", chargingSchema);

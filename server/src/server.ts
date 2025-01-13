@@ -8,6 +8,7 @@ import bodyParser from "body-parser";
 import postsRoutes from "./routes/posts_route";
 import commentsRoutes from "./routes/comment_route";
 import addChargingStation from "./routes/add_charging_route";
+import addComments from "./routes/add_comments_route";
 import userRouter from "./routes/user_route";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
@@ -52,6 +53,7 @@ const moduleApp = async (): Promise<Express> => {
   app.use("/comments", commentsRoutes);
   app.use("/auth", userRouter);
   app.use("/addChargingStation", addChargingStation);
+  app.use("/addComments", addComments);
 
   return app;
 };

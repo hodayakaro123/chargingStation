@@ -9,7 +9,8 @@
     "testAuth": "tsc && jest --detectOpenHandles --forceExit user_auth.test.ts",
     "postAuth": "tsc && jest --detectOpenHandles --forceExit posts.test.ts",
     "commentsAuth": "tsc && jest --detectOpenHandles --forceExit comments.test.ts",
-    "addChargingStation": "tsc && jest --detectOpenHandles --forceExit add_chargnig.test.ts",
+    "addChargingStation": "tsc && jest --detectOpenHandles --forceExit add_charger.test.ts",
+    "addComments": "tsc && jest --detectOpenHandles --forceExit add_comments.test.ts",
     "lint": "eslint . --ext .ts"
   },
   "author": "Tom and Hodaya",
