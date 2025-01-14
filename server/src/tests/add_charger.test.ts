@@ -128,14 +128,14 @@ describe("add charging station Test Suite", () => {
   });
 
 
-  // test("should delete a comment from the charging station", async () => {
-  //   expect(chargerId).toBeDefined();
+  test("should delete a comment from the charging station", async () => {
+    expect(chargerId).toBeDefined();
 
-  //   const deleteResponse = await request(app)
-  //     .delete(`/addChargingStation/deleteChargerById/${chargerId}`)
-  //     .set("authorization", `JWT ${testUser.token}`);
+    const deleteResponse = await request(app)
+      .delete(`/addChargingStation/deleteChargerById/${chargerId}`)
+      .set("authorization", `JWT ${testUser.token}`);
 
-  //   expect(deleteResponse.status).toBe(200);
-  //   expect(deleteResponse.body.message).toBe("Comment deleted successfully");
-  // });
+    expect(deleteResponse.status).toBe(200);
+    expect(deleteResponse.body.message).toBe("Comment deleted successfully");
+  });
 });

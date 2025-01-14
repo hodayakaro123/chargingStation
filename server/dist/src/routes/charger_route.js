@@ -353,4 +353,4 @@ router.post("/addSelectedChargingStation/:userId/:chargerId", user_controller_au
     add_charging_controller_1.default.addSelectedChargingStation(req, res);
 });
 exports.default = router;
-//# sourceMappingURL=add_charging_route.js.map
+//# sourceMappingURL=charger_route.js.map

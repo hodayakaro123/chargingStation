@@ -111,13 +111,13 @@ describe("add charging station Test Suite", () => {
         expect(response.body.chargers).toBeInstanceOf(Array);
         expect(response.body.chargers.length).toBeGreaterThan(0);
     }));
-    // test("should delete a comment from the charging station", async () => {
-    //   expect(chargerId).toBeDefined();
-    //   const deleteResponse = await request(app)
-    //     .delete(`/addChargingStation/deleteChargerById/${chargerId}`)
-    //     .set("authorization", `JWT ${testUser.token}`);
-    //   expect(deleteResponse.status).toBe(200);
-    //   expect(deleteResponse.body.message).toBe("Comment deleted successfully");
-    // });
+    test("should delete a comment from the charging station", () => __awaiter(void 0, void 0, void 0, function* () {
+        expect(chargerId).toBeDefined();
+        const deleteResponse = yield (0, supertest_1.default)(app)
+            .delete(`/addChargingStation/deleteChargerById/${chargerId}`)
+            .set("authorization", `JWT ${testUser.token}`);
+        expect(deleteResponse.status).toBe(200);
+        expect(deleteResponse.body.message).toBe("Comment deleted successfully");
+    }));
 });
 //# sourceMappingURL=add_charger.test.js.map

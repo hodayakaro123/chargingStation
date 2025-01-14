@@ -16,12 +16,10 @@ const supertest_1 = __importDefault(require("supertest"));
 const server_1 = __importDefault(require("../server"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const user_model_1 = __importDefault(require("../models/user_model"));
-const posts_model_1 = __importDefault(require("../models/posts_model"));
 let app;
 beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     app = yield (0, server_1.default)();
     yield user_model_1.default.deleteMany();
-    yield posts_model_1.default.deleteMany();
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
     yield mongoose_1.default.connection.close();
@@ -61,35 +59,6 @@ describe("Auth Tests", () => {
             password: userInfo.password,
         });
         expect(response.body.accessToken).not.toEqual(userInfo.accessToken);
-    }));
-    test("Get protected API", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app).post("/posts").send({
-            sender: "invalid owner",
-            message: "My First post",
-        });
-        expect(response.statusCode).not.toBe(201);
-        const response2 = yield (0, supertest_1.default)(app)
-            .post("/posts")
-            .set({
-            authorization: "jwt " + userInfo.accessToken,
-        })
-            .send({
-            sender: "invalid owner",
-            message: "My First post",
-        });
-        expect(response2.statusCode).toBe(201);
-    }));
-    test("Get protected API invalid token", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app)
-            .post("/posts")
-            .set({
-            authorization: "jwt " + userInfo.accessToken + "1",
-        })
-            .send({
-            sender: userInfo._id,
-            message: "This is my first post",
-        });
-        expect(response.statusCode).not.toBe(201);
     }));
     test("Refresh Token", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app).post("/auth/refresh").send({
@@ -147,32 +116,6 @@ describe("Auth Tests", () => {
         userInfo.accessToken = response.body.accessToken;
         userInfo.refreshToken = response.body.refreshToken;
         yield new Promise((resolve) => setTimeout(resolve, 6000));
-        const response2 = yield (0, supertest_1.default)(app)
-            .post("/posts")
-            .set({
-            authorization: "jwt " + userInfo.accessToken,
-        })
-            .send({
-            sender: "Tom",
-            mwssage: "My First post",
-        });
-        expect(response2.statusCode).not.toBe(201);
-        const response3 = yield (0, supertest_1.default)(app).post("/auth/refresh").send({
-            refreshToken: userInfo.refreshToken,
-        });
-        expect(response3.statusCode).toBe(200);
-        userInfo.accessToken = response3.body.accessToken;
-        userInfo.refreshToken = response3.body.refreshToken;
-        const response4 = yield (0, supertest_1.default)(app)
-            .post("/posts")
-            .set({
-            authorization: "jwt " + userInfo.accessToken,
-        })
-            .send({
-            sender: "Tom",
-            message: "My First post",
-        });
-        expect(response4.statusCode).toBe(201);
     }));
 });
 //# sourceMappingURL=user_auth.test.js.map

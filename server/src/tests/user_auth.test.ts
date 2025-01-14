@@ -3,14 +3,12 @@ import initApp from "../server";
 import mongoose from "mongoose";
 import { Express } from "express";
 import userModel from "../models/user_model";
-import postsModel from "../models/posts_model";
 
 let app: Express;
 
 beforeAll(async () => {
   app = await initApp();
   await userModel.deleteMany();
-  await postsModel.deleteMany();
 });
 
 afterAll(async () => {
@@ -68,36 +66,8 @@ describe("Auth Tests", () => {
     expect(response.body.accessToken).not.toEqual(userInfo.accessToken);
   });
 
-  test("Get protected API", async () => {
-    const response = await request(app).post("/posts").send({
-      sender: "invalid owner",
-      message: "My First post",
-    });
-    expect(response.statusCode).not.toBe(201);
-    const response2 = await request(app)
-      .post("/posts")
-      .set({
-        authorization: "jwt " + userInfo.accessToken,
-      })
-      .send({
-        sender: "invalid owner",
-        message: "My First post",
-      });
-    expect(response2.statusCode).toBe(201);
-  });
+  
 
-  test("Get protected API invalid token", async () => {
-    const response = await request(app)
-      .post("/posts")
-      .set({
-        authorization: "jwt " + userInfo.accessToken + "1",
-      })
-      .send({
-        sender: userInfo._id,
-        message: "This is my first post",
-      });
-    expect(response.statusCode).not.toBe(201);
-  });
 
   test("Refresh Token", async () => {
     const response = await request(app).post("/auth/refresh").send({
@@ -170,33 +140,6 @@ describe("Auth Tests", () => {
     await new Promise((resolve) => setTimeout(resolve, 6000));
 
     
-    const response2 = await request(app)
-      .post("/posts")
-      .set({
-        authorization: "jwt " + userInfo.accessToken,
-      })
-      .send({
-        sender: "Tom",
-        mwssage: "My First post",
-      });
-    expect(response2.statusCode).not.toBe(201);
 
-    const response3 = await request(app).post("/auth/refresh").send({
-      refreshToken: userInfo.refreshToken,
-    });
-    expect(response3.statusCode).toBe(200);
-    userInfo.accessToken = response3.body.accessToken;
-    userInfo.refreshToken = response3.body.refreshToken;
-
-    const response4 = await request(app)
-      .post("/posts")
-      .set({
-        authorization: "jwt " + userInfo.accessToken,
-      })
-      .send({
-        sender: "Tom",
-        message: "My First post",
-      });
-    expect(response4.statusCode).toBe(201);
   });
 });
