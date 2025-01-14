@@ -18,10 +18,8 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const posts_route_1 = __importDefault(require("./routes/posts_route"));
-const comment_route_1 = __importDefault(require("./routes/comment_route"));
-const add_charging_route_1 = __importDefault(require("./routes/add_charging_route"));
-const add_comments_route_1 = __importDefault(require("./routes/add_comments_route"));
+const charger_route_1 = __importDefault(require("./routes/charger_route"));
+const commentsOnCharger_route_1 = __importDefault(require("./routes/commentsOnCharger_route"));
 const user_route_1 = __importDefault(require("./routes/user_route"));
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
@@ -55,11 +53,9 @@ const moduleApp = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     app.use(body_parser_1.default.json());
     app.use(body_parser_1.default.urlencoded({ extended: true }));
-    app.use("/posts", posts_route_1.default);
-    app.use("/comments", comment_route_1.default);
     app.use("/auth", user_route_1.default);
-    app.use("/addChargingStation", add_charging_route_1.default);
-    app.use("/addComments", add_comments_route_1.default);
+    app.use("/addChargingStation", charger_route_1.default);
+    app.use("/addComments", commentsOnCharger_route_1.default);
     return app;
 });
 exports.default = moduleApp;

@@ -342,4 +342,4 @@ router.delete("/deleteComment/:chargerId/:commentId", user_controller_auth_1.aut
     add_comments_controller_1.default.deleteCommentById(req, res);
 });
 exports.default = router;
-//# sourceMappingURL=add_comments_route.js.map
+//# sourceMappingURL=commentsOnCharger_route.js.map

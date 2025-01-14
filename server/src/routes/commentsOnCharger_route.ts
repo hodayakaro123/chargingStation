@@ -1,18 +1,22 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const add_comments_controller_1 = __importDefault(require("../controllers/add_comments_controller"));
-const user_controller_auth_1 = require("../controllers/user_controller_auth");
-const router = (0, express_1.Router)();
+import { Router } from "express";
+import add_comments_controller from "../controllers/add_comments_controller";
+import { authMiddleware } from "../controllers/user_controller_auth";
+
+
+const router = Router();
+
+
+
 /**
  * @swagger
  * tags:
  *   name: Charging Stations Comments
  *   description: The Charging Stations API
  */
+
+
+
+
 /**
  * @swagger
  * components:
@@ -104,9 +108,18 @@ const router = (0, express_1.Router)();
  *                   type: string
  *                   example: "Failed to add comment"
  */
-router.post("/addComment/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_comments_controller_1.default.addComment(req, res);
+router.post("/addComment/:chargerId", authMiddleware, (req, res) => {
+    add_comments_controller.addComment(req, res); 
 });
+
+
+
+
+
+
+
+
+
 /**
  * @swagger
  * /addComments/getComment/{chargerId}/{commentId}:
@@ -169,9 +182,21 @@ router.post("/addComment/:chargerId", user_controller_auth_1.authMiddleware, (re
  *                   type: string
  *                   example: "Failed to retrieve comment"
  */
+
 router.get("/getComment/:chargerId/:commentId", (req, res) => {
-    add_comments_controller_1.default.getCommentById(req, res);
+    add_comments_controller.getCommentById(req, res);
 });
+
+
+
+
+
+
+
+
+
+
+
 /**
  * @swagger
  * /addComments/updateComment/{chargerId}/{commentId}:
@@ -265,9 +290,18 @@ router.get("/getComment/:chargerId/:commentId", (req, res) => {
  *                   type: string
  *                   example: "Failed to update comment"
  */
-router.put("/updateComment/:chargerId/:commentId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_comments_controller_1.default.updateComment(req, res);
+
+router.put("/updateComment/:chargerId/:commentId", authMiddleware, (req, res) => {
+    add_comments_controller.updateComment(req, res);
 });
+
+
+
+
+
+
+
+
 /**
  * @swagger
  * /addComments/deleteComment/{chargerId}/{commentId}:
@@ -338,8 +372,11 @@ router.put("/updateComment/:chargerId/:commentId", user_controller_auth_1.authMi
  *                   type: string
  *                   example: "Failed to delete comment"
  */
-router.delete("/deleteComment/:chargerId/:commentId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_comments_controller_1.default.deleteCommentById(req, res);
+
+router.delete("/deleteComment/:chargerId/:commentId", authMiddleware, (req, res) => {
+    add_comments_controller.deleteCommentById(req, res);
 });
-exports.default = router;
-//# sourceMappingURL=add_comments_route.js.map
+
+
+
+export default router;

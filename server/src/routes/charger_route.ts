@@ -1,18 +1,20 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const add_charging_controller_1 = __importDefault(require("../controllers/add_charging_controller"));
-const user_controller_auth_1 = require("../controllers/user_controller_auth");
-const router = (0, express_1.Router)();
+import { Router } from "express";
+import add_charging_controller from "../controllers/add_charging_controller";
+import { authMiddleware } from "../controllers/user_controller_auth";
+
+const router = Router();
+
+
 /**
  * @swagger
  * tags:
  *   name: Charging Stations
  *   description: The Charging Stations API
  */
+
+
+
+
 /**
  * @swagger
  * components:
@@ -75,6 +77,21 @@ const router = (0, express_1.Router)();
  *           - text: Clean and well-maintained
  *         userId: 67861a6f42063748092fa962
  */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * @swagger
  * /addChargingStation/addCharger:
@@ -147,9 +164,18 @@ const router = (0, express_1.Router)();
  *       500:
  *         description: Server error
  */
-router.post("/addCharger", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_charging_controller_1.default.addChargingStation(req, res);
+router.post("/addCharger", authMiddleware, (req, res) => {
+    add_charging_controller.addChargingStation(req, res); 
 });
+
+
+
+
+
+
+
+
+
 /**
  * @swagger
  * /addChargingStation/getChargerById/{chargerId}:
@@ -193,9 +219,23 @@ router.post("/addCharger", user_controller_auth_1.authMiddleware, (req, res) => 
  *                   type: string
  *                   example: Failed to retrieve charging station
  */
+
 router.get("/getChargerById/:chargerId", (req, res) => {
-    add_charging_controller_1.default.getChargerById(req, res);
+    add_charging_controller.getChargerById(req, res);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * @swagger
  * /addChargingStation/getChargersByUserId/chargers/{userId}:
@@ -243,9 +283,15 @@ router.get("/getChargerById/:chargerId", (req, res) => {
  *                   type: string
  *                   example: Failed to retrieve charging stations
  */
-router.get("/getChargersByUserId/chargers/:userId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_charging_controller_1.default.getChargersByUserId(req, res);
+
+router.get("/getChargersByUserId/chargers/:userId", authMiddleware, (req, res) => {
+    add_charging_controller.getChargersByUserId(req, res);
 });
+
+
+
+
+
 /**
  * @swagger
  * /addChargingStation/updateCharger/{chargerId}:
@@ -277,9 +323,22 @@ router.get("/getChargersByUserId/chargers/:userId", user_controller_auth_1.authM
  *       500:
  *         description: Server error
  */
-router.put("/updateCharger/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_charging_controller_1.default.updateCharger(req, res);
+
+
+router.put("/updateCharger/:chargerId", authMiddleware, (req, res) => {
+    add_charging_controller.updateCharger(req, res);
 });
+
+
+
+
+
+
+
+
+
+
+
 /**
  * @swagger
  * /addChargingStation/deleteChargerById/{chargerId}:
@@ -305,9 +364,27 @@ router.put("/updateCharger/:chargerId", user_controller_auth_1.authMiddleware, (
  *       500:
  *         description: Server error
  */
-router.delete("/deleteChargerById/:chargerId/", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_charging_controller_1.default.deleteChargerById(req, res);
+
+router.delete("/deleteChargerById/:chargerId/", authMiddleware, (req, res) => {
+    add_charging_controller.deleteChargerById(req, res);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * @swagger
  * /addChargingStation/addSelectedChargingStation/{userId}/{chargerId}:
@@ -349,8 +426,11 @@ router.delete("/deleteChargerById/:chargerId/", user_controller_auth_1.authMiddl
  *       500:
  *         description: Server error
  */
-router.post("/addSelectedChargingStation/:userId/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_charging_controller_1.default.addSelectedChargingStation(req, res);
+
+router.post("/addSelectedChargingStation/:userId/:chargerId", authMiddleware, (req, res) => {
+    add_charging_controller.addSelectedChargingStation(req, res);
 });
-exports.default = router;
-//# sourceMappingURL=add_charging_route.js.map
+
+
+
+export default router;
