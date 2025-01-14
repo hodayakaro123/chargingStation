@@ -13,34 +13,34 @@ import { authMiddleware } from "../controllers/user_controller_auth";
 
 
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     Comment:
- *       type: object
- *       required:
- *         - sender
- *         - comment
- *       properties:
- *         _id:
- *           type: string
- *           description: The auto-generated id of the comment
- *         sender:
- *           type: string
- *           description: The sender of the comment
- *         comment:
- *           type: string
- *           description: The content of the comment
- *         postId:
- *           type: string
- *           description: The ID of the post
- *       example:
- *         _id: 60d0fe4f531123fs168as09cb
- *         sender: Jane
- *         comment: This is a comment on the post.
- *         postId: 60d0fe4f531123fs168as09ca
- */
+// /**
+//  * @swagger
+//  * components:
+//  *   schemas:
+//  *     Comment:
+//  *       type: object
+//  *       required:
+//  *         - sender
+//  *         - comment
+//  *       properties:
+//  *         _id:
+//  *           type: string
+//  *           description: The auto-generated id of the comment
+//  *         sender:
+//  *           type: string
+//  *           description: The sender of the comment
+//  *         comment:
+//  *           type: string
+//  *           description: The content of the comment
+//  *         postId:
+//  *           type: string
+//  *           description: The ID of the post
+//  *       example:
+//  *         _id: 60d0fe4f531123fs168as09cb
+//  *         sender: Jane
+//  *         comment: This is a comment on the post.
+//  *         postId: 60d0fe4f531123fs168as09ca
+//  */
 
 
 /**
