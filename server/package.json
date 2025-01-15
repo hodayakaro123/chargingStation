@@ -9,12 +9,14 @@
     "testAuth": "tsc && jest --detectOpenHandles --forceExit user_auth.test.ts",
     "chargingStation": "tsc && jest --detectOpenHandles --forceExit add_charger.test.ts",
     "commentsOnCharger": "tsc && jest --detectOpenHandles --forceExit add_comments.test.ts",
+    "geminiTest": "tsc && jest --detectOpenHandles --forceExit gemini.test.ts",
     "lint": "eslint . --ext .ts"
   },
   "author": "Tom and Hodaya",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@types/axios": "^0.9.36",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.1",
     "@types/jest": "^29.5.14",

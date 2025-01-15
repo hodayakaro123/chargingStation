@@ -1,5 +1,5 @@
 import request from "supertest";
-import initApp from "../server";
+import moduleApp from "../server";
 import mongoose from "mongoose";
 import { Express } from "express";
 import userModel from "../models/user_model";
@@ -7,7 +7,7 @@ import userModel from "../models/user_model";
 let app: Express;
 
 beforeAll(async () => {
-  app = await initApp();
+  app = await moduleApp();
   await userModel.deleteMany();
 });
 

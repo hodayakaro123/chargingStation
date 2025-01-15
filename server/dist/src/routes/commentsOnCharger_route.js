@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const add_comments_controller_1 = __importDefault(require("../controllers/add_comments_controller"));
+const commentsOnCharger_controller_1 = __importDefault(require("../controllers/commentsOnCharger_controller"));
 const user_controller_auth_1 = require("../controllers/user_controller_auth");
 const router = (0, express_1.Router)();
 /**
@@ -105,7 +105,7 @@ const router = (0, express_1.Router)();
  *                   example: "Failed to add comment"
  */
 router.post("/addComment/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_comments_controller_1.default.addComment(req, res);
+    commentsOnCharger_controller_1.default.addComment(req, res);
 });
 /**
  * @swagger
@@ -170,7 +170,7 @@ router.post("/addComment/:chargerId", user_controller_auth_1.authMiddleware, (re
  *                   example: "Failed to retrieve comment"
  */
 router.get("/getComment/:chargerId/:commentId", (req, res) => {
-    add_comments_controller_1.default.getCommentById(req, res);
+    commentsOnCharger_controller_1.default.getCommentById(req, res);
 });
 /**
  * @swagger
@@ -266,7 +266,7 @@ router.get("/getComment/:chargerId/:commentId", (req, res) => {
  *                   example: "Failed to update comment"
  */
 router.put("/updateComment/:chargerId/:commentId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_comments_controller_1.default.updateComment(req, res);
+    commentsOnCharger_controller_1.default.updateComment(req, res);
 });
 /**
  * @swagger
@@ -339,7 +339,7 @@ router.put("/updateComment/:chargerId/:commentId", user_controller_auth_1.authMi
  *                   example: "Failed to delete comment"
  */
 router.delete("/deleteComment/:chargerId/:commentId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_comments_controller_1.default.deleteCommentById(req, res);
+    commentsOnCharger_controller_1.default.deleteCommentById(req, res);
 });
 exports.default = router;
 //# sourceMappingURL=commentsOnCharger_route.js.map

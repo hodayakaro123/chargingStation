@@ -1,5 +1,5 @@
 import { Router } from "express";
-import add_comments_controller from "../controllers/add_comments_controller";
+import add_comments_controller from "../controllers/commentsOnCharger_controller";
 import { authMiddleware } from "../controllers/user_controller_auth";
 
 

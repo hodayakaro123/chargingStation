@@ -1,5 +1,5 @@
 import request from "supertest";
-import initApp from "../server";
+import moduleApp from "../server";
 import mongoose from "mongoose";
 import userModel from "../models/user_model";
 import { Express } from "express";
@@ -40,7 +40,7 @@ const comment1 = {
 newChargingStation.comments.push(comment1);
 
 beforeAll(async () => {
-  app = await initApp();
+  app = await moduleApp();
 
   await userModel.deleteMany();
   await chargingStationModel.deleteMany();
