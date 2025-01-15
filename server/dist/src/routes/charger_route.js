@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const add_charging_controller_1 = __importDefault(require("../controllers/add_charging_controller"));
+const charger_controller_1 = __importDefault(require("../controllers/charger_controller"));
 const user_controller_auth_1 = require("../controllers/user_controller_auth");
 const router = (0, express_1.Router)();
 /**
@@ -148,7 +148,7 @@ const router = (0, express_1.Router)();
  *         description: Server error
  */
 router.post("/addCharger", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_charging_controller_1.default.addChargingStation(req, res);
+    charger_controller_1.default.addChargingStation(req, res);
 });
 /**
  * @swagger
@@ -194,7 +194,7 @@ router.post("/addCharger", user_controller_auth_1.authMiddleware, (req, res) => 
  *                   example: Failed to retrieve charging station
  */
 router.get("/getChargerById/:chargerId", (req, res) => {
-    add_charging_controller_1.default.getChargerById(req, res);
+    charger_controller_1.default.getChargerById(req, res);
 });
 /**
  * @swagger
@@ -244,7 +244,7 @@ router.get("/getChargerById/:chargerId", (req, res) => {
  *                   example: Failed to retrieve charging stations
  */
 router.get("/getChargersByUserId/chargers/:userId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_charging_controller_1.default.getChargersByUserId(req, res);
+    charger_controller_1.default.getChargersByUserId(req, res);
 });
 /**
  * @swagger
@@ -278,7 +278,7 @@ router.get("/getChargersByUserId/chargers/:userId", user_controller_auth_1.authM
  *         description: Server error
  */
 router.put("/updateCharger/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_charging_controller_1.default.updateCharger(req, res);
+    charger_controller_1.default.updateCharger(req, res);
 });
 /**
  * @swagger
@@ -306,7 +306,7 @@ router.put("/updateCharger/:chargerId", user_controller_auth_1.authMiddleware, (
  *         description: Server error
  */
 router.delete("/deleteChargerById/:chargerId/", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_charging_controller_1.default.deleteChargerById(req, res);
+    charger_controller_1.default.deleteChargerById(req, res);
 });
 /**
  * @swagger
@@ -350,7 +350,7 @@ router.delete("/deleteChargerById/:chargerId/", user_controller_auth_1.authMiddl
  *         description: Server error
  */
 router.post("/addSelectedChargingStation/:userId/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
-    add_charging_controller_1.default.addSelectedChargingStation(req, res);
+    charger_controller_1.default.addSelectedChargingStation(req, res);
 });
 exports.default = router;
 //# sourceMappingURL=charger_route.js.map

@@ -23,6 +23,7 @@ const commentsOnCharger_route_1 = __importDefault(require("./routes/commentsOnCh
 const user_route_1 = __importDefault(require("./routes/user_route"));
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
+const gemini_route_1 = __importDefault(require("./routes/gemini_route"));
 const app = (0, express_1.default)();
 dotenv_1.default.config();
 const options = {
@@ -31,7 +32,7 @@ const options = {
         info: {
             title: "Assignment 2 2025 REST API",
             version: "1.0.0",
-            description: "REST server including authentication using JWT, CRUD operations on posts and comments, and a user registration system.",
+            description: "REST server including authentication using JWT, CRUD operations on charging stations, comments, and a user registration system.",
         },
         servers: [{ url: "http://localhost:3000", },],
     },
@@ -56,6 +57,7 @@ const moduleApp = () => __awaiter(void 0, void 0, void 0, function* () {
     app.use("/auth", user_route_1.default);
     app.use("/addChargingStation", charger_route_1.default);
     app.use("/addComments", commentsOnCharger_route_1.default);
+    app.use("/gemini", gemini_route_1.default);
     return app;
 });
 exports.default = moduleApp;

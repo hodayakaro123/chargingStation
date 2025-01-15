@@ -10,6 +10,7 @@ import addComments from "./routes/commentsOnCharger_route";
 import userRouter from "./routes/user_route";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
+import geminiRouter from "./routes/gemini_route";
 
 const app = express();
 dotenv.config();
@@ -51,6 +52,8 @@ const moduleApp = async (): Promise<Express> => {
   app.use("/auth", userRouter);
   app.use("/addChargingStation", addChargingStation);
   app.use("/addComments", addComments);
+  app.use("/gemini", geminiRouter);
+
 
   return app;
 };

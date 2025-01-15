@@ -1,5 +1,5 @@
 import { Router } from "express";
-import add_charging_controller from "../controllers/add_charging_controller";
+import add_charging_controller from "../controllers/charger_controller";
 import { authMiddleware } from "../controllers/user_controller_auth";
 
 const router = Router();
