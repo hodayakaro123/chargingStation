@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import addChargingStation from "./routes/charger_route";
+import cors from "cors";
 import addComments from "./routes/commentsOnCharger_route";
 import userRouter from "./routes/user_route";
 import swaggerJsDoc from "swagger-jsdoc";
@@ -14,6 +15,8 @@ import geminiRouter from "./routes/gemini_route";
 
 const app = express();
 dotenv.config();
+
+app.use(cors());
 
 const options = {
   definition: {
