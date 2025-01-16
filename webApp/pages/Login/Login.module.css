@@ -1,10 +1,99 @@
 .loginPage {
-  background: url("/path") no center center fixed;
-  background-size: cover;
-  height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  color: white;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  height: auto;
+}
+
+.loginContainer {
+  background: #ffffff;
+  padding: 2rem 3rem;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #4a90e2;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  letter-spacing: 1px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  border-color: #2575fc;
+  box-shadow: 0 0 8px rgba(37, 117, 252, 0.3);
+}
+
+.button {
+  background: #2575fc;
+  color: #fff;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  background: #6a11cb;
+}
+
+.linkContainer {
+  margin-top: 1.5rem;
+}
+
+.linkContainer p {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.link {
+  color: #2575fc;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.link:hover {
+  color: #6a11cb;
+  text-decoration: underline;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
 }
