@@ -19,6 +19,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const charger_route_1 = __importDefault(require("./routes/charger_route"));
+const cors_1 = __importDefault(require("cors"));
 const commentsOnCharger_route_1 = __importDefault(require("./routes/commentsOnCharger_route"));
 const user_route_1 = __importDefault(require("./routes/user_route"));
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
@@ -26,6 +27,7 @@ const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const gemini_route_1 = __importDefault(require("./routes/gemini_route"));
 const app = (0, express_1.default)();
 dotenv_1.default.config();
+app.use((0, cors_1.default)());
 const options = {
     definition: {
         openapi: "3.0.0",
