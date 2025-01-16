@@ -1,51 +1,69 @@
 .map-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   padding: 20px;
   font-family: Arial, sans-serif;
-  min-height: 100vh;
 }
 
-.map-page h2 {
-  color: #1976d2;
-  margin-bottom: 20px;
-  font-size: 2rem;
+.title {
+  font-size: 24px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  color: #ffffff;
 }
 
-.map-page button {
-  padding: 10px 20px;
-  margin: 10px 0;
+.btn {
+  padding: 10px 15px;
+  background-color: #0078d4;
+  color: #fff;
   border: none;
   border-radius: 5px;
-  background-color: #1976d2;
-  color: white;
-  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  margin-right: 5px;
+  transition: background-color 0.3s;
 }
 
-.map-page button:hover {
-  background-color: #145ea8;
+.btn:hover {
+  background-color: #005bb5;
 }
 
-.map-page input {
-  padding: 10px;
-  width: 300px;
-  border: 1px solid #ced4da;
+.input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.input {
+  padding: 8px;
+  border: 1px solid #ccc;
   border-radius: 5px;
-  margin-bottom: 20px;
-  font-size: 1rem;
+  margin-right: 5px;
+  width: 150px;
 }
 
-.map-page input:focus {
-  border-color: #1976d2;
-  outline: none;
-  box-shadow: 0 0 4px rgba(25, 118, 210, 0.4);
-}
-
-.map-page .leaflet-container {
-  border: 2px solid #1976d2;
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px; /* תואם לגובה המפה */
+  background-color: #f9f9f9;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #0078d4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

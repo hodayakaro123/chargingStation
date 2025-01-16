@@ -9,10 +9,7 @@
 }
 
 .loginContainer {
-  background: #ffffff;
   padding: 2rem 3rem;
-  border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 400px;
   text-align: center;
@@ -30,7 +27,7 @@
 
 .subtitle {
   font-size: 1rem;
-  color: #666;
+  color: #ffffff;
   margin-bottom: 1.5rem;
 }
 
@@ -50,7 +47,7 @@
 }
 
 .button {
-  background: #2575fc;
+  background: #5e5eef;
   color: #fff;
   border: none;
   padding: 0.8rem;
@@ -69,12 +66,12 @@
 }
 
 .linkContainer p {
-  color: #666;
+  color: #ffffff;
   margin-bottom: 0.5rem;
 }
 
 .link {
-  color: #2575fc;
+  color: #ffffff;
   text-decoration: none;
   font-weight: bold;
   transition: all 0.3s ease;
@@ -96,4 +93,21 @@
   width: 100%;
   max-width: 380px;
   margin: 0 auto;
+}
+.error {
+  color: red;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+  height: 18px;
+  transition: visibility 0.2s, opacity 0.2s ease-in-out;
+}
+
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.visible {
+  visibility: visible;
+  opacity: 1;
 }
