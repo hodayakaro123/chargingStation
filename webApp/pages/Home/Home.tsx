@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useState } from "react";
 import "leaflet/dist/leaflet.css";
+import "./Home.css";
 
 export default function Home() {
   const [coordinates, setCoordinates] = useState<

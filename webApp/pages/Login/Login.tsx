@@ -5,15 +5,31 @@ import { Link } from "react-router-dom";
 const LoginPage: React.FC = () => {
   return (
     <div className={styles.loginPage}>
-      <h2>Login</h2>
+      <div className={styles.loginContainer}>
+        <h2 className={styles.title}>Go Electric</h2>
+        <p className={styles.subtitle}>Please log in to continue</p>
 
-      <form>
-        <input type="text" />
-        <input type="text" />
-        <button>Login</button>
+        <form className={styles.form}>
+          <input
+            type="text"
+            placeholder="Enter your email"
+            className={styles.input}
+          />
+          <input
+            type="password"
+            placeholder="Enter your password"
+            className={styles.input}
+          />
+          <button className={styles.button}>Login</button>
+        </form>
 
-        <Link to="/signup">Don't have account yet?</Link>
-      </form>
+        <div className={styles.linkContainer}>
+          <p>Don’t have an account?</p>
+          <Link to="/signup" className={styles.link}>
+            Sign up here
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };
