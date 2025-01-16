@@ -1,0 +1,49 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navList {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navItem {
+  display: inline;
+}
+
+.navLink {
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+/* אפקט מעבר כשעוברים על הקישור */
+.navLink:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* סגנון לקישור פעיל */
+.activeLink {
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
