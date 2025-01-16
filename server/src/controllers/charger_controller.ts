@@ -4,32 +4,29 @@ import userModel from "../models/user_model";
 import mongoose from "mongoose";
 
 const addChargingStation = async (req: Request, res: Response) => {
-  try {
-      const { latitude, longitude, price, rating, picture, description, userId, comments } = req.body;
-
-
+    try {
+      const { location, chargingRate, price, description } = req.body;
+  
+  
       const newChargingStation = new ChargingModel({
-          latitude,
-          longitude,
-          price,
-          rating,
-          picture,
-          description,
-          userId,
-          comments: comments.map((comment: { text: string, userId: string }) => ({
-              text: comment.text,
-              userId: comment.userId,
-          })),
+        location,
+        price,
+        chargingRate,
+        description,
       });
-
-
+  
       await newChargingStation.save();
-
-      res.status(201).json({ message: "Charging station added successfully", chargingStation: newChargingStation });
-  } catch (error) {
+  
+      res.status(201).json({
+        message: "Charging station added successfully",
+        chargingStation: newChargingStation,
+      });
+    } catch (error) {
+      console.error("Error in addChargingStation:", error);
       res.status(500).json({ message: "Failed to add charging station", error });
-  }
-};
+    }
+  };
+  
 
 const getChargerById = async (req: Request, res: Response) => {
     try {
