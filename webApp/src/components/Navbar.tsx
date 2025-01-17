@@ -1,8 +1,7 @@
 import styles from "./Navbar.module.css";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaUser, FaHome } from "react-icons/fa";
 import { MdExitToApp } from "react-icons/md";
-import { NavLink, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -31,7 +30,6 @@ export default function Navbar() {
 
       localStorage.removeItem("authToken");
       localStorage.removeItem("refreshToken");
-
 
       navigate("/");
     } catch (error) {
@@ -92,7 +90,7 @@ export default function Navbar() {
             }
           >
             <MdExitToApp style={{ marginRight: "8px" }} />
-
+          </NavLink>
           <button onClick={handleLogout} className={styles.navLink}>
             Logout
           </button>

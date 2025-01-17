@@ -24,15 +24,15 @@ const options = {
     info: {
       title: "Assignment 2 2025 REST API",
       version: "1.0.0",
-      description: "REST server including authentication using JWT, CRUD operations on charging stations, comments, and a user registration system.",
+      description:
+        "REST server including authentication using JWT, CRUD operations on charging stations, comments, and a user registration system.",
     },
-    servers: [{ url: "http://localhost:3000", },],
+    servers: [{ url: "http://localhost:3000" }],
   },
   apis: ["./src/routes/*.ts"],
 };
 const specs = swaggerJsDoc(options);
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
-
 
 const moduleApp = async (): Promise<Express> => {
   if (!process.env.DB_CONNECT) {
@@ -47,16 +47,13 @@ const moduleApp = async (): Promise<Express> => {
     throw error;
   }
 
-
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
-
 
   app.use("/auth", userRouter);
   app.use("/addChargingStation", addChargingStation);
   app.use("/addComments", addComments);
   app.use("/gemini", geminiRouter);
-
 
   return app;
 };
