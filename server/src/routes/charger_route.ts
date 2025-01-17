@@ -431,6 +431,9 @@ router.post("/addSelectedChargingStation/:userId/:chargerId", authMiddleware, (r
     add_charging_controller.addSelectedChargingStation(req, res);
 });
 
+router.get("/getAllChargers", (req, res) => {
+    add_charging_controller.getAllChargers(req, res);
+});
 
 
 export default router;

@@ -17,9 +17,10 @@ const server_1 = __importDefault(require("../server"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const user_model_1 = __importDefault(require("../models/user_model"));
 const add_charging_model_1 = __importDefault(require("../models/add_charging_model"));
+const book_a_chrager_model_1 = __importDefault(require("../models/book_a_chrager.model"));
 let app;
 const testUser = {
-    firstName: "Tom2",
+    firstName: "Tom3",
     lastName: "Guter",
     email: "tom@user.com",
     password: "123456",
@@ -44,14 +45,18 @@ const newChargingStation = {
         },
     ],
 };
-const comment1 = {
-    text: "Bad station!!!!",
+const newBookCharger = {
+    chargerId: "",
+    StartTime: "2022-01-01T10:00:00.000Z",
+    EndTime: "2022-01-01T12:00:00.000Z",
+    Date: "2022-01-01",
+    userId: "",
 };
-newChargingStation.comments.push(comment1);
 beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     app = yield (0, server_1.default)();
     yield user_model_1.default.deleteMany();
     yield add_charging_model_1.default.deleteMany();
+    yield book_a_chrager_model_1.default.deleteMany();
     const registerResponse = yield (0, supertest_1.default)(app)
         .post("/auth/signUp")
         .send(testUser);
@@ -63,63 +68,32 @@ beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     testUser.token = loginResponse.body.accessToken;
     testUser._id = loginResponse.body._id;
     newChargingStation.userId = testUser._id;
+    newBookCharger.userId = testUser._id;
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
     yield mongoose_1.default.connection.close();
 }));
-let chargerId;
-describe("add charging station Test Suite", () => {
+describe("Book a charger", () => {
     test("should add a new charging station", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .post("/addChargingStation/addCharger")
             .set("authorization", `JWT ${testUser.token}`)
             .send(newChargingStation);
         expect(response.status).toBe(201);
-        chargerId = response.body.chargingStation._id;
     }));
-    test("should get a charging station by ID", () => __awaiter(void 0, void 0, void 0, function* () {
-        const getResponse = yield (0, supertest_1.default)(app).get(`/addChargingStation/getChargerById/${chargerId}`);
-        expect(getResponse.status).toBe(200);
-    }));
-    test("should update charger details", () => __awaiter(void 0, void 0, void 0, function* () {
-        const updatedDetails = {
-            latitude: 41.1234,
-            longitude: -75.1234,
-            price: 15,
-            rating: 4.8,
-            picture: "http://example.com/newpicture.jpg",
-            description: "Updated charging station description",
-        };
-        const updateResponse = yield (0, supertest_1.default)(app)
-            .put(`/addChargingStation/updateCharger/${chargerId}`)
+    test("should book a charger", () => __awaiter(void 0, void 0, void 0, function* () {
+        const addChargingStationResponse = yield (0, supertest_1.default)(app)
+            .post("/bookings/bookCharger")
             .set("authorization", `JWT ${testUser.token}`)
-            .send(updatedDetails);
-        expect(updateResponse.status).toBe(200);
-        expect(updateResponse.body.message).toBe("Charging station updated successfully");
-        expect(updateResponse.body.chargingStation).toMatchObject(updatedDetails);
-    }));
-    test("should add a selected charging station to the user's list", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/addSelectedChargingStation/${testUser._id}/${chargerId}`)
-            .set("authorization", `JWT ${testUser.token}`);
-        expect(response.status).toBe(200);
-        expect(response.body.message).toBe("Charging station added to user's list successfully");
-    }));
-    test("should get all chargers by user ID", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app)
-            .get(`/addChargingStation/getChargersByUserId/chargers/${testUser._id}`)
-            .set("authorization", `JWT ${testUser.token}`);
-        expect(response.status).toBe(200);
-        expect(response.body.chargers).toBeInstanceOf(Array);
-        expect(response.body.chargers.length).toBeGreaterThan(0);
-    }));
-    test("should delete a comment from the charging station", () => __awaiter(void 0, void 0, void 0, function* () {
-        expect(chargerId).toBeDefined();
-        const deleteResponse = yield (0, supertest_1.default)(app)
-            .delete(`/addChargingStation/deleteChargerById/${chargerId}`)
-            .set("authorization", `JWT ${testUser.token}`);
-        expect(deleteResponse.status).toBe(200);
-        expect(deleteResponse.body.message).toBe("Comment deleted successfully");
+            .send(newChargingStation);
+        expect(addChargingStationResponse.statusCode).toBe(201);
+        newBookCharger.chargerId = addChargingStationResponse.body.chargingStation._id;
+        const bookChargerResponse = yield (0, supertest_1.default)(app)
+            .post("/bookings/bookCharger")
+            .set("authorization", `JWT ${testUser.token}`)
+            .send(newBookCharger);
+        expect(bookChargerResponse.statusCode).toBe(201);
+        expect(bookChargerResponse.body.message).toBe("Charger booked successfully");
     }));
 });
-//# sourceMappingURL=add_charger.test.js.map
+//# sourceMappingURL=book_a_charger.test.js.map

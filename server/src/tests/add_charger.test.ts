@@ -19,10 +19,12 @@ const testUser = {
 };
 
 const newChargingStation = {
+  location: "New York",
   latitude: 40.7128,
   longitude: -74.006,
   price: 10,
   rating: 4.5,
+  chargingRate: 5,
   picture: "http://example.com/picture.jpg",
   description: "A new charging station",
   userId: "",
@@ -67,6 +69,7 @@ afterAll(async () => {
 let chargerId: string;
 
 describe("add charging station Test Suite", () => {
+
   test("should add a new charging station", async () => {
     const response = await request(app)
       .post("/addChargingStation/addCharger")
