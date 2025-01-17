@@ -1,14 +1,30 @@
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+}
 .activity-history-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
   margin: 20px;
   padding: 20px;
-  width: 100%;
+  width: 1400px;
+  height: 1121px;
+  flex-shrink: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  flex-direction: column;
 }
 
 .table-title {
   margin-bottom: 20px;
   text-align: center;
-  color: #007bff;
+  color: #ffffff;
   font-weight: bold;
+  font-family: Georgia, "Times New Roman", Times, serif;
 }
 
 .table-container {

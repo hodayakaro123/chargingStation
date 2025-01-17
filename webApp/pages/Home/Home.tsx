@@ -76,7 +76,7 @@ export default function Home() {
           }
         />
         <button className="btn" onClick={addCustomLocation}>
-          Add current Location
+          Find Charging Station by location
         </button>
       </div>
 
@@ -89,7 +89,7 @@ export default function Home() {
           center={[userLocation.lat, userLocation.lng]}
           zoom={14}
           scrollWheelZoom={false}
-          style={{ width: "100%", height: "400px", borderRadius: "10px" }}
+          style={{ width: "100%", height: "600px", borderRadius: "10px" }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
