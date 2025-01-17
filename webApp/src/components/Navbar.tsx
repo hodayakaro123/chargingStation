@@ -25,15 +25,21 @@ export default function Navbar() {
       });
 
       if (!response.ok) {
-        throw new Error("Logout failed");
+        throw new Error(`Logout failed with status: ${response.status}`);
       }
 
       localStorage.removeItem("authToken");
       localStorage.removeItem("refreshToken");
-
       navigate("/");
+
     } catch (error) {
       console.error("Error during logout:", error);
+
+ 
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("refreshToken");
+
+      alert("Logout failed. Please try again later.");
     }
   };
 
