@@ -1,0 +1,90 @@
+.charge-container {
+  padding: 20px;
+}
+
+.table-title {
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: #000;
+}
+
+.table-container {
+  margin-top: 20px;
+  border-radius: 30px;
+}
+
+.table-header-row {
+  background-color: #f5f5f5;
+}
+
+.table-cell {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.more-column img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.table-row {
+  cursor: pointer;
+}
+
+.table-header-cell {
+  font-weight: bold;
+}
+
+.schedule-btn {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.schedule-btn:hover {
+  background-color: #081b44;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.file-upload-label {
+  display: inline-block;
+  padding: 12px 25px;
+  background-color: #2563eb;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.file-upload-label:hover {
+  background-color: #081b44;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.file-upload-input {
+  display: none;
+}
+
+.file-upload-input:focus + .file-upload-label {
+  outline: none;
+  box-shadow: 0px 0px 5px rgba(37, 99, 235, 0.5);
+}
+.without-title {
+  margin-top: 20px;
+}

@@ -1,0 +1,192 @@
+.card-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border: 1px solid #d1e9fc;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: "Inter", sans-serif;
+  width: 1229px;
+  box-sizing: border-box;
+}
+
+.patient-details {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-right: 16px;
+}
+
+.patient-details h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patient-details p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 4px 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.info-section {
+  flex: 1.5;
+  text-align: left;
+  border-left: 1px solid #e5e7eb;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.info-section .label {
+  font-weight: 500;
+  color: #374151;
+}
+
+.info-section .value {
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.diagnosis-section {
+  flex: 2;
+  text-align: left;
+  border-left: 1px solid #e5e7eb;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.diagnosis-section .label {
+  font-weight: 500;
+  color: #374151;
+}
+
+.diagnosis-section .diagnosis-item {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.diagnosis-section .diagnosis-item span {
+  color: #2563eb;
+  margin-left: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px; /* כדי להפריד את הכפתורים */
+}
+
+.schedule-btn {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.schedule-btn:hover {
+  background-color: #081b44;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.more-btn {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.more-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.edit-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #374151;
+  background-color: #f9fafb;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.edit-input:focus {
+  border-color: #2563eb;
+  background-color: #ffffff;
+  outline: none;
+}
+
+.edit-input::placeholder {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.patient-details input {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.patient-details label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.patient-details input:last-child {
+  margin-right: 0;
+}
+
+.patient-details,
+.info-section,
+.diagnosis-section {
+  flex: 1;
+}
+
+.patient-details input,
+.info-section input,
+.diagnosis-section input {
+  margin-bottom: 8px;
+}
+
+.patient-details input:focus,
+.info-section input:focus,
+.diagnosis-section input:focus {
+  border-color: #2563eb;
+  background-color: #ffffff;
+}

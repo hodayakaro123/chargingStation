@@ -1,6 +1,7 @@
-// import React from "react";
 import styles from "./Navbar.module.css";
 import { NavLink, useNavigate } from "react-router-dom";
+import { FaUser, FaHome } from "react-icons/fa";
+import { MdExitToApp } from "react-icons/md";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -30,7 +31,6 @@ export default function Navbar() {
       localStorage.removeItem("authToken");
       localStorage.removeItem("refreshToken");
 
-
       navigate("/");
     } catch (error) {
       console.error("Error during logout:", error);
@@ -40,6 +40,17 @@ export default function Navbar() {
   return (
     <nav className={styles.navbar}>
       <ul className={styles.navList}>
+        <li className={styles.navItem}>
+          <NavLink
+            to="/Home"
+            className={({ isActive }) =>
+              isActive ? styles.activeLink : styles.navLink
+            }
+          >
+            <FaHome style={{ marginRight: "8px" }} />
+            Home
+          </NavLink>
+        </li>
         <li className={styles.navItem}>
           <NavLink
             to="/newChargingStation"
@@ -67,21 +78,19 @@ export default function Navbar() {
               isActive ? styles.activeLink : styles.navLink
             }
           >
+            <FaUser style={{ marginRight: "8px" }} /> {/* Icon with margin */}
             Personal area
           </NavLink>
         </li>
         <li className={styles.navItem}>
           <NavLink
-            to="/Home"
-            className={({ isActive }: { isActive: boolean }) =>
+            to="/"
+            className={({ isActive }) =>
               isActive ? styles.activeLink : styles.navLink
             }
           >
-            Home
+            <MdExitToApp style={{ marginRight: "8px" }} />
           </NavLink>
-        </li>
-        <li className={styles.navItem}>
-
           <button onClick={handleLogout} className={styles.navLink}>
             Logout
           </button>
