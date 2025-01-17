@@ -6,6 +6,7 @@ import Signup from "../pages/Signup/Signup";
 import Navbar from "./components/Navbar";
 import NewChargingStation from "../pages/NewChargingStation/NewChargingStation";
 import ActivityHistory from "../pages/ActivityHistory/ActivityHistory";
+import PersonalArea from "../pages/PersonalArea/PersonalArea";
 
 const App = () => {
   const location = useLocation();
@@ -22,6 +23,7 @@ const App = () => {
         <Route path="/home" element={<Home />} />
         <Route path="/newChargingStation" element={<NewChargingStation />} />
         <Route path="/ActivityHistory" element={<ActivityHistory />} />
+        <Route path="/PersonalArea" element={<PersonalArea />} />
       </Routes>
     </>
   );

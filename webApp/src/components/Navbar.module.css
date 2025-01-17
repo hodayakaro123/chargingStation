@@ -1,11 +1,18 @@
 .navbar {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  right: 50%;
+  width: 100%;
   background: linear-gradient(to right, #6a11cb, #2575fc);
   padding: 1rem 2rem;
   display: flex;
   justify-content: center;
+  margin: 0 auto;
   align-items: center;
+  z-index: 1000;
+  box-sizing: border-box;
 }
 
 .navList {
@@ -30,12 +37,10 @@
   transition: all 0.3s ease;
 }
 
-/* אפקט מעבר כשעוברים על הקישור */
 .navLink:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* סגנון לקישור פעיל */
 .activeLink {
   text-decoration: none;
   font-size: 1rem;
