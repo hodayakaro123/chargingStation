@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema({
     ref: "Charging",
     default: [],
   },
+  carDetails: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "CarData",
+    required: false,
+  },
   refreshTokens: {
     type: [String],
     default: [],

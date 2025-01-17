@@ -66,6 +66,8 @@ const LoginPage: React.FC = () => {
 
       localStorage.setItem("authToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken); 
+      localStorage.setItem('userId', data._id);
+
 
       navigate("/Home"); 
     } catch (error) {

@@ -110,47 +110,40 @@ const login = async (req: Request, res: Response) => {
 const logout = async (req: Request, res: Response) => {
   const refreshToken = req.body.refreshToken;
   if (!refreshToken) {
-    res.status(400).send("missing refresh token");
-    return;
+    return res.status(400).send("missing refresh token");
   }
 
   if (!process.env.TOKEN_SECRET) {
-    res.status(400).send("missing auth configuration");
-    return;
+    return res.status(400).send("missing auth configuration");
   }
-  jwt.verify(
-    refreshToken,
-    process.env.TOKEN_SECRET,
-    async (err: any, data: any) => {
-      if (err) {
-        res.status(403).send("invalid token");
-        return;
-      }
-      const payload = data as TokenPayload;
-      try {
-        const user = await userModel.findOne({ _id: payload._id });
-        if (!user) {
-          res.status(400).send("invalid token");
-          return;
-        }
-        if (!user.refreshTokens || !user.refreshTokens.includes(refreshToken)) {
-          res.status(400).send("invalid token");
-          user.refreshTokens = [];
-          await user.save();
-          return;
-        }
-        const tokens = user.refreshTokens.filter(
-          (token) => token !== refreshToken
-        );
-        user.refreshTokens = tokens;
-        await user.save();
-        res.status(200).send("logged out");
-      } catch (err) {
-        res.status(400).send("invalid token");
-      }
+
+  jwt.verify(refreshToken, process.env.TOKEN_SECRET, async (err: any, data: any) => {
+    if (err) {
+      return res.status(403).send("invalid token");
     }
-  );
+
+    const payload = data as TokenPayload;
+    try {
+      const user = await userModel.findOne({ _id: payload._id });
+      if (!user) {
+        return res.status(400).send("invalid token");
+      }
+
+      if (!user.refreshTokens || !user.refreshTokens.includes(refreshToken)) {
+        user.refreshTokens = [];
+        await user.save();
+        return res.status(400).send("invalid token");
+      }
+
+      user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
+      await user.save();
+      return res.status(200).send("logged out");
+    } catch (err) {
+      return res.status(400).send("invalid token");
+    }
+  });
 };
+
 
 const refreshToken = async (req: Request, res: Response) => {
   
