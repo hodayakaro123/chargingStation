@@ -10,6 +10,7 @@
     "chargingStation": "tsc && jest --detectOpenHandles --forceExit add_charger.test.ts",
     "commentsOnCharger": "tsc && jest --detectOpenHandles --forceExit add_comments.test.ts",
     "geminiTest": "tsc && jest --detectOpenHandles --forceExit gemini.test.ts",
+    "bookCharger": "tsc && jest --detectOpenHandles --forceExit book_a_charger.test.ts",
     "lint": "eslint . --ext .ts"
   },
   "author": "Tom and Hodaya",

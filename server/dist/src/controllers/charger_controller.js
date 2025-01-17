@@ -15,26 +15,53 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const add_charging_model_1 = __importDefault(require("../models/add_charging_model"));
 const user_model_1 = __importDefault(require("../models/user_model"));
 const mongoose_1 = __importDefault(require("mongoose"));
+const axios_1 = __importDefault(require("axios"));
+const getCoordinates = (address) => __awaiter(void 0, void 0, void 0, function* () {
+    const apiKey = process.env.OPENCAGE_API_KEY;
+    const url = `${process.env.OPENCAGE_API_URL}=${encodeURIComponent(address)}&key=${apiKey}`;
+    try {
+        const response = yield axios_1.default.get(url);
+        const data = response.data;
+        if (data.results.length > 0) {
+            const latitude = data.results[0].geometry.lat;
+            const longitude = data.results[0].geometry.lng;
+            console.log('Coordinates:', latitude, longitude);
+            return { latitude, longitude };
+        }
+        else {
+            console.error('No results found for the given address.');
+            return null;
+        }
+    }
+    catch (error) {
+        console.error('Error fetching coordinates:', error);
+        return null;
+    }
+});
 const addChargingStation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { latitude, longitude, price, rating, picture, description, userId, comments } = req.body;
+        const { location, chargingRate, price, description } = req.body;
+        const coordinates = yield getCoordinates(location);
+        if (!coordinates) {
+            return res.status(400).json({ error: 'Invalid location' });
+        }
+        const { latitude, longitude } = coordinates;
         const newChargingStation = new add_charging_model_1.default({
+            location,
             latitude,
             longitude,
             price,
-            rating,
-            picture,
+            chargingRate,
             description,
-            userId,
-            comments: comments.map((comment) => ({
-                text: comment.text,
-                userId: comment.userId,
-            })),
         });
         yield newChargingStation.save();
-        res.status(201).json({ message: "Charging station added successfully", chargingStation: newChargingStation });
+        res.status(201).json({
+            message: "Charging station added successfully",
+            chargingStation: newChargingStation,
+        });
     }
     catch (error) {
+        console.error("Error in addChargingStation:", error);
         res.status(500).json({ message: "Failed to add charging station", error });
     }
 });

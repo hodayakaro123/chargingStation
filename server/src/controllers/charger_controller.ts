@@ -98,6 +98,19 @@ const getChargersByUserId = async (req: Request, res: Response) => {
     }
 };
 
+const getAllChargers = async (req: Request, res: Response) => {
+    try {
+        const chargers = await ChargingModel.find();
+        if (!chargers) {
+            return res.status(404).json({ message: "No charging stations found" });
+        }
+
+        res.status(200).json({ chargers });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to get charging stations", error });
+    }
+};
+
 
 const updateCharger = async (req: Request, res: Response) => {
     try {
@@ -164,4 +177,4 @@ const addSelectedChargingStation = async (req: Request, res: Response) => {
     }
 };
 
-export default { addChargingStation, getChargerById, updateCharger, deleteChargerById, addSelectedChargingStation, getChargersByUserId };
+export default { addChargingStation, getChargerById, getAllChargers, updateCharger, deleteChargerById, addSelectedChargingStation, getChargersByUserId };

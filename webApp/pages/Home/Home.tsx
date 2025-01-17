@@ -1,28 +1,37 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Home.css";
 
+function MapUpdater({ coordinates }: { coordinates: { lat: number; lng: number } | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (coordinates) {
+      map.setView([coordinates.lat, coordinates.lng], map.getZoom()); // Update map center
+    }
+  }, [coordinates, map]);
+
+  return null;
+}
+
 export default function Home() {
-  const [coordinates, setCoordinates] = useState<
-    Array<{ lat: number; lng: number }>
-  >([]);
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const [newLocation, setNewLocation] = useState<{ lat: string; lng: string }>({
-    lat: "",
-    lng: "",
-  });
+  const [address, setAddress] = useState<string>("");
+  const [chargingStations, setChargingStations] = useState<any[]>([]); // To hold the charging stations data
 
   useEffect(() => {
+    // Get the user's current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserLocation({ lat: latitude, lng: longitude });
-          setCoordinates([{ lat: latitude, lng: longitude }]);
+          setCoordinates({ lat: latitude, lng: longitude }); // Initially set marker to user location
         },
         (error) => {
           console.error("Error getting user location:", error);
@@ -33,23 +42,53 @@ export default function Home() {
     }
   }, []);
 
-  const addUserLocation = () => {
-    if (userLocation) {
-      setCoordinates((prev) => [...prev, userLocation]);
-      console.log("Added current location:", userLocation);
+  useEffect(() => {
+
+    const fetchChargingStations = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/addChargingStation/getAllChargers"); 
+        const data = await response.json();
+        if (data.chargers) {
+          setChargingStations(data.chargers); 
+        } else {
+          console.error("No chargers found in response.");
+        }
+      } catch (error) {
+        console.error("Error fetching charging stations:", error);
+      }
+    };
+
+    fetchChargingStations();
+  }, []);
+
+  const searchAddress = async () => {
+    if (!address.trim()) {
+      alert("Please enter a valid address.");
+      return;
     }
-  };
 
-  const addCustomLocation = () => {
-    const lat = parseFloat(newLocation.lat);
-    const lng = parseFloat(newLocation.lng);
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          address
+        )}`
+      );
+      const data = await response.json();
 
-    if (!isNaN(lat) && !isNaN(lng)) {
-      setCoordinates((prev) => [...prev, { lat, lng }]);
-      setNewLocation({ lat: "", lng: "" });
-      console.log("Added custom location:", { lat, lng });
-    } else {
-      alert("Please enter valid latitude and longitude values.");
+      if (data.length > 0) {
+        const { lat, lon } = data[0];
+        const newLat = parseFloat(lat);
+        const newLng = parseFloat(lon);
+
+        setCoordinates({ lat: newLat, lng: newLng }); 
+        setUserLocation({ lat: newLat, lng: newLng });
+        console.log("Address coordinates:", { lat: newLat, lng: newLng });
+      } else {
+        alert("No results found for the entered address.");
+      }
+    } catch (error) {
+      console.error("Error fetching address coordinates:", error);
+      alert("Failed to fetch coordinates. Please try again.");
     }
   };
 
@@ -60,23 +99,12 @@ export default function Home() {
         <input
           className="input"
           type="text"
-          placeholder="Latitude"
-          value={newLocation.lat}
-          onChange={(e) =>
-            setNewLocation((prev) => ({ ...prev, lat: e.target.value }))
-          }
+          placeholder="Enter address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
         />
-        <input
-          className="input"
-          type="text"
-          placeholder="Longitude"
-          value={newLocation.lng}
-          onChange={(e) =>
-            setNewLocation((prev) => ({ ...prev, lng: e.target.value }))
-          }
-        />
-        <button className="btn" onClick={addCustomLocation}>
-          Find Charging Station by location
+        <button className="btn" onClick={searchAddress}>
+          Find Charging Station by Address
         </button>
       </div>
 
@@ -86,7 +114,7 @@ export default function Home() {
         </div>
       ) : (
         <MapContainer
-          center={[userLocation.lat, userLocation.lng]}
+          center={coordinates ? [coordinates.lat, coordinates.lng] : [userLocation.lat, userLocation.lng]}
           zoom={14}
           scrollWheelZoom={false}
           style={{ width: "100%", height: "600px", borderRadius: "10px" }}
@@ -96,17 +124,26 @@ export default function Home() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {coordinates.map((coord, index) => (
-            <Marker key={index} position={[coord.lat, coord.lng]}>
+          {chargingStations.map((charger) => (
+            <Marker
+              key={charger._id} 
+              position={[charger.latitude, charger.longitude]}
+            >
               <Popup>
-                <strong>Charging Station {index + 1}</strong>
+                <strong>{charger.location}</strong>
                 <br />
-                Latitude: {coord.lat.toFixed(6)}
+                Price: ${charger.price}
                 <br />
-                Longitude: {coord.lng.toFixed(6)}
+                Rating: {charger.rating} stars
+                <br />
+                Charging Rate: {charger.chargingRate} kW
+                <br />
+                {charger.description && <p>{charger.description}</p>}
               </Popup>
             </Marker>
           ))}
+
+          <MapUpdater coordinates={coordinates} /> {}
         </MapContainer>
       )}
     </div>

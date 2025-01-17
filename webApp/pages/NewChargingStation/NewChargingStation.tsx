@@ -21,8 +21,7 @@ export default function NewChargingStation() {
 
     const authToken = localStorage.getItem("authToken");
     const refreshToken = localStorage.getItem("refreshToken");
-    console.log("authToken:", authToken);
-    console.log("refreshToken:", refreshToken);
+
     if (!authToken) {
       setError("You must be logged in to add a charging station.");
       return;
