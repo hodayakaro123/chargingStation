@@ -2,34 +2,69 @@ import { Request, Response } from "express";
 import ChargingModel from "../models/add_charging_model";
 import userModel from "../models/user_model";
 import mongoose from "mongoose";
+import axios from 'axios';
+
+
+
+const getCoordinates = async (address: string) => {
+    const apiKey = process.env.OPENCAGE_API_KEY;
+    const url = `${process.env.OPENCAGE_API_URL}=${encodeURIComponent(address)}&key=${apiKey}`;  
+    try {
+      const response = await axios.get(url);
+      const data = response.data as { results: { geometry: { lat: number, lng: number } }[] };
+  
+      if (data.results.length > 0) {
+        const latitude = data.results[0].geometry.lat;
+        const longitude = data.results[0].geometry.lng;
+  
+        console.log('Coordinates:', latitude, longitude);
+        return { latitude, longitude };
+      } else {
+        console.error('No results found for the given address.');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching coordinates:', error);
+      return null;
+    }
+  };
+  
+
+
 
 const addChargingStation = async (req: Request, res: Response) => {
-  try {
-      const { latitude, longitude, price, rating, picture, description, userId, comments } = req.body;
+    
 
+    try {
+      const { location, chargingRate, price, description } = req.body;
+  
+      const coordinates = await getCoordinates(location);
+      if (!coordinates) {
+        return res.status(400).json({ error: 'Invalid location' });
+      }
+      const { latitude, longitude } = coordinates;
 
       const newChargingStation = new ChargingModel({
-          latitude,
-          longitude,
-          price,
-          rating,
-          picture,
-          description,
-          userId,
-          comments: comments.map((comment: { text: string, userId: string }) => ({
-              text: comment.text,
-              userId: comment.userId,
-          })),
+        location,
+        latitude,
+        longitude,
+        price,
+        chargingRate,
+        description,
       });
-
-
+  
       await newChargingStation.save();
-
-      res.status(201).json({ message: "Charging station added successfully", chargingStation: newChargingStation });
-  } catch (error) {
+  
+      res.status(201).json({
+        message: "Charging station added successfully",
+        chargingStation: newChargingStation,
+      });
+    } catch (error) {
+      console.error("Error in addChargingStation:", error);
       res.status(500).json({ message: "Failed to add charging station", error });
-  }
-};
+    }
+  };
+  
 
 const getChargerById = async (req: Request, res: Response) => {
     try {

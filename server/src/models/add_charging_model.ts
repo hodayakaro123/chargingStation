@@ -8,14 +8,19 @@ const commentSchema = new mongoose.Schema({
 });
 
 const chargingSchema = new mongoose.Schema({
-
+    location: {
+        type: String,
+        required: false,
+    },
     latitude: {
         type: Number,
         required: false,
+        default: 0.0,
     },
     longitude: {
         type: Number,
         required: false,
+        default: 0.0,
     },
     price: {
         type: Number,
@@ -23,7 +28,13 @@ const chargingSchema = new mongoose.Schema({
     },
     rating: {
         type: Number,
-        required: true,
+        required: false,
+        default: 0,
+    },
+    chargingRate: {
+        type: Number,
+        required: false,
+        default: 0,
     },
     picture: {
         type: String,

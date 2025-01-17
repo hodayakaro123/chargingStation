@@ -2,7 +2,43 @@ import styles from "./Navbar.module.css";
 import { NavLink } from "react-router-dom";
 import { FaUser, FaHome } from "react-icons/fa";
 import { MdExitToApp } from "react-icons/md";
+import { NavLink, useNavigate } from "react-router-dom";
+
 export default function Navbar() {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    console.log("refreshToken:", refreshToken);
+
+    if (!refreshToken) {
+      console.error("No refresh token found");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3000/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("refreshToken");
+
+
+      navigate("/");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   return (
     <nav className={styles.navbar}>
       <ul className={styles.navList}>
@@ -56,8 +92,10 @@ export default function Navbar() {
             }
           >
             <MdExitToApp style={{ marginRight: "8px" }} />
+
+          <button onClick={handleLogout} className={styles.navLink}>
             Logout
-          </NavLink>
+          </button>
         </li>
       </ul>
     </nav>
