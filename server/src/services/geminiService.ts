@@ -39,6 +39,7 @@ const agent = new https.Agent({
 
 const saveCarData = async (userId: string, brandName: string, carModel: string, year: number, range: number, fastChargingSpeed: number, homeChargingSpeed: number, batteryCapacity: number) => {
   try {
+
     const existingCar = await carDataModel.findOne({ userId });
 
     if (existingCar) {
@@ -51,7 +52,7 @@ const saveCarData = async (userId: string, brandName: string, carModel: string, 
 
       await existingCar.save();
 
-      console.log("Car information updated successfully");
+      console.log("Car information updated successfully!");
     } else {
       const newCarData = new carDataModel({
         userId,
