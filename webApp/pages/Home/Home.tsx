@@ -14,7 +14,7 @@ function MapUpdater({ coordinates }: { coordinates: { lat: number; lng: number }
 
   return null;
 }
-
+console.log("Home.tsx");
 export default function Home() {
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [userLocation, setUserLocation] = useState<{
