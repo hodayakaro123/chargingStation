@@ -56,7 +56,7 @@ export default function Home() {
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserLocation({ lat: latitude, lng: longitude });
-          setCoordinates({ lat: latitude, lng: longitude }); // Initially set marker to user location
+          setCoordinates({ lat: latitude, lng: longitude }); 
         },
         (error) => {
           console.error("Error getting user location:", error);
@@ -117,7 +117,7 @@ export default function Home() {
         if (data && data.length > 0) {
           setCarData(data[0]);
         } else {
-          console.error("No car data found for the user.");
+          console.error("No car data found for the user!");
         }
       } catch (error) {
         console.error("Error fetching car data:", error);
