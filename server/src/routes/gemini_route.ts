@@ -1,6 +1,7 @@
 import express from "express";
 import generateCarInfo from "../services/geminiService";
 
+
 const router = express.Router();
 
 
@@ -24,7 +25,6 @@ router.post("/generate-content", async (req, res) => {
     res.status(500).json({ message: "Failed to generate content", error });
   }
 });
-
 
 
 

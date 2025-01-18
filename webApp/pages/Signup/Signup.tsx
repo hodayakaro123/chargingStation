@@ -42,10 +42,12 @@ export default function Signup() {
         throw new Error("Sign-up failed");
       }
 
-      const data = await response.json();
-      console.log("Sign-up successful:", data);
-      
-      navigate("/Home");  
+
+      // localStorage.setItem('userId', data._id);
+      // localStorage.setItem("firstName", data.firstName);
+      // localStorage.setItem("lastName", data.lastName);
+    
+      navigate("/");  
 
     } catch (error) {
       console.error("Error:", error);

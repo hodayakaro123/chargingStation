@@ -9,6 +9,7 @@ import addChargingStation from "./routes/charger_route";
 import cors from "cors";
 import addComments from "./routes/commentsOnCharger_route";
 import userRouter from "./routes/user_route";
+import carDaraRouter from "./routes/car_data_route";
 import bookCharger from "./routes/book_a_charger_route";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
@@ -56,6 +57,7 @@ const moduleApp = async (): Promise<Express> => {
   app.use("/addComments", addComments);
   app.use("/gemini", geminiRouter);
   app.use("/bookings", bookCharger);
+  app.use("/carData", carDaraRouter);
 
   return app;
 };

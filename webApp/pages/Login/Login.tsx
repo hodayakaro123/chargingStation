@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
+import { GoogleLogin } from '@react-oauth/google';
+import { CredentialResponse } from '@react-oauth/google';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -9,9 +11,9 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const authToken = localStorage.getItem("authToken");
+    const accessToken = localStorage.getItem("accessToken");
 
-    if (authToken) {
+    if (accessToken) {
       navigate("/Home"); 
     }
   }, [navigate]);
@@ -64,9 +66,11 @@ const LoginPage: React.FC = () => {
 
       const data = await response.json();
 
-      localStorage.setItem("authToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken); 
+      localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem('userId', data._id);
+      localStorage.setItem("firstName", data.firstName);
+      localStorage.setItem("lastName", data.lastName);
+      console.log("Login successful:", data.firstName, data.lastName);
 
 
       navigate("/Home"); 
@@ -74,6 +78,41 @@ const LoginPage: React.FC = () => {
       console.error("Error:", error);
       setError("Login failed. Please check your credentials.");
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    try {
+      const response = await fetch("http://localhost:3000/auth/logInWithGoogle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          idToken: credentialResponse.credential,
+          password: Math.random().toString(36).slice(-8),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Google login failed");
+      }
+
+      const data = await response.json();
+
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem('userId', data.user.id);
+      localStorage.setItem("firstName", data.user.firstName);
+      localStorage.setItem("lastName", data.user.lastName);
+
+      navigate("/Home");
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Google login failed. Please try again.");
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError("Google login failed. Please try again.");
   };
 
   return (
@@ -108,6 +147,14 @@ const LoginPage: React.FC = () => {
             {error || " "}
           </p>
         </form>
+
+        <div className={styles.googleLogin}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            useOneTap
+          />
+        </div>
 
         <div className={styles.linkContainer}>
           <p>Don’t have an account?</p>

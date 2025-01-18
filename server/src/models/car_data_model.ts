@@ -14,19 +14,19 @@ const carDataSchema = new mongoose.Schema({
     required: true,
   },
   range: {
-    type: String,
+    type: Number,
     required: true,
   },
   fastChargingSpeed: {
-    type: String,
+    type: Number,
     required: true,
   },
   homeChargingSpeed: {
-    type: String,
+    type: Number,
     required: true,
   },
   batteryCapacity: {
-    type: String,
+    type: Number,
     required: true,
   },
   userId: {

@@ -91,6 +91,18 @@ const getChargersByUserId = (req, res) => __awaiter(void 0, void 0, void 0, func
         res.status(500).json({ message: "Failed to get charging stations", error });
     }
 });
+const getAllChargers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const chargers = yield add_charging_model_1.default.find();
+        if (!chargers) {
+            return res.status(404).json({ message: "No charging stations found" });
+        }
+        res.status(200).json({ chargers });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Failed to get charging stations", error });
+    }
+});
 const updateCharger = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { chargerId } = req.params;
@@ -141,5 +153,5 @@ const addSelectedChargingStation = (req, res) => __awaiter(void 0, void 0, void 
         res.status(500).json({ message: "Failed to add charging station to user's list", error });
     }
 });
-exports.default = { addChargingStation, getChargerById, updateCharger, deleteChargerById, addSelectedChargingStation, getChargersByUserId };
+exports.default = { addChargingStation, getChargerById, getAllChargers, updateCharger, deleteChargerById, addSelectedChargingStation, getChargersByUserId };
 //# sourceMappingURL=charger_controller.js.map
