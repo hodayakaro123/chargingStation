@@ -7,10 +7,10 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    console.log("refreshToken:", refreshToken);
+    const accessToken = localStorage.getItem("accessToken");
+    console.log("accessToken:", accessToken);
 
-    if (!refreshToken) {
+    if (!accessToken) {
       console.error("No refresh token found");
       return;
     }
@@ -21,15 +21,14 @@ export default function Navbar() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ refreshToken }),
+        body: JSON.stringify({ accessToken }),
       });
 
       if (!response.ok) {
         throw new Error(`Logout failed with status: ${response.status}`);
       }
 
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("accessToken");
       localStorage.removeItem("userId");
       navigate("/");
 
@@ -37,8 +36,8 @@ export default function Navbar() {
       console.error("Error during logout:", error);
 
  
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("accessToken");
+
 
       alert("Logout failed. Please try again later.");
     }
@@ -85,7 +84,7 @@ export default function Navbar() {
               isActive ? styles.activeLink : styles.navLink
             }
           >
-            <FaUser style={{ marginRight: "8px" }} /> {/* Icon with margin */}
+            <FaUser style={{ marginRight: "8px" }} /> {}
             Personal area
           </NavLink>
         </li>

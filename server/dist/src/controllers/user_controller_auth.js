@@ -16,6 +16,7 @@ exports.authMiddleware = void 0;
 const user_model_1 = __importDefault(require("../models/user_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const google_auth_library_1 = require("google-auth-library");
 const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
@@ -92,6 +93,8 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         user.refreshTokens.push(tokens.refreshToken);
         yield user.save();
         res.status(200).send({
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
             _id: user._id,
             accessToken: tokens.accessToken,
@@ -105,38 +108,32 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const refreshToken = req.body.refreshToken;
     if (!refreshToken) {
-        res.status(400).send("missing refresh token");
-        return;
+        return res.status(400).send("missing refresh token");
     }
     if (!process.env.TOKEN_SECRET) {
-        res.status(400).send("missing auth configuration");
-        return;
+        return res.status(400).send("missing auth configuration");
     }
     jsonwebtoken_1.default.verify(refreshToken, process.env.TOKEN_SECRET, (err, data) => __awaiter(void 0, void 0, void 0, function* () {
         if (err) {
-            res.status(403).send("invalid token");
-            return;
+            return res.status(403).send("invalid token");
         }
         const payload = data;
         try {
             const user = yield user_model_1.default.findOne({ _id: payload._id });
             if (!user) {
-                res.status(400).send("invalid token");
-                return;
+                return res.status(400).send("invalid token");
             }
             if (!user.refreshTokens || !user.refreshTokens.includes(refreshToken)) {
-                res.status(400).send("invalid token");
                 user.refreshTokens = [];
                 yield user.save();
-                return;
+                return res.status(400).send("invalid token");
             }
-            const tokens = user.refreshTokens.filter((token) => token !== refreshToken);
-            user.refreshTokens = tokens;
+            user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
             yield user.save();
-            res.status(200).send("logged out");
+            return res.status(200).send("logged out");
         }
         catch (err) {
-            res.status(400).send("invalid token");
+            return res.status(400).send("invalid token");
         }
     }));
 });
@@ -210,5 +207,72 @@ const authMiddleware = (req, res, next) => {
     });
 };
 exports.authMiddleware = authMiddleware;
-exports.default = { signUp, login, logout, refreshToken };
+const client = new google_auth_library_1.OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const googleSignIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { idToken, password } = req.body;
+        const ticket = yield client.verifyIdToken({
+            idToken,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        if (!payload) {
+            return res.status(400).json({ message: "Invalid token payload" });
+        }
+        const { sub: googleId, email, given_name: firstName, family_name: lastName, picture } = payload;
+        if (!googleId || !email) {
+            return res.status(400).json({ message: "Incomplete Google user data" });
+        }
+        let user = yield user_model_1.default.findOne({ email });
+        if (!user) {
+            const hashedPassword = yield bcrypt_1.default.hash(password, 10);
+            user = new user_model_1.default({
+                email,
+                firstName,
+                lastName,
+                password: hashedPassword,
+                picture,
+                refreshTokens: [],
+            });
+            yield user.save();
+        }
+        else if (!googleId) {
+            const isPasswordValid = yield bcrypt_1.default.compare(password, user.password);
+            if (!isPasswordValid) {
+                return res.status(401).json({ message: "Invalid password" });
+            }
+        }
+        else if (googleId !== googleId) {
+            return res.status(403).json({ message: "Account mismatch. Please use the correct Google account." });
+        }
+        const tokens = generateTokens(user._id.toString());
+        if (!tokens) {
+            return res.status(500).json({ message: "Failed to generate tokens" });
+        }
+        if (!user.refreshTokens) {
+            user.refreshTokens = [];
+        }
+        if (!user.refreshTokens.includes(tokens.refreshToken)) {
+            user.refreshTokens.push(tokens.refreshToken);
+        }
+        yield user.save();
+        res.status(200).json({
+            message: "User logged in successfully",
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                picture: user.picture,
+            },
+        });
+    }
+    catch (error) {
+        console.error("Error in Google Sign-In:", error);
+        res.status(400).json({ message: "Google Sign-In failed", error });
+    }
+});
+exports.default = { signUp, login, logout, refreshToken, googleSignIn };
 //# sourceMappingURL=user_controller_auth.js.map

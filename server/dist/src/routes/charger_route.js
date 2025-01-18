@@ -352,5 +352,8 @@ router.delete("/deleteChargerById/:chargerId/", user_controller_auth_1.authMiddl
 router.post("/addSelectedChargingStation/:userId/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
     charger_controller_1.default.addSelectedChargingStation(req, res);
 });
+router.get("/getAllChargers", (req, res) => {
+    charger_controller_1.default.getAllChargers(req, res);
+});
 exports.default = router;
 //# sourceMappingURL=charger_route.js.map

@@ -22,6 +22,7 @@ const charger_route_1 = __importDefault(require("./routes/charger_route"));
 const cors_1 = __importDefault(require("cors"));
 const commentsOnCharger_route_1 = __importDefault(require("./routes/commentsOnCharger_route"));
 const user_route_1 = __importDefault(require("./routes/user_route"));
+const car_data_route_1 = __importDefault(require("./routes/car_data_route"));
 const book_a_charger_route_1 = __importDefault(require("./routes/book_a_charger_route"));
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
@@ -37,7 +38,7 @@ const options = {
             version: "1.0.0",
             description: "REST server including authentication using JWT, CRUD operations on charging stations, comments, and a user registration system.",
         },
-        servers: [{ url: "http://localhost:3000", },],
+        servers: [{ url: "http://localhost:3000" }],
     },
     apis: ["./src/routes/*.ts"],
 };
@@ -62,6 +63,7 @@ const moduleApp = () => __awaiter(void 0, void 0, void 0, function* () {
     app.use("/addComments", commentsOnCharger_route_1.default);
     app.use("/gemini", gemini_route_1.default);
     app.use("/bookings", book_a_charger_route_1.default);
+    app.use("/carData", car_data_route_1.default);
     return app;
 });
 exports.default = moduleApp;

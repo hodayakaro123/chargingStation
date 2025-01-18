@@ -169,5 +169,6 @@ router.post("/logout", user_controller_auth_1.default.logout);
  *         description: Server error
  */
 router.post("/refresh", user_controller_auth_1.default.refreshToken);
+router.post("/logInWithGoogle", user_controller_auth_1.default.googleSignIn);
 exports.default = router;
 //# sourceMappingURL=user_route.js.map

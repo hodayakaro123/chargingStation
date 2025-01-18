@@ -14,10 +14,21 @@ const getCarData = async (req: Request, res: Response) => {
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-  
       const carData = await carDataModel.find({ userId: user._id });
+
       if (!carData || carData.length === 0) {
-        return res.status(404).json({ message: "No car data found for this user" });
+        const defaultCarData = new carDataModel({
+          userId: user._id,
+          brandName: "Unknown",
+          carModel: "Unknown",
+          year: 0,
+          range: 0,
+          fastChargingSpeed: 0,
+          homeChargingSpeed: 0,
+          batteryCapacity: 0,
+        });
+        
+        return res.status(200).json([defaultCarData]);
       }
   
       res.status(200).json(carData);

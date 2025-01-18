@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -48,15 +49,32 @@ export default function Home() {
   const [carData, setCarData] = useState<{ batteryCapacity: number } | null>(
     null
   );
+  const [userName, setUserName] = useState<{ firstName: string; lastName: string } | null>(null);
 
   useEffect(() => {
+
+    const accessToken = localStorage.getItem("accessToken");
+    console.log("The Access Token:", accessToken);
+    if (!accessToken) {
+      navigate("/login"); 
+      return;
+    }
+
+    const firstName = localStorage.getItem("firstName");
+    const lastName = localStorage.getItem("lastName");
+    console.log("The First Name:", firstName);
+    console.log("The Last Name:", lastName);
+    if (firstName && lastName) {
+      setUserName({ firstName, lastName });
+    }
+
     // Get the user's current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserLocation({ lat: latitude, lng: longitude });
-          setCoordinates({ lat: latitude, lng: longitude }); 
+          setCoordinates({ lat: latitude, lng: longitude });
         },
         (error) => {
           console.error("Error getting user location:", error);
@@ -87,7 +105,6 @@ export default function Home() {
     const fetchCarData = async () => {
       try {
         const userId = localStorage.getItem("userId");
-
         if (!userId) {
           console.error("User ID not found in local storage.");
           return;
@@ -113,7 +130,7 @@ export default function Home() {
         }
 
         const data = await response.json();
-        console.log("Car data:", data);
+
         if (data && data.length > 0) {
           setCarData(data[0]);
         } else {
@@ -161,7 +178,9 @@ export default function Home() {
 
   return (
     <div className="map-page">
-      <h2 className="title">Charging Station Map</h2>
+      <h2 className="title">
+        Hi {userName ? `${userName.firstName} ${userName.lastName}` : "User"}, Charging Station Map
+      </h2>
       <div className="input-container">
         <input
           className="input"
@@ -218,8 +237,7 @@ export default function Home() {
                       )}
                     </strong>
                     <div>
-                      (based on {carData.brandName} {carData.carModel} 
-                      {carData.year})
+                      (based on {carData.brandName} {carData.carModel} {carData.year})
                     </div>
                   </>
                 ) : (

@@ -50,6 +50,7 @@ const saveCarData = async (userId: string, brandName: string, carModel: string, 
 
     if (existingCar && existingCar._id.toString() === user.carDetails?.toString()) {
       existingCar.brandName = brandName;
+      existingCar.carModel = carModel;
       existingCar.year = year;
       existingCar.range = range;
       existingCar.fastChargingSpeed = fastChargingSpeed;

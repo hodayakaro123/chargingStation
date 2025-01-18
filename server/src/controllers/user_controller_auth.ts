@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import userModel from "../models/user_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
+
 
 const signUp = async (req: Request, res: Response) => {
   const firstName = req.body.firstName;
@@ -97,6 +99,8 @@ const login = async (req: Request, res: Response) => {
     user.refreshTokens.push(tokens.refreshToken);
     await user.save();
     res.status(200).send({
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       _id: user._id,
       accessToken: tokens.accessToken,
@@ -237,4 +241,91 @@ export const authMiddleware = (
   });
 };
 
-export default { signUp, login, logout, refreshToken };
+
+
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const googleSignIn = async (req: Request, res: Response) => {
+  try {
+    const { idToken, password } = req.body;
+
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload) {
+      return res.status(400).json({ message: "Invalid token payload" });
+    }
+
+    const { sub: googleId, email, given_name: firstName, family_name: lastName, picture } = payload;
+
+    if (!googleId || !email) {
+      return res.status(400).json({ message: "Incomplete Google user data" });
+    }
+
+    let user = await userModel.findOne({ email });
+
+    if (!user) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      user = new userModel({
+        email,
+        firstName,
+        lastName,
+        password: hashedPassword,
+        picture,
+        refreshTokens: [],
+      });
+
+      await user.save();
+    } else if (!googleId) {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: "Invalid password" });
+      }
+    } else if (googleId !== googleId) {
+      return res.status(403).json({ message: "Account mismatch. Please use the correct Google account." });
+    }
+
+    const tokens = generateTokens(user._id.toString());
+    if (!tokens) {
+      return res.status(500).json({ message: "Failed to generate tokens" });
+    }
+
+    if (!user.refreshTokens) {
+      user.refreshTokens = [];
+    }
+
+    if (!user.refreshTokens.includes(tokens.refreshToken)) {
+      user.refreshTokens.push(tokens.refreshToken);
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: "User logged in successfully",
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        picture: user.picture,
+      },
+    });
+  } catch (error) {
+    console.error("Error in Google Sign-In:", error);
+    res.status(400).json({ message: "Google Sign-In failed", error });
+  }
+};
+
+
+
+
+
+export default { signUp, login, logout, refreshToken, googleSignIn };
