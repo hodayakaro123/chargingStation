@@ -30,6 +30,7 @@ export default function Navbar() {
 
       localStorage.removeItem("authToken");
       localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userId");
       navigate("/");
 
     } catch (error) {

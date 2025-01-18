@@ -45,6 +45,8 @@ export default function Signup() {
       const data = await response.json();
       console.log("Sign-up successful:", data);
       
+      localStorage.setItem('userId', data._id);
+    
       navigate("/Home");  
 
     } catch (error) {

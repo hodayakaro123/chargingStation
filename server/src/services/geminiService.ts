@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import axios from "axios";
 import https from "https";
 import carDataModel from '../models/car_data_model';
+import userModel from '../models/user_model';
 
 dotenv.config();
 
@@ -37,19 +38,46 @@ const agent = new https.Agent({
 });
 
 const saveCarData = async (userId: string, brandName: string, carModel: string, year: number, range: number, fastChargingSpeed: number, homeChargingSpeed: number, batteryCapacity: number) => {
-  const carData = new carDataModel({
-    userId,
-    brandName,
-    carModel,
-    year,
-    range: `${range}km`,
-    fastChargingSpeed: `${fastChargingSpeed}kw`,
-    homeChargingSpeed: `${homeChargingSpeed}kw`,
-    batteryCapacity: `${batteryCapacity}kwh`,
-  });
+  try {
+    const existingCar = await carDataModel.findOne({ userId });
 
-  await carData.save();
+    if (existingCar) {
+      existingCar.brandName = brandName;
+      existingCar.year = year;
+      existingCar.range = `${range}km`;
+      existingCar.fastChargingSpeed = `${fastChargingSpeed}kw`;
+      existingCar.homeChargingSpeed = `${homeChargingSpeed}kw`;
+      existingCar.batteryCapacity = `${batteryCapacity}kwh`;
+
+      await existingCar.save();
+
+      console.log("Car information updated successfully");
+    } else {
+      const newCarData = new carDataModel({
+        userId,
+        brandName,
+        carModel,
+        year,
+        range: `${range}km`,
+        fastChargingSpeed: `${fastChargingSpeed}kw`,
+        homeChargingSpeed: `${homeChargingSpeed}kw`,
+        batteryCapacity: `${batteryCapacity}kwh`,
+      });
+
+      await newCarData.save();
+      console.log("New car information saved successfully");
+
+      const user = await userModel.findById(userId);
+      if (user) {
+        user.carDetails = newCarData._id; 
+        await user.save();
+      }
+    }
+  } catch (error) {
+    console.error("Error saving car data:", error);
+  }
 };
+
 
 const generateCarInfo = async (text: string, userId: string, brandName: string, carModel: string, year: number): Promise<string> => {
   const url = `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`;

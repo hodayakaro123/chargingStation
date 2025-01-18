@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "CarData",
     required: false,
+    default: null,
   },
   refreshTokens: {
     type: [String],
