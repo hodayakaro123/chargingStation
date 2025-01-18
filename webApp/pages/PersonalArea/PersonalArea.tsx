@@ -96,6 +96,7 @@ const PersonalArea: React.FC = () => {
       console.log(result);
   
       alert("Car information sent successfully");
+      
       setLoading(false);
     } catch (error) {
       console.error("Error sending car information:", error);
