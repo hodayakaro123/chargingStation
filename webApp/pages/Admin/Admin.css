@@ -1,0 +1,19 @@
+.admin-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* עמודות גמישות */
+  grid-template-rows: auto; /* שורות גמישות */
+  gap: 20px;
+  padding: 20px;
+}
+
+.manageUsers {
+  width: 1400px;
+
+  max-width: 614px; /* גובה מקסימלי */
+}
+
+.manageStations {
+  background-color: aliceblue;
+  padding: 20px;
+  height: auto;
+}
