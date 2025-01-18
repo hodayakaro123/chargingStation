@@ -127,14 +127,14 @@ const LoginPage: React.FC = () => {
             placeholder="Enter your email"
             className={styles.input}
             value={email}
-            onChange={handleEmailChange} // Validate email on change
+            onChange={handleEmailChange} 
           />
           <input
             type="password"
             placeholder="Enter your password"
             className={styles.input}
             value={password}
-            onChange={(e) => setPassword(e.target.value)} // Update password state
+            onChange={(e) => setPassword(e.target.value)} 
           />
           <button className={styles.button} type="submit">
             Login
