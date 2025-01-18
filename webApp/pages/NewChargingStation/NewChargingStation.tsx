@@ -19,10 +19,9 @@ export default function NewChargingStation() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const authToken = localStorage.getItem("authToken");
-    const refreshToken = localStorage.getItem("refreshToken");
+    const accessToken = localStorage.getItem("accessToken");
 
-    if (!authToken) {
+    if (!accessToken) {
       setError("You must be logged in to add a charging station.");
       return;
     }
@@ -46,7 +45,7 @@ export default function NewChargingStation() {
         method: "POST",
         headers: {
           "Content-Type": "application/json", 
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(chargerData), 
       });

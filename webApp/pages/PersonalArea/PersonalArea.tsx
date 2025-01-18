@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./PersonalArea.css";
 import GeneralInfoHeader from "../../src/components/GeneralInfoHeader";
 import ChargeInfo from "../../src/components/ChargeInfo";
@@ -32,12 +32,6 @@ const PersonalArea: React.FC = () => {
   const [carModel, setCarModel] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    // Optionally fetch current car details from the backend if needed
-    // setCarBrand(currentUserCarBrand);
-    // setCarYear(currentUserCarYear);
-    // setCarModel(currentUserCarModel);
-  }, []);
 
   const handleCarBrandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCarBrand(e.target.value);
@@ -140,7 +134,7 @@ const PersonalArea: React.FC = () => {
             placeholder="Enter your car year"
             min="1900"       
             max={new Date().getFullYear()}  
-            step="1"    // Optional: Restrict to integer values
+            step="1"   
           />
           <input
             type="text"

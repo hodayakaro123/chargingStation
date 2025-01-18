@@ -1,8 +1,29 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Home.css";
+
+
+
+interface Comment {
+  text: string;
+}
+
+interface ChargingStation {
+  _id: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+  price: number;
+  rating: number;
+  chargingRate: number;
+  picture?: string;
+  description: string;
+  comments?: Comment[];
+  userId: string; 
+}
 
 function MapUpdater({
   coordinates,
@@ -36,6 +57,8 @@ function calculateChargingTime(
 }
 
 export default function Home() {
+  const navigate = useNavigate();
+
   const [coordinates, setCoordinates] = useState<{
     lat: number;
     lng: number;
@@ -45,10 +68,14 @@ export default function Home() {
     lng: number;
   } | null>(null);
   const [address, setAddress] = useState<string>("");
-  const [chargingStations, setChargingStations] = useState<any[]>([]);
-  const [carData, setCarData] = useState<{ batteryCapacity: number } | null>(
-    null
-  );
+  const [chargingStations, setChargingStations] = useState<ChargingStation[]>([]);
+  const [carData, setCarData] = useState<{
+    batteryCapacity: number;
+    brandName: string;
+    year: number;
+    carModel: string;
+  } | null>(null);
+  
   const [userName, setUserName] = useState<{ firstName: string; lastName: string } | null>(null);
 
   useEffect(() => {
@@ -56,7 +83,7 @@ export default function Home() {
     const accessToken = localStorage.getItem("accessToken");
     console.log("The Access Token:", accessToken);
     if (!accessToken) {
-      navigate("/login"); 
+      navigate("/"); 
       return;
     }
 
