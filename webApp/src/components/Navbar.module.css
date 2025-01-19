@@ -1,6 +1,6 @@
 .navbar {
   position: fixed;
-  top: 10px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   right: 50%;

@@ -277,6 +277,11 @@ export default function Home() {
                 <br />
                 {charger.description && <p>{charger.description}</p>}
                 <br />
+                <img
+                  src={`http://loacalhost:3000${charger.picture}`}
+                  alt="Charging Station"
+                  style={{ width: "100%", height: "auto" }}
+                />
                 <button
                   onClick={() =>
                     (window.location.href = "http://localhost:5173/Booking")
@@ -286,7 +291,7 @@ export default function Home() {
                     color: "white",
                     padding: "10px 20px",
                     border: "none",
-                    borderRadius: "8px",
+                    borderRadius: "5px",
                     cursor: "pointer",
                   }}
                 >

@@ -11,152 +11,99 @@ import {
 } from "@mui/material";
 import "./ActivityHistory.css";
 
+type Status = "Pending" | "Approved" | "Declined";
+
 const rows = [
   {
     id: 1,
-    name: "John Doe",
-    age: 30,
-    location: "New York",
-    cost: "$10",
-    more: "Details",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    age: 25,
-    location: "Los Angeles",
-    cost: "$20",
-    more: "Details",
-  },
-  {
-    id: 3,
-    name: "Alice Johnson",
-    age: 35,
-    location: "Chicago",
-    cost: "$15",
-    more: "Details",
-  },
-  {
-    id: 4,
-    name: "Michael Brown",
-    age: 40,
-    location: "Miami",
-    cost: "$18",
-    more: "Details",
-  },
-  {
-    id: 5,
-    name: "Sarah Wilson",
-    age: 28,
-    location: "San Francisco",
-    cost: "$25",
-    more: "Details",
-  },
-  {
-    id: 6,
-    name: "David Lee",
-    age: 32,
-    location: "Boston",
-    cost: "$12",
-    more: "Details",
-  },
-  {
-    id: 9,
     Date: "27/05/2001",
     Time: 29,
     location: "Houston",
     cost: "$30",
     more: "Details",
+    status: "Pending" as Status,
   },
   {
-    id: 10,
+    id: 2,
     Date: "17/01/2023",
     Time: 31,
     location: "Dallas",
     cost: "$14",
     more: "Details",
+    status: "Approved" as Status,
   },
   {
-    id: 11,
+    id: 3,
     Date: "09/11/2022",
     Time: 33,
     location: "Seattle",
     cost: "$22",
     more: "Details",
+    status: "Declined" as Status,
   },
   {
-    id: 12,
+    id: 4,
     Date: "03/07/2021",
     Time: 35,
     location: "Portland",
     cost: "$17",
     more: "Details",
+    status: "Pending" as Status,
   },
   {
-    id: 13,
+    id: 5,
     Date: "21/04/2020",
     Time: 37,
     location: "Las Vegas",
     cost: "$28",
     more: "Details",
+    status: "Approved" as Status,
   },
   {
-    id: 14,
+    id: 6,
     Date: "11/02/2023",
     Time: 39,
     location: "Denver",
     cost: "$11",
     more: "Details",
+    status: "Pending" as Status,
   },
   {
-    id: 15,
+    id: 7,
     Date: "01/12/2022",
     Time: 41,
     location: "Phoenix",
     cost: "$19",
     more: "Details",
+    status: "Declined" as Status,
   },
   {
-    id: 16,
+    id: 8,
     Date: "13/10/2021",
     Time: 43,
     location: "San Diego",
     cost: "$23",
     more: "Details",
+    status: "Approved" as Status,
   },
-  {
-    id: 17,
-    Date: "25/08/2020",
-    Time: 45,
-    location: "Philadelphia",
-    cost: "$26",
-    more: "Details",
-  },
-  {
-    id: 18,
-    Date: "07/06/2019",
-    Time: 47,
-    location: "Atlanta",
-    cost: "$13",
-    more: "Details",
-  },
-  {
-    id: 19,
-    Date: "19/04/2018",
-    Time: 49,
-    location: "Orlando",
-    cost: "$21",
-    more: "Details",
-  },
-  {
-    id: 20,
-    Date: "31/01/2017",
-    Time: 51,
-    location: "Austin",
-    cost: "$16",
-    more: "Details",
-  },
+  // More rows...
 ];
+
+const statusStyles: Record<Status, { backgroundColor: string; color: string }> =
+  {
+    Pending: {
+      backgroundColor: "#FFA500", // Orange for Pending
+      color: "white",
+    },
+    Approved: {
+      backgroundColor: "#28a745", // Green for Approved
+      color: "white",
+    },
+    Declined: {
+      backgroundColor: "#dc3545", // Red for Declined
+      color: "white",
+    },
+  };
 
 export default function ActivityHistory() {
   return (
@@ -172,7 +119,7 @@ export default function ActivityHistory() {
               <TableCell className="table-header-cell">Time</TableCell>
               <TableCell className="table-header-cell">Location</TableCell>
               <TableCell className="table-header-cell">Cost</TableCell>
-              <TableCell className="table-header-cell">More</TableCell>
+              <TableCell className="table-header-cell">Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -182,8 +129,19 @@ export default function ActivityHistory() {
                 <TableCell className="table-cell">{row.Time}</TableCell>
                 <TableCell className="table-cell">{row.location}</TableCell>
                 <TableCell className="table-cell">{row.cost}</TableCell>
-                <TableCell className="table-cell more-column">
-                  {row.more}
+                <TableCell
+                  className={`table-cell status-cell ${row.status}`}
+                  style={{
+                    backgroundColor: statusStyles[row.status]?.backgroundColor,
+                    color: statusStyles[row.status]?.color,
+                    padding: "12px 15px",
+                    width: "30px",
+                    height: "10px",
+                    borderRadius: "10px",
+                    textAlign: "center",
+                  }}
+                >
+                  {row.status}
                 </TableCell>
               </TableRow>
             ))}

@@ -1,55 +1,79 @@
-.container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  grid-template-rows: auto auto;
-  padding: 20px;
-  max-width: 100%;
-  max-height: 100vh;
-  margin: 0 auto;
-  border-radius: 8px;
-  overflow: auto;
+* {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-.general-info,
-.charge-info {
-  padding: 20px;
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f9fafb;
+  overflow: hidden;
 }
-.car-model-section {
+
+.container {
+  padding: 14px 16px;
+  height: 100%;
   display: flex;
-  flex-direction: column; /* סידור כעמודה */
-  align-items: stretch; /* התאמת כל פריט לרוחב מלא */
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 20px; /* רווח פנימי */
-  margin: 10px; /* רווח חיצוני */
+  flex-direction: column;
+  gap: 16px;
+}
+
+.general-info {
+  padding-top: 20px;
+  width: 100%;
+  height: 100%;
+}
+
+.charge-info {
+  padding-top: 40px;
+}
+
+.car-model-section {
+  padding-top: 40px;
+  background-color: aliceblue;
+}
+
+.car-model-section h3 {
+  font-size: 24px;
+  margin-bottom: 16px;
 }
 
 .input-group {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
+.input-group input {
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  width: calc(33.33% - 10px);
+}
+
+.input-group input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* כפתור לשליחת המידע */
 button {
-  width: 100%;
-  padding: 10px;
-  background-color: #1976d2;
-  color: #fff;
+  background-color: #007bff;
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
   border: none;
   border-radius: 8px;
+  margin-top: 20px;
   cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
 }
 
 button:disabled {
-  background-color: #ccc;
+  background-color: #b8d0da;
   cursor: not-allowed;
 }
 
-button:hover:not(:disabled) {
-  background-color: #145ca8;
+button:hover {
+  background-color: #0056b3;
 }

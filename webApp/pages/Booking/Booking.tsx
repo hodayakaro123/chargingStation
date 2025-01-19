@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import "./Booking.css";
+import ReviewCard from "../../src/components/ReviewCard/ReviewCard";
 
 export default function Booking() {
   const [formData, setFormData] = useState({
@@ -122,6 +123,16 @@ export default function Booking() {
           Submit
         </button>
       </form>
+      <div className="review-container">
+        <ReviewCard
+          userName="יוסי כהן"
+          location="תל אביב"
+          reviewText="עמדת טעינה מצוינת! תהליך מהיר ונוח."
+          rating={4}
+          date="19/01/2025"
+          avatar="https://randomuser.me/api/portraits/men/1.jpg"
+        />
+      </div>
     </div>
   );
 }

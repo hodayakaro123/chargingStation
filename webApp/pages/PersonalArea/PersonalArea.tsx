@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./PersonalArea.css";
+import "./PersonalArea.css"; // הוסף את הקובץ הזה
 import GeneralInfoHeader from "../../src/components/GeneralInfoHeader";
 import ChargeInfo from "../../src/components/ChargeInfo";
 
@@ -146,6 +146,8 @@ const PersonalArea: React.FC = () => {
           {loading ? "Sending..." : "Send Car Information"}
         </button>
       </div>
+
+      <div></div>
     </div>
   );
 };
