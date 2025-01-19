@@ -7,4 +7,10 @@ const router = Router();
 
 router.post("/bookCharger", authMiddleware, book_a_charger_controller.bookCharger);
 
+router.get("/getAllBookings", authMiddleware, book_a_charger_controller.getAllBookings);
+
+router.get("/getBookingById/:bookingId", authMiddleware, book_a_charger_controller.getBookingById);
+
+router.delete("/deleteBookingByID/:BookingId", authMiddleware, book_a_charger_controller.deleteBookingByID);
+
 export default router;

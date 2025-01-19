@@ -36,6 +36,9 @@ const getCarData = async (req: Request, res: Response) => {
       console.error("Error fetching car data:", error);
       res.status(500).json({ message: "Internal server error", error });
     }
-  };
+};
+
+
+  
 
 export default { getCarData };

@@ -18,43 +18,41 @@ export default function NewChargingStation() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     const accessToken = localStorage.getItem("accessToken");
-
+  
     if (!accessToken) {
       setError("You must be logged in to add a charging station.");
       return;
     }
-
-    if (!location || !chargingRate || !price || !description) {
-      setError("All fields are required.");
+  
+    if (!location || !chargingRate || !price || !description || !selectedImage) {
+      setError("All fields, including an image, are required.");
       return;
     }
-
-    const chargerData = {
-      location,
-      chargingRate,
-      price,
-      description,
-    };
-
-
+    const userId = localStorage.getItem("userId") || "";
+    const formData = new FormData();
+    formData.append("userId", userId); 
+    formData.append("location", location);
+    formData.append("chargingRate", chargingRate);
+    formData.append("price", price);
+    formData.append("description", description);
+    formData.append("image", selectedImage);
+    formData.append("type", "charger");
+  
     try {
-
       const response = await fetch("http://localhost:3000/addChargingStation/addCharger", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", 
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`, 
         },
-        body: JSON.stringify(chargerData), 
+        body: formData,
       });
-      
-
+  
       if (!response.ok) {
         throw new Error("Failed to add charging station.");
       }
-
+  
       setSuccessMessage("Charging station added successfully!");
       setError("");
       setLocation("");
@@ -68,6 +66,8 @@ export default function NewChargingStation() {
       setSuccessMessage("");
     }
   };
+  
+  
 
   return (
     <div className="newChargingPage">

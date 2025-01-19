@@ -6,6 +6,7 @@ import axios from 'axios';
 
 
 
+
 const getCoordinates = async (address: string) => {
     const apiKey = process.env.OPENCAGE_API_KEY;
     const url = `${process.env.OPENCAGE_API_URL}=${encodeURIComponent(address)}&key=${apiKey}`;  
@@ -32,25 +33,31 @@ const getCoordinates = async (address: string) => {
 
 
 
-const addChargingStation = async (req: Request, res: Response) => {
-    
-
+  const addChargingStation = async (req: Request, res: Response) => {
     try {
-      const { location, chargingRate, price, description } = req.body;
+      const { userId, location, chargingRate, price, description } = req.body;
+      const imageFile = req.file;
   
-      const coordinates = await getCoordinates(location);
-      if (!coordinates) {
-        return res.status(400).json({ error: 'Invalid location' });
+      if (!userId || !location || !chargingRate || !price || !description || !imageFile) {
+        return res.status(400).json({ error: "All fields, including userId and an image, are required." });
       }
+  
+      const coordinates = await getCoordinates(location); 
+      if (!coordinates) {
+        return res.status(400).json({ error: "Invalid location" });
+      }
+  
       const { latitude, longitude } = coordinates;
-
+  
       const newChargingStation = new ChargingModel({
+        userId, 
         location,
         latitude,
         longitude,
-        price,
-        chargingRate,
+        price: parseFloat(price),
+        chargingRate: parseFloat(chargingRate),
         description,
+        picture: `/uploads/${userId}/${imageFile.filename}`,
       });
   
       await newChargingStation.save();
@@ -64,6 +71,9 @@ const addChargingStation = async (req: Request, res: Response) => {
       res.status(500).json({ message: "Failed to add charging station", error });
     }
   };
+  
+  
+  
   
 
 const getChargerById = async (req: Request, res: Response) => {
@@ -84,6 +94,7 @@ const getChargerById = async (req: Request, res: Response) => {
 };
 
 const getChargersByUserId = async (req: Request, res: Response) => {
+    console.log('getChargersByUserId');
     try {
         const { userId } = req.params;
 

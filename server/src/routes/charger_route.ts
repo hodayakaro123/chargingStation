@@ -1,6 +1,7 @@
 import { Router } from "express";
 import add_charging_controller from "../controllers/charger_controller";
 import { authMiddleware } from "../controllers/user_controller_auth";
+import upload from "../uploads";
 
 const router = Router();
 
@@ -164,10 +165,10 @@ const router = Router();
  *       500:
  *         description: Server error
  */
-router.post("/addCharger", authMiddleware, (req, res) => {
-    add_charging_controller.addChargingStation(req, res); 
-});
-
+router.post("/addCharger", authMiddleware,  upload.single("image"), (req, res) => {
+      add_charging_controller.addChargingStation(req, res);
+    }
+  );
 
 
 
