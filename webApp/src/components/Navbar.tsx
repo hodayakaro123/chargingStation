@@ -103,16 +103,7 @@ export default function Navbar() {
             }
           >
             <MdExitToApp />
-            <button
-              onClick={handleLogout}
-              className={styles.navLink}
-              style={{
-                padding: "8px 16px",
-                border: "none",
-                backgroundColor: "transparent",
-                cursor: "pointer",
-              }}
-            >
+            <button onClick={handleLogout} className={styles.navLink}>
               Logout
             </button>
           </NavLink>

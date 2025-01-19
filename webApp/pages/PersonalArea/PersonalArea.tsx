@@ -32,7 +32,6 @@ const PersonalArea: React.FC = () => {
   const [carModel, setCarModel] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-
   const handleCarBrandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCarBrand(e.target.value);
   };
@@ -50,47 +49,50 @@ const PersonalArea: React.FC = () => {
       alert("Please enter all car details.");
       return;
     }
-  
+
     const currentYear = new Date().getFullYear();
     if (parseInt(carYear) > currentYear) {
       alert("The car year cannot be greater than the current year.");
       return;
     }
-  
+
     setLoading(true);
-  
+
     const userId = localStorage.getItem("userId");
-  
+
     if (!userId) {
       alert("User ID is required");
       setLoading(false);
       return;
     }
-  
+
     try {
-      const response = await fetch("http://localhost:3000/gemini/generate-content", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,  
-        },
-        body: JSON.stringify({
-          carBrand,   
-          carYear,    
-          carModel,   
-          userId,     
-        }),
-      });
-  
+      const response = await fetch(
+        "http://localhost:3000/gemini/generate-content",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+          body: JSON.stringify({
+            carBrand,
+            carYear,
+            carModel,
+            userId,
+          }),
+        }
+      );
+
       if (!response.ok) {
         throw new Error("Failed to generate content");
       }
-  
+
       const result = await response.json();
       console.log(result);
-  
+
       alert("Car information sent successfully");
-      
+
       setLoading(false);
     } catch (error) {
       console.error("Error sending car information:", error);
@@ -98,9 +100,6 @@ const PersonalArea: React.FC = () => {
       setLoading(false);
     }
   };
-  
-  
-  
 
   return (
     <div className="container">
@@ -132,9 +131,9 @@ const PersonalArea: React.FC = () => {
             value={carYear}
             onChange={handleCarYearChange}
             placeholder="Enter your car year"
-            min="1900"       
-            max={new Date().getFullYear()}  
-            step="1"   
+            min="1900"
+            max={new Date().getFullYear()}
+            step="1"
           />
           <input
             type="text"

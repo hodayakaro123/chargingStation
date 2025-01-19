@@ -1,19 +1,13 @@
 .admin-container {
-  display: grid;
-  grid-template-columns: 2fr 1fr; /* עמודות גמישות */
-  grid-template-rows: auto; /* שורות גמישות */
-  gap: 20px;
+  display: flex;
+  justify-content: space-between; /* תוודא שיש רווח בין הרכיבים */
+  gap: 20px; /* רווח בין שני הרכיבים */
   padding: 20px;
 }
 
-.manageUsers {
-  width: 1400px;
-
-  max-width: 614px; /* גובה מקסימלי */
-}
-
+.manageUsers,
 .manageStations {
-  background-color: aliceblue;
-  padding: 20px;
-  height: auto;
+  flex: 1;
+  padding: 15px;
+  width: 80%;
 }

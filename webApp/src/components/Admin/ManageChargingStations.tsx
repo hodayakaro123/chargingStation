@@ -12,83 +12,91 @@ import {
   Box,
   Input,
 } from "@mui/material";
-import "./ManageUsers.css";
+import "./ManageChargingStations.css";
 
-interface User {
-  id: number;
+interface ChargeStation {
+  chargeId: number;
   firstName: string;
   lastName: string;
   email: string;
-  address: string;
+  location: string;
   phone: string;
 }
 
-export default function ManageUsers() {
-  const [users, setUsers] = useState<User[]>([
+export default function ManageChargeStations() {
+  const [chargeStations, setChargeStations] = useState<ChargeStation[]>([
     {
-      id: 1,
+      chargeId: 1,
       firstName: "John",
       lastName: "Doe",
       email: "john@example.com",
-      address: "123 Main St",
+      location: "123 Main St",
       phone: "123-456-7890",
     },
     {
-      id: 2,
+      chargeId: 2,
       firstName: "Jane",
       lastName: "Smith",
       email: "jane@example.com",
-      address: "456 Oak St",
+      location: "456 Oak St",
       phone: "234-567-8901",
     },
     {
-      id: 3,
+      chargeId: 3,
       firstName: "Alice",
       lastName: "Johnson",
-      email: "",
-      address: "789 Elm St",
+      email: "alice@example.com",
+      location: "789 Elm St",
       phone: "345-678-9012",
     },
   ]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [editUser, setEditUser] = useState<number | null>(null);
-  const [editedData, setEditedData] = useState<User | null>(null);
 
-  const filterUsers = () => {
-    return users.filter(
-      (user) =>
-        user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.phone.includes(searchTerm)
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [editChargeStation, setEditChargeStation] = useState<number | null>(
+    null
+  );
+  const [editedData, setEditedData] = useState<ChargeStation | null>(null);
+
+  const filterChargeStations = () => {
+    return chargeStations.filter(
+      (station) =>
+        station.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        station.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        `${station.firstName} ${station.lastName}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
     );
   };
 
-  const deleteUser = (id: number) => {
-    setUsers(users.filter((user) => user.id !== id));
+  const deleteChargeStation = (chargeId: number) => {
+    setChargeStations(
+      chargeStations.filter((station) => station.chargeId !== chargeId)
+    );
   };
 
-  const handleEditUser = (user: User) => {
-    setEditUser(user.id);
-    setEditedData(user);
+  const handleEditChargeStation = (station: ChargeStation) => {
+    setEditChargeStation(station.chargeId);
+    setEditedData(station);
   };
 
   const handleSaveEdit = () => {
     if (editedData) {
-      setUsers(
-        users.map((user) =>
-          user.id === editedData.id ? { ...editedData } : user
+      setChargeStations(
+        chargeStations.map((station) =>
+          station.chargeId === editedData.chargeId ? { ...editedData } : station
         )
       );
-      setEditUser(null);
+      setEditChargeStation(null);
       setEditedData(null);
     }
   };
 
   const handleCancelEdit = () => {
-    setEditUser(null);
+    setEditChargeStation(null);
     setEditedData(null);
   };
 
-  const handleChange = (field: keyof User, value: string) => {
+  const handleChange = (field: keyof ChargeStation, value: string) => {
     if (editedData) {
       setEditedData({
         ...editedData,
@@ -104,16 +112,20 @@ export default function ManageUsers() {
         gutterBottom
         sx={{ fontWeight: "bold", color: "#333" }}
       >
-        Control All Users
+        Manage All Charging Stations
       </Typography>
 
       <TextField
-        label="Search by name or phone"
+        label="Search by location, email, or owner's name"
         variant="outlined"
         fullWidth
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        sx={{ marginBottom: 2, backgroundColor: "#fff", borderRadius: 1 }}
+        sx={{
+          marginBottom: 2,
+          backgroundColor: "#fff",
+          borderRadius: 1,
+        }}
       />
 
       <TableContainer
@@ -137,13 +149,16 @@ export default function ManageUsers() {
           >
             <TableRow>
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-                Name
+                Charge Id
+              </TableCell>
+              <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                Owner's Name
               </TableCell>
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
                 Email
               </TableCell>
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-                Address
+                Location
               </TableCell>
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
                 Phone
@@ -154,13 +169,24 @@ export default function ManageUsers() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filterUsers().map((user) => (
+            {filterChargeStations().map((station) => (
               <TableRow
-                key={user.id}
+                key={station.chargeId}
                 sx={{ "&:hover": { backgroundColor: "#f1f1f1" } }}
               >
                 <TableCell>
-                  {editUser === user.id ? (
+                  {editChargeStation === station.chargeId ? (
+                    <Input
+                      value={editedData?.chargeId}
+                      onChange={(e) => handleChange("chargeId", e.target.value)}
+                      sx={{ marginBottom: 1 }}
+                    />
+                  ) : (
+                    station.chargeId
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editChargeStation === station.chargeId ? (
                     <Box>
                       <Input
                         value={editedData?.firstName}
@@ -178,44 +204,44 @@ export default function ManageUsers() {
                       />
                     </Box>
                   ) : (
-                    `${user.firstName} ${user.lastName}`
+                    `${station.firstName} ${station.lastName}`
                   )}
                 </TableCell>
                 <TableCell>
-                  {editUser === user.id ? (
+                  {editChargeStation === station.chargeId ? (
                     <Input
                       value={editedData?.email}
                       onChange={(e) => handleChange("email", e.target.value)}
                       sx={{ marginBottom: 1 }}
                     />
                   ) : (
-                    user.email
+                    station.email
                   )}
                 </TableCell>
                 <TableCell>
-                  {editUser === user.id ? (
+                  {editChargeStation === station.chargeId ? (
                     <Input
-                      value={editedData?.address}
-                      onChange={(e) => handleChange("address", e.target.value)}
+                      value={editedData?.location}
+                      onChange={(e) => handleChange("location", e.target.value)}
                       sx={{ marginBottom: 1 }}
                     />
                   ) : (
-                    user.address
+                    station.location
                   )}
                 </TableCell>
                 <TableCell>
-                  {editUser === user.id ? (
+                  {editChargeStation === station.chargeId ? (
                     <Input
                       value={editedData?.phone}
                       onChange={(e) => handleChange("phone", e.target.value)}
                       sx={{ marginBottom: 1 }}
                     />
                   ) : (
-                    user.phone
+                    station.phone
                   )}
                 </TableCell>
-                <TableCell className="tableCell">
-                  {editUser === user.id ? (
+                <TableCell>
+                  {editChargeStation === station.chargeId ? (
                     <div className="buttun">
                       <button onClick={handleSaveEdit} className="schedule-btn">
                         Save
@@ -230,13 +256,13 @@ export default function ManageUsers() {
                   ) : (
                     <div className="buttun">
                       <button
-                        onClick={() => handleEditUser(user)}
+                        onClick={() => handleEditChargeStation(station)}
                         className="schedule-btn"
                       >
                         Edit
                       </button>
                       <button
-                        onClick={() => deleteUser(user.id)}
+                        onClick={() => deleteChargeStation(station.chargeId)}
                         className="schedule-btn"
                       >
                         Delete

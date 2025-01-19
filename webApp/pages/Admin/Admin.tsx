@@ -1,5 +1,7 @@
 import React from "react";
+import "./Admin.css";
 import ManageUsers from "../../src/components/Admin/ManageUsers";
+import ManageChargeStations from "../../src/components/Admin/ManageChargingStations";
 export default function Admin() {
   return (
     <div className="admin-container">
@@ -7,7 +9,7 @@ export default function Admin() {
         <ManageUsers />
       </div>
       <div className="manageStations">
-        <h2>Manage Stations</h2>
+        <ManageChargeStations />
       </div>
     </div>
   );
