@@ -31,13 +31,10 @@ export default function Navbar() {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("userId");
       navigate("/");
-
     } catch (error) {
       console.error("Error during logout:", error);
 
- 
       localStorage.removeItem("accessToken");
-
 
       alert("Logout failed. Please try again later.");
     }
@@ -46,6 +43,16 @@ export default function Navbar() {
   return (
     <nav className={styles.navbar}>
       <ul className={styles.navList}>
+        <li className={styles.navItem}>
+          <NavLink
+            to="/Admin"
+            className={({ isActive }) =>
+              isActive ? styles.activeLink : styles.navLink
+            }
+          >
+            Admin
+          </NavLink>
+        </li>
         <li className={styles.navItem}>
           <NavLink
             to="/Home"
@@ -60,7 +67,7 @@ export default function Navbar() {
         <li className={styles.navItem}>
           <NavLink
             to="/newChargingStation"
-            className={({ isActive }: { isActive: boolean }) =>
+            className={({ isActive }) =>
               isActive ? styles.activeLink : styles.navLink
             }
           >
@@ -70,7 +77,7 @@ export default function Navbar() {
         <li className={styles.navItem}>
           <NavLink
             to="/ActivityHistory"
-            className={({ isActive }: { isActive: boolean }) =>
+            className={({ isActive }) =>
               isActive ? styles.activeLink : styles.navLink
             }
           >
@@ -80,11 +87,11 @@ export default function Navbar() {
         <li className={styles.navItem}>
           <NavLink
             to="/PersonalArea"
-            className={({ isActive }: { isActive: boolean }) =>
+            className={({ isActive }) =>
               isActive ? styles.activeLink : styles.navLink
             }
           >
-            <FaUser style={{ marginRight: "8px" }} /> {}
+            <FaUser style={{ marginRight: "8px" }} />
             Personal area
           </NavLink>
         </li>
@@ -95,11 +102,11 @@ export default function Navbar() {
               isActive ? styles.activeLink : styles.navLink
             }
           >
-            <MdExitToApp style={{ marginRight: "8px" }} />
+            <MdExitToApp />
+            <button onClick={handleLogout} className={styles.navLink}>
+              Logout
+            </button>
           </NavLink>
-          <button onClick={handleLogout} className={styles.navLink}>
-            Logout
-          </button>
         </li>
       </ul>
     </nav>

@@ -111,3 +111,28 @@
   visibility: visible;
   opacity: 1;
 }
+/* Inside your CSS or module CSS file */
+.googleLogin {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+  max-width: 400px; /* Limit the width */
+  margin: 20px auto; /* Center it horizontally with space around */
+}
+
+.googleLogin button {
+  background-color: #4285f4; /* Google blue */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.googleLogin button:hover {
+  background-color: #357ae8; /* Darker blue on hover */
+}
