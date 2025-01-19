@@ -171,6 +171,8 @@ const PersonalArea: React.FC = () => {
           {loading ? "Sending..." : "Send Car Information"}
         </button>
       </div>
+
+      <div></div>
     </div>
   );
 };

@@ -5,8 +5,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Home.css";
 
-
-
 interface Comment {
   text: string;
 }
@@ -22,7 +20,7 @@ interface ChargingStation {
   picture?: string;
   description: string;
   comments?: Comment[];
-  userId: string; 
+  userId: string;
 }
 
 function MapUpdater({
@@ -34,7 +32,7 @@ function MapUpdater({
 
   useEffect(() => {
     if (coordinates) {
-      map.setView([coordinates.lat, coordinates.lng], map.getZoom()); // Update map center
+      map.setView([coordinates.lat, coordinates.lng], map.getZoom());
     }
   }, [coordinates, map]);
 
@@ -68,22 +66,26 @@ export default function Home() {
     lng: number;
   } | null>(null);
   const [address, setAddress] = useState<string>("");
-  const [chargingStations, setChargingStations] = useState<ChargingStation[]>([]);
+  const [chargingStations, setChargingStations] = useState<ChargingStation[]>(
+    []
+  );
   const [carData, setCarData] = useState<{
     batteryCapacity: number;
     brandName: string;
     year: number;
     carModel: string;
   } | null>(null);
-  
-  const [userName, setUserName] = useState<{ firstName: string; lastName: string } | null>(null);
+
+  const [userName, setUserName] = useState<{
+    firstName: string;
+    lastName: string;
+  } | null>(null);
 
   useEffect(() => {
-
     const accessToken = localStorage.getItem("accessToken");
     console.log("The Access Token:", accessToken);
     if (!accessToken) {
-      navigate("/"); 
+      navigate("/");
       return;
     }
 
@@ -95,7 +97,6 @@ export default function Home() {
       setUserName({ firstName, lastName });
     }
 
-    // Get the user's current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -206,7 +207,8 @@ export default function Home() {
   return (
     <div className="map-page">
       <h2 className="title">
-        Hi {userName ? `${userName.firstName} ${userName.lastName}` : "User"}, Charging Station Map
+        Hi {userName ? `${userName.firstName} ${userName.lastName}` : "User"},
+        Charging Station Map
       </h2>
       <div className="input-container">
         <input
@@ -264,7 +266,8 @@ export default function Home() {
                       )}
                     </strong>
                     <div>
-                      (based on {carData.brandName} {carData.carModel} {carData.year})
+                      (based on {carData.brandName} {carData.carModel}{" "}
+                      {carData.year})
                     </div>
                   </>
                 ) : (
@@ -273,6 +276,27 @@ export default function Home() {
                 <br />
                 <br />
                 {charger.description && <p>{charger.description}</p>}
+                <br />
+                <img
+                  src={`http://loacalhost:3000${charger.picture}`}
+                  alt="Charging Station"
+                  style={{ width: "100%", height: "auto" }}
+                />
+                <button
+                  onClick={() =>
+                    (window.location.href = "http://localhost:5173/Booking")
+                  }
+                  style={{
+                    backgroundColor: "#066C91",
+                    color: "white",
+                    padding: "10px 20px",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Book Now
+                </button>
               </Popup>
             </Marker>
           ))}
