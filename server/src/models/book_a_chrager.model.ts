@@ -18,6 +18,10 @@ const BookCharger = new mongoose.Schema({
         type: Date,
         required: true,
     },
+    Status: {
+        type: String,
+        required: true,
+    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Users",

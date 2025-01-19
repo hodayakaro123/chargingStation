@@ -94,7 +94,6 @@ const getChargerById = async (req: Request, res: Response) => {
 };
 
 const getChargersByUserId = async (req: Request, res: Response) => {
-    console.log('getChargersByUserId');
     try {
         const { userId } = req.params;
 
