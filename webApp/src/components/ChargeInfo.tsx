@@ -14,40 +14,43 @@ import {
 } from "@mui/material";
 import "./ChargeInfo.css";
 
+interface ChargerRow {
+  id: number;
+  Location: string;
+  ChargingRate: number;
+  Description: string;
+  Price: string;
+  picture: string;
+  userId: string;
+}
+
 type ChargeInfoProps = {
-  rows: {
-    id: number;
-    Location: string;
-    ChargingRate: number;
-    Description: string;
-    Price: string;
-    picture: string;
-  }[];
+  rows: ChargerRow[];
 };
 
 export default function ChargeInfo({ rows }: ChargeInfoProps) {
   const [editableRow, setEditableRow] = useState<number | null>(null);
-  const [editData, setEditData] = useState<any>({});
+  const [editData, setEditData] = useState<ChargerRow | null>(null);
 
   const handleEditClick = (id: number) => {
     setEditableRow(id);
     const row = rows.find((row) => row.id === id);
-    setEditData(row);
+    if (row) setEditData(row);
   };
 
   const handleSaveClick = () => {
-    // Logic to save the edited data
     setEditableRow(null);
+    setEditData(null);
   };
 
   const handleCancelClick = () => {
     setEditableRow(null);
-    setEditData({});
+    setEditData(null);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setEditData((prev: any) => ({ ...prev, [name]: value }));
+    setEditData((prev) => (prev ? { ...prev, [name]: value } : prev));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,10 +58,9 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setEditData((prev: any) => ({
-          ...prev,
-          picture: reader.result as string,
-        }));
+        setEditData((prev) =>
+          prev ? { ...prev, picture: reader.result as string } : prev
+        );
       };
       reader.readAsDataURL(file);
     }
@@ -84,54 +86,22 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
           <TableBody>
             {rows.map((row) => (
               <TableRow key={row.id} className="table-row">
-                <TableCell className="table-cell">
-                  {editableRow === row.id ? (
-                    <TextField
-                      name="Location"
-                      value={editData.Location}
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  ) : (
-                    row.Location
-                  )}
-                </TableCell>
-                <TableCell className="table-cell">
-                  {editableRow === row.id ? (
-                    <TextField
-                      name="ChargingRate"
-                      value={editData.ChargingRate}
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  ) : (
-                    row.ChargingRate
-                  )}
-                </TableCell>
-                <TableCell className="table-cell">
-                  {editableRow === row.id ? (
-                    <TextField
-                      name="Description"
-                      value={editData.Description}
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  ) : (
-                    row.Description
-                  )}
-                </TableCell>
-                <TableCell className="table-cell">
-                  {editableRow === row.id ? (
-                    <TextField
-                      name="Price"
-                      value={editData.Price}
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  ) : (
-                    row.Price
-                  )}
-                </TableCell>
+                {["Location", "ChargingRate", "Description", "Price"].map(
+                  (field) => (
+                    <TableCell key={field} className="table-cell">
+                      {editableRow === row.id ? (
+                        <TextField
+                          name={field}
+                          value={editData?.[field as keyof ChargerRow] || ""}
+                          onChange={handleChange}
+                          fullWidth
+                        />
+                      ) : (
+                        row[field as keyof ChargerRow]
+                      )}
+                    </TableCell>
+                  )
+                )}
                 <TableCell className="table-cell">
                   {editableRow === row.id ? (
                     <Box>
@@ -141,22 +111,20 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
                         fullWidth
                         className="file-upload-input"
                       />
-                      {editData.picture && (
+                      {editData?.picture && (
                         <img
-                          src={editData.picture}
-                          alt="New Charging Station"
+                          src={`http://localhost:3000${row.picture}`}                           alt="Charging Station"
                           style={{
                             width: "50px",
                             height: "50px",
                             objectFit: "cover",
-                            marginTop: "10px",
                           }}
                         />
                       )}
                     </Box>
                   ) : (
                     <img
-                      src={row.picture}
+                      src={`http://localhost:3000${row.picture}`} 
                       alt="Charging Station"
                       style={{
                         width: "50px",
@@ -166,6 +134,7 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
                     />
                   )}
                 </TableCell>
+
                 <TableCell className="table-cell">
                   {editableRow === row.id ? (
                     <Box

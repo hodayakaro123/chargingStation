@@ -1,6 +1,3 @@
-// // Tom-Guter-316487230
-// // Hodaya-Karo-322579848
-
 import express, { Express } from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -18,9 +15,22 @@ import geminiRouter from "./routes/gemini_route";
 import fs from "fs";
 import path from "path";
 
-
 const app = express();
 dotenv.config();
+
+const ensureUploadDirectories = () => {
+  const directories = ["uploads"];
+  directories.forEach((dir) => {
+    const fullPath = path.resolve(__dirname, dir);
+    if (!fs.existsSync(fullPath)) {
+      fs.mkdirSync(fullPath, { recursive: true });
+    }
+  });
+};
+
+ensureUploadDirectories();
+
+app.use("/uploads", express.static(path.resolve(__dirname, "uploads")));
 
 app.use(cors());
 
@@ -39,23 +49,6 @@ const options = {
 };
 const specs = swaggerJsDoc(options);
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
-
-
-
-
-const ensureUploadDirectories = () => {
-  const directories = ["uploads"];
-  directories.forEach((dir) => {
-    const fullPath = path.resolve(__dirname, dir);
-    if (!fs.existsSync(fullPath)) {
-      fs.mkdirSync(fullPath, { recursive: true });
-    }
-  });
-};
-
-
-ensureUploadDirectories();
-
 
 const moduleApp = async (): Promise<Express> => {
   if (!process.env.DB_CONNECT) {

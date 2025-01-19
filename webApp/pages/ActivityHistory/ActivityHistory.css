@@ -104,13 +104,13 @@ body {
 }
 
 .status-cell.Pending:hover {
-  background-color: #ff8c00; /* Darker Orange */
+  background-color: #ff8c00; 
 }
 
 .status-cell.Approved:hover {
-  background-color: #218838; /* Darker Green */
+  background-color: #218838; 
 }
 
 .status-cell.Declined:hover {
-  background-color: #c82333; /* Darker Red */
+  background-color: #c82333; 
 }

@@ -86,21 +86,20 @@ const rows = [
     more: "Details",
     status: "Approved" as Status,
   },
-  // More rows...
 ];
 
 const statusStyles: Record<Status, { backgroundColor: string; color: string }> =
   {
     Pending: {
-      backgroundColor: "#FFA500", // Orange for Pending
+      backgroundColor: "#FFA500", 
       color: "white",
     },
     Approved: {
-      backgroundColor: "#28a745", // Green for Approved
+      backgroundColor: "#28a745", 
       color: "white",
     },
     Declined: {
-      backgroundColor: "#dc3545", // Red for Declined
+      backgroundColor: "#dc3545", 
       color: "white",
     },
   };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -24,38 +24,66 @@ interface ChargeStation {
 }
 
 export default function ManageChargeStations() {
-  const [chargeStations, setChargeStations] = useState<ChargeStation[]>([
-    {
-      chargeId: 1,
-      firstName: "John",
-      lastName: "Doe",
-      email: "john@example.com",
-      location: "123 Main St",
-      phone: "123-456-7890",
-    },
-    {
-      chargeId: 2,
-      firstName: "Jane",
-      lastName: "Smith",
-      email: "jane@example.com",
-      location: "456 Oak St",
-      phone: "234-567-8901",
-    },
-    {
-      chargeId: 3,
-      firstName: "Alice",
-      lastName: "Johnson",
-      email: "alice@example.com",
-      location: "789 Elm St",
-      phone: "345-678-9012",
-    },
-  ]);
-
+  const [chargeStations, setChargeStations] = useState<ChargeStation[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [editChargeStation, setEditChargeStation] = useState<number | null>(
     null
   );
   const [editedData, setEditedData] = useState<ChargeStation | null>(null);
+
+  useEffect(() => {
+    const fetchChargeStations = async () => {
+      const userId = localStorage.getItem("userId");
+      const accessToken = localStorage.getItem("accessToken");
+    
+      if (!userId) {
+        alert("User ID is required to fetch charging stations");
+        return;
+      }
+    
+      try {
+        const response = await fetch(
+          `http://localhost:3000/admin/getAllChargers`,  // Make sure the URL is correct
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+    
+        if (!response.ok) {
+          throw new Error("Failed to fetch charge stations");
+        }
+    
+        const data = await response.json();
+        console.log("Fetched data:", data); 
+    
+
+        if (data.chargers && Array.isArray(data.chargers)) {
+          const fetchedStations = data.chargers.map((station: any) => ({
+            chargeId: station._id,
+            firstName: station.firstName,
+            lastName: station.lastName,
+            email: station.email,
+            location: station.location,
+            phone: station.phone,
+          }));
+    
+          setChargeStations(fetchedStations);
+        } else {
+          console.error("Expected an array under 'chargers', but received:", data);
+          alert("Error: Expected an array of charge stations under 'chargers'.");
+        }
+    
+      } catch (error) {
+        console.error("Error fetching charge stations:", error);
+        alert("Failed to fetch charge stations");
+      }
+    };
+    
+
+    fetchChargeStations();
+  }, []);
 
   const filterChargeStations = () => {
     return chargeStations.filter(

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -15,7 +15,7 @@ import {
 import "./ManageUsers.css";
 
 interface User {
-  id: number;
+  _id: number;
   firstName: string;
   lastName: string;
   email: string;
@@ -24,62 +24,113 @@ interface User {
 }
 
 export default function ManageUsers() {
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: 1,
-      firstName: "John",
-      lastName: "Doe",
-      email: "john@example.com",
-      address: "123 Main St",
-      phone: "123-456-7890",
-    },
-    {
-      id: 2,
-      firstName: "Jane",
-      lastName: "Smith",
-      email: "jane@example.com",
-      address: "456 Oak St",
-      phone: "234-567-8901",
-    },
-    {
-      id: 3,
-      firstName: "Alice",
-      lastName: "Johnson",
-      email: "",
-      address: "789 Elm St",
-      phone: "345-678-9012",
-    },
-  ]);
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [editUser, setEditUser] = useState<number | null>(null);
   const [editedData, setEditedData] = useState<User | null>(null);
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const accessToken = localStorage.getItem("accessToken");
+      try {
+        const response = await fetch(
+          "http://localhost:3000/admin/getAllUsers",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch users");
+        }
+        const data: User[] = await response.json();
+        setUsers(data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   const filterUsers = () => {
     return users.filter(
       (user) =>
-        user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.phone.includes(searchTerm)
+        user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.phone?.includes(searchTerm)
     );
   };
 
-  const deleteUser = (id: number) => {
-    setUsers(users.filter((user) => user.id !== id));
+
+
+  
+
+  const deleteUser = async (id: number) => {
+    const accessToken = localStorage.getItem("accessToken");
+    console.log("Deleting user with ID:", id);
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/admin/deleteUser${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete user");
+      }
+
+      setUsers(users.filter((user) => user._id !== id));
+      console.log(`User with ID ${id} deleted successfully`);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
   };
 
   const handleEditUser = (user: User) => {
-    setEditUser(user.id);
+    setEditUser(user._id);
     setEditedData(user);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editedData) {
-      setUsers(
-        users.map((user) =>
-          user.id === editedData.id ? { ...editedData } : user
-        )
-      );
-      setEditUser(null);
-      setEditedData(null);
+      const accessToken = localStorage.getItem("accessToken");
+      console.log(editedData._id);
+      try {
+        const response = await fetch(
+          `http://localhost:3000/admin/updateUser/${editedData._id}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(editedData), 
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error("Failed to update user");
+        }
+  
+        setUsers(
+          users.map((user) =>
+            user._id === editedData._id ? { ...editedData } : user
+          )
+        );
+  
+        setEditUser(null); // Close the editing mode
+        setEditedData(null); // Clear the edited data
+      } catch (error) {
+        console.error("Error updating user:", error);
+      }
     }
   };
 
@@ -156,11 +207,11 @@ export default function ManageUsers() {
           <TableBody>
             {filterUsers().map((user) => (
               <TableRow
-                key={user.id}
+                key={user._id} 
                 sx={{ "&:hover": { backgroundColor: "#f1f1f1" } }}
               >
-                <TableCell>
-                  {editUser === user.id ? (
+                <TableCell key={`name-${user._id}`}>
+                  {editUser === user._id ? (
                     <Box>
                       <Input
                         value={editedData?.firstName}
@@ -181,8 +232,8 @@ export default function ManageUsers() {
                     `${user.firstName} ${user.lastName}`
                   )}
                 </TableCell>
-                <TableCell>
-                  {editUser === user.id ? (
+                <TableCell key={`email-${user._id}`}>
+                  {editUser === user._id ? (
                     <Input
                       value={editedData?.email}
                       onChange={(e) => handleChange("email", e.target.value)}
@@ -192,8 +243,8 @@ export default function ManageUsers() {
                     user.email
                   )}
                 </TableCell>
-                <TableCell>
-                  {editUser === user.id ? (
+                <TableCell key={`address-${user._id}`}>
+                  {editUser === user._id ? (
                     <Input
                       value={editedData?.address}
                       onChange={(e) => handleChange("address", e.target.value)}
@@ -203,8 +254,8 @@ export default function ManageUsers() {
                     user.address
                   )}
                 </TableCell>
-                <TableCell>
-                  {editUser === user.id ? (
+                <TableCell key={`phone-${user._id}`}>
+                  {editUser === user._id ? (
                     <Input
                       value={editedData?.phone}
                       onChange={(e) => handleChange("phone", e.target.value)}
@@ -214,8 +265,8 @@ export default function ManageUsers() {
                     user.phone
                   )}
                 </TableCell>
-                <TableCell className="tableCell">
-                  {editUser === user.id ? (
+                <TableCell className="tableCell" key={`actions-${user._id}`}>
+                  {editUser === user._id ? (
                     <div className="buttun">
                       <button onClick={handleSaveEdit} className="schedule-btn">
                         Save
@@ -236,7 +287,7 @@ export default function ManageUsers() {
                         Edit
                       </button>
                       <button
-                        onClick={() => deleteUser(user.id)}
+                        onClick={() => deleteUser(user._id)}
                         className="schedule-btn"
                       >
                         Delete

@@ -3,7 +3,6 @@ import "./PersonalArea.css";
 import GeneralInfoHeader from "../../src/components/GeneralInfoHeader";
 import ChargeInfo from "../../src/components/ChargeInfo";
 
-
 interface Comment {
   text: string;
 }
@@ -19,6 +18,17 @@ interface Charger {
   description?: string;
   comments: Comment[];
   userId: string;
+  _id: string; 
+}
+
+interface ChargeInfoRow {
+  id: number;
+  Location: string;
+  ChargingRate: number;
+  Description: string;
+  Price: string;
+  picture: string;
+  userId: string; 
 }
 
 const PersonalArea: React.FC = () => {
@@ -26,35 +36,50 @@ const PersonalArea: React.FC = () => {
   const [carYear, setCarYear] = useState<string>("");
   const [carModel, setCarModel] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [rows, setRows] = useState<Charger[]>([]);
+  const [rows, setRows] = useState<ChargeInfoRow[]>([]);
 
   useEffect(() => {
     const fetchChargingStations = async () => {
       const userId = localStorage.getItem("userId");
       const accessToken = localStorage.getItem("accessToken");
+
       if (!userId) {
-        alert("User ID is required");
+        alert("User ID is required to fetch charging stations");
         return;
       }
 
       try {
-        const response = await fetch(`http://localhost:3000/addChargingStation/getChargersByUserId/chargers/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-      
+        const response = await fetch(
+          `http://localhost:3000/addChargingStation/getChargersByUserId/chargers/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
         if (!response.ok) {
           throw new Error("Failed to fetch charging stations");
         }
-      
+
         const data = await response.json();
-        setRows(data.chargers); 
+        console.log(data);
+
+        const chargers = data.chargers.map((charger: Charger, index: number) => ({
+          id: `${charger._id}-${index}`, 
+          Location: charger.location || "Unknown",
+          ChargingRate: charger.chargingRate || 0,
+          Description: charger.description || "No description",
+          Price: charger.price.toString(),
+          picture: charger.picture || "",
+          userId: charger.userId,
+        }));
+
+        setRows(chargers); 
       } catch (error) {
         console.error("Error fetching charging stations:", error);
         alert("Failed to fetch charging stations");
       }
-      
     };
 
     fetchChargingStations();
@@ -95,19 +120,22 @@ const PersonalArea: React.FC = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/gemini/generate-content", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        body: JSON.stringify({
-          carBrand,
-          carYear,
-          carModel,
-          userId,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:3000/gemini/generate-content",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          body: JSON.stringify({
+            carBrand,
+            carYear,
+            carModel,
+            userId,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to generate content");
