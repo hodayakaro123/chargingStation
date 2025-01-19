@@ -12,6 +12,7 @@ router.get("getUserById/:id", authMiddleware, userControllerAuth.getUserById);
 
 router.delete("/deleteUser:id", authMiddleware, userControllerAuth.deleteUser);
 
+router.put("/updateUser/:id", authMiddleware, userControllerAuth.updateUser);
 
 router.get("/getAllChargers", (req, res) => {
     add_charging_controller.getAllChargers(req, res);

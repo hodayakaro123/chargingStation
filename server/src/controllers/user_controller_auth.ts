@@ -362,4 +362,19 @@ const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-export default { signUp, login, logout, refreshToken, googleSignIn, getAllUsers, getUserById, deleteUser };
+const updateUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const updateData = req.body;
+    const user = await userModel.findByIdAndUpdate(userId, updateData, { new: true });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "User updated successfully", user });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+export default { signUp, login, logout, refreshToken, googleSignIn, getAllUsers, getUserById, deleteUser, updateUser };
