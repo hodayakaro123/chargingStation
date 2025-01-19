@@ -76,3 +76,41 @@ body {
   color: #0056b3;
   text-decoration: none;
 }
+.status-cell {
+  font-size: 14px;
+  color: #fff;
+  padding: 12px 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.status-cell.Pending {
+  background-color: #ffa500; /* Orange */
+}
+
+.status-cell.Approved {
+  background-color: #28a745; /* Green */
+}
+
+.status-cell.Declined {
+  background-color: #dc3545; /* Red */
+}
+
+.status-cell:hover {
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.status-cell.Pending:hover {
+  background-color: #ff8c00; 
+}
+
+.status-cell.Approved:hover {
+  background-color: #218838; 
+}
+
+.status-cell.Declined:hover {
+  background-color: #c82333; 
+}

@@ -56,9 +56,9 @@ export default function ManageChargeStations() {
         }
     
         const data = await response.json();
-        console.log("Fetched data:", data); // Log the fetched data to check its structure
+        console.log("Fetched data:", data); 
     
-        // Access the 'chargers' array from the response
+
         if (data.chargers && Array.isArray(data.chargers)) {
           const fetchedStations = data.chargers.map((station: any) => ({
             chargeId: station._id,
