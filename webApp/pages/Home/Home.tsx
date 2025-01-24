@@ -1,9 +1,9 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Home.css";
+import React from "react";
 
 interface Comment {
   text: string;
@@ -23,20 +23,42 @@ interface ChargingStation {
   userId: string;
 }
 
-function MapUpdater({
-  coordinates,
+
+
+function ReturnToLocationButton({
+  userLocation,
 }: {
-  coordinates: { lat: number; lng: number } | null;
+  userLocation: { lat: number; lng: number } | null;
 }) {
   const map = useMap();
 
-  useEffect(() => {
-    if (coordinates) {
-      map.setView([coordinates.lat, coordinates.lng], map.getZoom());
+  const goToCurrentLocation = () => {
+    if (userLocation) {
+      map.flyTo([userLocation.lat, userLocation.lng], 14);
+    } else {
+      alert("Current location not available.");
     }
-  }, [coordinates, map]);
+  };
 
-  return null;
+  return (
+    <button
+      className="btn"
+      style={{
+        width: "250px",
+        position: "absolute",
+        right: 0,
+        zIndex: 1000,
+        backgroundColor: "#066C91",
+        color: "#fff",
+        border: "none",
+        borderRadius: "8px",
+        cursor: "pointer",
+      }}
+      onClick={goToCurrentLocation}
+    >
+      Return to Current Location
+    </button>
+  );
 }
 
 function calculateChargingTime(
@@ -57,6 +79,7 @@ function calculateChargingTime(
 export default function Home() {
   const navigate = useNavigate();
 
+ 
   const [coordinates, setCoordinates] = useState<{
     lat: number;
     lng: number;
@@ -83,16 +106,17 @@ export default function Home() {
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
-    console.log("The Access Token:", accessToken);
     if (!accessToken) {
+      navigate("/");
+      return;
+    }
+    if (!localStorage.getItem("refreshToken")) {
       navigate("/");
       return;
     }
 
     const firstName = localStorage.getItem("firstName");
     const lastName = localStorage.getItem("lastName");
-    console.log("The First Name:", firstName);
-    console.log("The Last Name:", lastName);
     if (firstName && lastName) {
       setUserName({ firstName, lastName });
     }
@@ -111,7 +135,7 @@ export default function Home() {
     } else {
       console.error("Geolocation is not supported by this browser.");
     }
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     const fetchChargingStations = async () => {
@@ -189,12 +213,7 @@ export default function Home() {
 
       if (data.length > 0) {
         const { lat, lon } = data[0];
-        const newLat = parseFloat(lat);
-        const newLng = parseFloat(lon);
-
-        setCoordinates({ lat: newLat, lng: newLng });
-        setUserLocation({ lat: newLat, lng: newLng });
-        console.log("Address coordinates:", { lat: newLat, lng: newLng });
+        setCoordinates({ lat: parseFloat(lat), lng: parseFloat(lon) });
       } else {
         alert("No results found for the entered address.");
       }
@@ -222,7 +241,6 @@ export default function Home() {
           Find Charging Station by Address
         </button>
       </div>
-
       {!userLocation || !carData ? (
         <div className="spinner-container">
           <div className="spinner"></div>
@@ -248,7 +266,9 @@ export default function Home() {
               position={[charger.latitude, charger.longitude]}
             >
               <Popup>
+                <input style={{ fontSize: "5px", padding: "0" }} type="file" />
                 <strong>{charger.location}</strong>
+                <br />
                 <br />
                 Price: ${charger.price}
                 <br />
@@ -257,25 +277,16 @@ export default function Home() {
                 Charging Speed: {charger.chargingRate}kW
                 <br />
                 Charging Time:{" "}
-                {carData.batteryCapacity && charger.chargingRate ? (
-                  <>
-                    <strong>
-                      {calculateChargingTime(
-                        carData.batteryCapacity,
-                        charger.chargingRate
-                      )}
-                    </strong>
-                    <div>
-                      (based on {carData.brandName} {carData.carModel}{" "}
-                      {carData.year})
-                    </div>
-                  </>
+                {carData?.batteryCapacity && charger.chargingRate ? (
+                  <strong>
+                    {calculateChargingTime(
+                      carData.batteryCapacity,
+                      charger.chargingRate
+                    )}
+                  </strong>
                 ) : (
                   "N/A"
                 )}
-                <br />
-                <br />
-                {charger.description && <p>{charger.description}</p>}
                 <br />
                 <button
                   onClick={() =>
@@ -288,6 +299,7 @@ export default function Home() {
                     border: "none",
                     borderRadius: "8px",
                     cursor: "pointer",
+                    marginTop: "10px",
                   }}
                 >
                   Book Now
@@ -295,7 +307,7 @@ export default function Home() {
               </Popup>
             </Marker>
           ))}
-          <MapUpdater coordinates={coordinates} /> {}
+          <ReturnToLocationButton userLocation={userLocation} />
         </MapContainer>
       )}
     </div>

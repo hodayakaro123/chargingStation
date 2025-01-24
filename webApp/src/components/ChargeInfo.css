@@ -1,99 +1,89 @@
 .charge-container {
-  padding: 20px;
-}
-
-.table-title {
-  margin-bottom: 20px;
-  font-weight: 600;
-  color: #000;
+  margin: 20px auto;
+  padding: 10px;
 }
 
 .table-container {
-  max-height: 400px;
-  overflow-y: auto;
-  width: 100%;
-  margin-top: 20px;
-  border-radius: 30px;
-  display: block; /* הכרחי כדי שהגלילה תעבוד */
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+}
+
+.table-title {
+  text-align: center;
+  margin: 15px 0;
+  font-weight: bold;
+  color: #1976d2;
 }
 
 .table-header-row {
-  background-color: #f5f5f5;
+  background-color: #f4f6f8;
 }
 
 .table-header-cell {
   font-weight: bold;
-  position: sticky;
-  top: 0; /* דואג שהכותרות יישארו קבועות */
-  background-color: #f5f5f5;
-  z-index: 1; /* להניח את הכותרת מעל התוכן */
+  color: black !important;
 }
 
 .table-cell {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.more-column img {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
+  text-align: center;
+  padding: 12px;
 }
 
 .table-row {
-  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+  background-color: #f9fafb;
 }
 
 .schedule-btn {
-  background-color: #2563eb;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 14px;
   transition: all 0.3s ease;
-  border: 1px solid transparent;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+}
+
+.schedule-btn.edit-btn {
+  background-color: #1976d2;
+  color: #fff;
+}
+
+.schedule-btn.save-btn {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.schedule-btn.cancel-btn {
+  background-color: #dc3545;
+  color: #fff;
 }
 
 .schedule-btn:hover {
-  background-color: #081b44;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-  transform: translateY(-2px);
-}
-
-.file-upload-label {
-  display: inline-block;
-  padding: 12px 25px;
-  background-color: #2563eb;
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 12px;
-  cursor: pointer;
-  margin-bottom: 10px;
-  transition: all 0.3s ease;
-}
-
-.file-upload-label:hover {
-  background-color: #081b44;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
 }
 
 .file-upload-input {
-  display: none;
+  margin-top: 10px;
 }
 
-.file-upload-input:focus + .file-upload-label {
-  outline: none;
-  box-shadow: 0px 0px 5px rgba(37, 99, 235, 0.5);
-}
+@media (max-width: 768px) {
+  .table-container {
+    overflow-x: auto;
+  }
 
-.without-title {
-  margin-top: 20px;
+  .table-cell,
+  .table-header-cell {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .schedule-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
 }

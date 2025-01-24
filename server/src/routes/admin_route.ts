@@ -8,7 +8,7 @@ const router = Router();
 
 router.get("/getAllUsers", authMiddleware, userControllerAuth.getAllUsers);
 
-router.get("getUserById/:id", authMiddleware, userControllerAuth.getUserById);
+router.get("/getUserById/:id", authMiddleware, userControllerAuth.getUserById);
 
 router.delete("/deleteUser:id", authMiddleware, userControllerAuth.deleteUser);
 

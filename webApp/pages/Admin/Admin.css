@@ -1,13 +1,15 @@
 .admin-container {
   display: flex;
-  justify-content: space-between; /* תוודא שיש רווח בין הרכיבים */
-  gap: 20px; /* רווח בין שני הרכיבים */
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
   padding: 20px;
+  padding-top: 30rem;
 }
 
 .manageUsers,
 .manageStations {
   flex: 1;
   padding: 15px;
-  width: 80%;
+  width: 100%;
 }

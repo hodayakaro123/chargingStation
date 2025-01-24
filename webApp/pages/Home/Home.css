@@ -2,7 +2,7 @@
   padding: 20px;
   font-family: "Roboto", sans-serif;
   position: relative;
-  top: 130px;
+  margin-top: 10rem;
   width: 773px;
   border-radius: 10px;
 }
@@ -29,6 +29,7 @@
   margin-right: 10px;
   width: 250px;
   font-size: 16px;
+  margin-bottom: 7px;
   transition: border-color 0.3s;
 }
 
@@ -81,24 +82,33 @@
   }
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
+.button-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1024px) {
   .map-page {
+    width: 90%;
+    top: 100px;
     padding: 15px;
-    top: 50px;
   }
 
-  .title {
-    font-size: 22px;
+  .input-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
   }
 
   .input {
-    width: 200px;
+    width: 100%;
+    max-width: 400px;
   }
 
   .btn {
-    padding: 10px 15px;
-    font-size: 14px;
+    width: 100%;
+    max-width: 200px;
+    font-size: 15px;
   }
 
   .spinner-container {
@@ -106,17 +116,62 @@
   }
 }
 
-@media (max-width: 480px) {
+/* Small screens (phones) */
+@media (max-width: 768px) {
+  .map-page {
+    width: 95%;
+    top: 50px;
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .input-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
   .input {
-    width: 150px;
+    width: 100%;
+    font-size: 14px;
   }
 
   .btn {
-    padding: 8px 12px;
+    width: 100%;
+    padding: 10px;
     font-size: 14px;
   }
 
   .spinner-container {
     height: 300px;
+  }
+}
+
+/* Extra-small screens (very small phones) */
+@media (max-width: 480px) {
+  .map-page {
+    width: 100%;
+    top: 30px;
+    padding: 8px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .input {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .spinner-container {
+    height: 250px;
   }
 }

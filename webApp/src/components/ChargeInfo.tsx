@@ -75,7 +75,13 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
         <Table stickyHeader className="without-title">
           <TableHead>
             <TableRow className="table-header-row">
-              <TableCell className="table-header-cell">Location</TableCell>
+              <TableCell
+                className="table-header-cell"
+                style={{ color: "black" }}
+              >
+                Location
+              </TableCell>
+
               <TableCell className="table-header-cell">Charging Rate</TableCell>
               <TableCell className="table-header-cell">Description</TableCell>
               <TableCell className="table-header-cell">Price</TableCell>
@@ -113,44 +119,47 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
                       />
                       {editData?.picture && (
                         <img
-                          src={`http://localhost:3000${row.picture}`}                           alt="Charging Station"
+                          src={editData.picture}
+                          alt="Preview"
                           style={{
                             width: "50px",
                             height: "50px",
                             objectFit: "cover",
+                            borderRadius: "4px",
                           }}
                         />
                       )}
                     </Box>
-                  ) : (
+                  ) : row.picture ? (
                     <img
-                      src={`http://localhost:3000${row.picture}`} 
+                      src={`http://localhost:3000${row.picture}`}
                       alt="Charging Station"
                       style={{
                         width: "50px",
                         height: "50px",
                         objectFit: "cover",
+                        borderRadius: "4px",
                       }}
                     />
+                  ) : (
+                    <Typography variant="body2" color="textSecondary">
+                      No Image
+                    </Typography>
                   )}
                 </TableCell>
 
                 <TableCell className="table-cell">
                   {editableRow === row.id ? (
-                    <Box
-                      display="flex"
-                      gap="16px"
-                      justifyContent="space-around"
-                    >
+                    <Box display="flex" gap="16px" justifyContent="center">
                       <button
                         onClick={handleSaveClick}
-                        className="schedule-btn"
+                        className="schedule-btn save-btn"
                       >
                         Save
                       </button>
                       <button
                         onClick={handleCancelClick}
-                        className="schedule-btn"
+                        className="schedule-btn cancel-btn"
                       >
                         Cancel
                       </button>
@@ -158,7 +167,7 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
                   ) : (
                     <button
                       onClick={() => handleEditClick(row.id)}
-                      className="schedule-btn"
+                      className="schedule-btn edit-btn"
                     >
                       Edit
                     </button>

@@ -91,15 +91,15 @@ const rows = [
 const statusStyles: Record<Status, { backgroundColor: string; color: string }> =
   {
     Pending: {
-      backgroundColor: "#FFA500", 
+      backgroundColor: "#FFA500",
       color: "white",
     },
     Approved: {
-      backgroundColor: "#28a745", 
+      backgroundColor: "#28a745",
       color: "white",
     },
     Declined: {
-      backgroundColor: "#dc3545", 
+      backgroundColor: "#dc3545",
       color: "white",
     },
   };

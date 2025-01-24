@@ -69,15 +69,15 @@ export default function ReviewCard({
         comment.id === commentId
           ? {
               ...comment,
-              // אם הלייק כבר פעיל, מבטלים אותו, אחרת לוחצים עליו
               liked: !comment.liked,
-              disliked: false, // מבטלים את הדיסלייק
+              disliked: comment.liked ? comment.disliked : false, // Reset dislike if switching from like
               likeCount: comment.liked
                 ? comment.likeCount - 1
                 : comment.likeCount + 1,
-              dislikeCount: comment.liked
-                ? comment.dislikeCount
-                : comment.dislikeCount,
+              dislikeCount:
+                comment.liked && comment.disliked
+                  ? comment.dislikeCount - 1
+                  : comment.dislikeCount,
             }
           : comment
       )
@@ -90,15 +90,15 @@ export default function ReviewCard({
         comment.id === commentId
           ? {
               ...comment,
-              // אם הדיסלייק כבר פעיל, מבטלים אותו, אחרת לוחצים עליו
               disliked: !comment.disliked,
-              liked: false, // מבטלים את הלייק
+              liked: comment.disliked ? comment.liked : false, // Reset like if switching from dislike
               dislikeCount: comment.disliked
                 ? comment.dislikeCount - 1
                 : comment.dislikeCount + 1,
-              likeCount: comment.disliked
-                ? comment.likeCount
-                : comment.likeCount,
+              likeCount:
+                comment.disliked && comment.liked
+                  ? comment.likeCount - 1
+                  : comment.likeCount,
             }
           : comment
       )

@@ -3,6 +3,9 @@ import userModel from "../models/user_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
+import fs from "fs";
+import path from "path";
+
 
 
 const signUp = async (req: Request, res: Response) => {
@@ -362,19 +365,36 @@ const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
+
+
 const updateUser = async (req: Request, res: Response) => {
+  console.log("updateUser");
   try {
     const userId = req.params.id;
     const updateData = req.body;
-    const user = await userModel.findByIdAndUpdate(userId, updateData, { new: true });
+    const imageFile = req.file;
+
+    const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json({ message: "User updated successfully", user });
+    
+    if (imageFile) {
+      const existingPicturePath = path.resolve(__dirname, `../${user.picture}`);
+      if (fs.existsSync(existingPicturePath)) {
+        fs.unlinkSync(existingPicturePath);
+      }
+      updateData.picture = `/uploads/${userId}/${imageFile.filename}`;
+    }
+
+    const updatedUser = await userModel.findByIdAndUpdate(userId, updateData, { new: true });
+    res.status(200).json({ message: "User updated successfully", user: updatedUser });
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).json({ message: "Internal server error", error });
   }
 };
+
+
 
 export default { signUp, login, logout, refreshToken, googleSignIn, getAllUsers, getUserById, deleteUser, updateUser };

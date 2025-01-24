@@ -9,6 +9,7 @@ export default function NewChargingStation() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [showLocationOption, setShowLocationOption] = useState(false); // New state for dropdown
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -16,43 +17,91 @@ export default function NewChargingStation() {
     }
   };
 
+  const handleUseCurrentLocation = async () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            );
+            const data = await response.json();
+            if (data && data.display_name) {
+              setLocation(data.display_name); // Use human-readable address
+            } else {
+              setLocation(`${latitude}, ${longitude}`); // Fallback to coordinates
+            }
+          } catch (error) {
+            console.error("Error fetching address:", error);
+            setLocation(`${latitude}, ${longitude}`); // Fallback to coordinates
+          }
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          setError("Unable to fetch your location. Please try again.");
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by your browser.");
+    }
+  };
+
+  const handleInputFocus = () => {
+    setShowLocationOption(true); // Show the dropdown when the input is focused
+  };
+
+  const handleInputBlur = () => {
+    setTimeout(() => setShowLocationOption(false), 200);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     const accessToken = localStorage.getItem("accessToken");
-  
+
     if (!accessToken) {
       setError("You must be logged in to add a charging station.");
       return;
     }
-  
-    if (!location || !chargingRate || !price || !description || !selectedImage) {
+
+    if (
+      !location ||
+      !chargingRate ||
+      !price ||
+      !description ||
+      !selectedImage
+    ) {
       setError("All fields, including an image, are required.");
       return;
     }
+
     const userId = localStorage.getItem("userId") || "";
     const formData = new FormData();
-    formData.append("userId", userId); 
+    formData.append("userId", userId);
     formData.append("location", location);
     formData.append("chargingRate", chargingRate);
     formData.append("price", price);
     formData.append("description", description);
     formData.append("image", selectedImage);
     formData.append("type", "charger");
-  
+
     try {
-      const response = await fetch("http://localhost:3000/addChargingStation/addCharger", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`, 
-        },
-        body: formData,
-      });
-  
+      const response = await fetch(
+        "http://localhost:3000/addChargingStation/addCharger",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: formData,
+        }
+      );
+
       if (!response.ok) {
         throw new Error("Failed to add charging station.");
       }
-  
+
       setSuccessMessage("Charging station added successfully!");
       setError("");
       setLocation("");
@@ -66,8 +115,6 @@ export default function NewChargingStation() {
       setSuccessMessage("");
     }
   };
-  
-  
 
   return (
     <div className="newChargingPage">
@@ -76,12 +123,27 @@ export default function NewChargingStation() {
           <h1>Add a New Charging Station</h1>
 
           <div className="input-group">
-            <input
-              type="text"
-              placeholder="Location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
+            <div className="location-group">
+              <input
+                type="text"
+                placeholder="Location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                onFocus={handleInputFocus} // Trigger dropdown on focus
+                onBlur={handleInputBlur} // Hide dropdown when input loses focus
+              />
+              {showLocationOption && (
+                <div className="location-dropdown">
+                  <button
+                    type="button"
+                    onClick={handleUseCurrentLocation}
+                    className="use-location-option"
+                  >
+                    Use Current Location
+                  </button>
+                </div>
+              )}
+            </div>
             <input
               type="text"
               placeholder="Charging rate"
