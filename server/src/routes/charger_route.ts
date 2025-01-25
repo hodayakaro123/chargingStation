@@ -436,5 +436,9 @@ router.get("/getAllChargers", (req, res) => {
     add_charging_controller.getAllChargers(req, res);
 });
 
+router.get("/getUserByChargerId/:chargerId", authMiddleware, (req, res) => {
+    add_charging_controller.getUserByChargerId(req, res);
+});
+
 
 export default router;

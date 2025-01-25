@@ -3,7 +3,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./Booking.css";
 import ReviewCard from "../../src/components/ReviewCard/ReviewCard";
 
+interface ChargerOwner {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  picture: string;
+}
+
 export default function Booking() {
+  const [chargerOwner, setChargerOwner] = useState<ChargerOwner | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const charger = location.state?.charger;
@@ -26,6 +35,37 @@ export default function Booking() {
   useEffect(() => {
     if (!charger) {
       navigate("/Home", { state: { message: "You have to pick a charger!" } });
+      return;
+    }
+
+    if (charger._id) {
+      const fetchUserByChargerId = async () => {
+        try {
+          const accessToken = localStorage.getItem("accessToken");
+          const response = await fetch(
+            `http://localhost:3000/addChargingStation/getUserByChargerId/${charger._id}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch user details.");
+          }
+
+          const data = await response.json();
+          const userData = data.user;
+          setChargerOwner(userData);
+        } catch (error) {
+          console.error("Error fetching user by charger ID:", error);
+        }
+      };
+
+      fetchUserByChargerId();
     }
   }, [charger, navigate]);
 
@@ -51,21 +91,24 @@ export default function Booking() {
 
     const startTime = new Date(`${formData.date}T${formData.startTime}:00`);
     const endTime = new Date(`${formData.date}T${formData.endTime}:00`);
-  
+
     if (startTime >= endTime) {
       setError("Start time must be earlier than end time.");
       return;
     }
     try {
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch("http://localhost:3000/bookings/bookCharger", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "http://localhost:3000/bookings/bookCharger",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to create booking.");
@@ -83,7 +126,9 @@ export default function Booking() {
         endTime: "",
         userId: localStorage.getItem("userId") || "",
       });
-      navigate("/ActivityHistory", { state: { message: "Booking submitted!" } });
+      navigate("/ActivityHistory", {
+        state: { message: "Booking submitted!" },
+      });
     } catch (error) {
       console.error(error);
       setError("An error occurred while submitting the booking.");
@@ -216,14 +261,26 @@ export default function Booking() {
         </div>
 
         <div className="review-container">
-          <ReviewCard
-            userName="יוסי כהן"
-            location="תל אביב"
-            reviewText="עמדת טעינה מצוינת! תהליך מהיר ונוח."
-            rating={4}
-            date="19/01/2025"
-            avatar="https://randomuser.me/api/portraits/men/1.jpg"
-          />
+          {charger ? (
+            <ReviewCard
+              userName={
+                chargerOwner && chargerOwner.firstName && chargerOwner.lastName
+                  ? `${chargerOwner.firstName} ${chargerOwner.lastName}`
+                  : "Unknown Owner"
+              }
+              location={charger.location || "Unknown Location"}
+              rating={charger.rating || 0}
+              picture={
+                charger.picture
+                  ? `http://localhost:3000${charger.picture}`
+                  : "https://randomuser.me/api/portraits/placeholder.jpg"
+              }
+              
+              charger={charger}
+            />
+          ) : (
+            <p>Loading charger details...</p>
+          )}
         </div>
       </div>
     </div>
