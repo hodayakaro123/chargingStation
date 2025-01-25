@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -21,6 +21,7 @@ interface ChargeStation {
   email: string;
   location: string;
   phone: string;
+  revenue: number; // New field for money earned
 }
 
 export default function ManageChargeStations() {
@@ -29,58 +30,62 @@ export default function ManageChargeStations() {
   const [editChargeStation, setEditChargeStation] = useState<number | null>(
     null
   );
-  const [editedData, setEditedData] = useState<ChargeStation | null>(null);
 
   useEffect(() => {
     const fetchChargeStations = async () => {
       const userId = localStorage.getItem("userId");
       const accessToken = localStorage.getItem("accessToken");
-    
+
       if (!userId) {
         alert("User ID is required to fetch charging stations");
         return;
       }
-    
+
       try {
         const response = await fetch(
-          `http://localhost:3000/admin/getAllChargers`,  // Make sure the URL is correct
+          `http://localhost:3000/admin/getAllChargers`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
           }
         );
-    
+
         if (!response.ok) {
           throw new Error("Failed to fetch charge stations");
         }
-    
+
         const data = await response.json();
-        console.log("Fetched data:", data); 
-    
+        console.log("Fetched data:", data);
 
         if (data.chargers && Array.isArray(data.chargers)) {
-          const fetchedStations = data.chargers.map((station: any) => ({
-            chargeId: station._id,
-            firstName: station.firstName,
-            lastName: station.lastName,
-            email: station.email,
-            location: station.location,
-            phone: station.phone,
-          }));
-    
+          const fetchedStations = data.chargers.map(
+            (station: ChargeStation) => ({
+              chargeId: station.chargeId,
+              firstName: station.firstName,
+              lastName: station.lastName,
+              email: station.email,
+              location: station.location,
+              phone: station.phone,
+              revenue: station.revenue || 0, // Default revenue to 0 if missing
+            })
+          );
+
           setChargeStations(fetchedStations);
         } else {
-          console.error("Expected an array under 'chargers', but received:", data);
-          alert("Error: Expected an array of charge stations under 'chargers'.");
+          console.error(
+            "Expected an array under 'chargers', but received:",
+            data
+          );
+          alert(
+            "Error: Expected an array of charge stations under 'chargers'."
+          );
         }
-    
       } catch (error) {
         console.error("Error fetching charge stations:", error);
         alert("Failed to fetch charge stations");
       }
     };
-    
 
     fetchChargeStations();
   }, []);
@@ -97,41 +102,48 @@ export default function ManageChargeStations() {
   };
 
   const deleteChargeStation = (chargeId: number) => {
-    setChargeStations(
-      chargeStations.filter((station) => station.chargeId !== chargeId)
+    setChargeStations((prevStations) =>
+      prevStations.filter((station) => station.chargeId !== chargeId)
     );
   };
 
-  const handleEditChargeStation = (station: ChargeStation) => {
-    setEditChargeStation(station.chargeId);
-    setEditedData(station);
+  const handleEditChargeStation = (chargeId: number) => {
+    setEditChargeStation(chargeId);
   };
 
   const handleSaveEdit = () => {
-    if (editedData) {
-      setChargeStations(
-        chargeStations.map((station) =>
-          station.chargeId === editedData.chargeId ? { ...editedData } : station
-        )
-      );
-      setEditChargeStation(null);
-      setEditedData(null);
-    }
+    setEditChargeStation(null);
   };
 
   const handleCancelEdit = () => {
     setEditChargeStation(null);
-    setEditedData(null);
   };
 
-  const handleChange = (field: keyof ChargeStation, value: string) => {
-    if (editedData) {
-      setEditedData({
-        ...editedData,
-        [field]: value,
-      });
-    }
+  const handleChange = (
+    chargeId: number,
+    field: keyof ChargeStation,
+    value: string
+  ) => {
+    setChargeStations((prevStations) =>
+      prevStations.map((station) =>
+        station.chargeId === chargeId
+          ? {
+              ...station,
+              [field]: field === "revenue" ? parseFloat(value) : value,
+            }
+          : station
+      )
+    );
   };
+
+  const filteredChargeStations = filterChargeStations();
+  const totalChargeStations = filteredChargeStations.length;
+
+  // Calculate total revenue
+  const totalRevenue = filteredChargeStations.reduce(
+    (sum, station) => sum + station.revenue,
+    0
+  );
 
   return (
     <Box sx={{ padding: 3, backgroundColor: "#f5f5f5", borderRadius: 2 }}>
@@ -141,6 +153,22 @@ export default function ManageChargeStations() {
         sx={{ fontWeight: "bold", color: "#333" }}
       >
         Manage All Charging Stations
+      </Typography>
+
+      <Typography
+        variant="subtitle1"
+        gutterBottom
+        sx={{ marginBottom: 1, fontWeight: "medium", color: "#555" }}
+      >
+        Total Charging Stations: {totalChargeStations}
+      </Typography>
+
+      <Typography
+        variant="subtitle1"
+        gutterBottom
+        sx={{ marginBottom: 2, fontWeight: "medium", color: "#555" }}
+      >
+        Total Money Earned: ${totalRevenue.toFixed(2)}
       </Typography>
 
       <TextField
@@ -160,7 +188,6 @@ export default function ManageChargeStations() {
         component={Paper}
         sx={{
           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          height: "200px",
           maxHeight: "400px",
           overflowY: "auto",
         }}
@@ -192,106 +219,59 @@ export default function ManageChargeStations() {
                 Phone
               </TableCell>
               <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                Revenue Earned
+              </TableCell>
+              <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
                 Actions
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filterChargeStations().map((station) => (
+            {filteredChargeStations.map((station) => (
               <TableRow
                 key={station.chargeId}
                 sx={{ "&:hover": { backgroundColor: "#f1f1f1" } }}
               >
+                <TableCell>{station.chargeId}</TableCell>
+                <TableCell>{`${station.firstName} ${station.lastName}`}</TableCell>
+                <TableCell>{station.email}</TableCell>
+                <TableCell>{station.location}</TableCell>
+                <TableCell>{station.phone}</TableCell>
                 <TableCell>
                   {editChargeStation === station.chargeId ? (
                     <Input
-                      value={editedData?.chargeId}
-                      onChange={(e) => handleChange("chargeId", e.target.value)}
+                      value={station.revenue}
+                      onChange={(e) =>
+                        handleChange(
+                          station.chargeId,
+                          "revenue",
+                          e.target.value
+                        )
+                      }
                       sx={{ marginBottom: 1 }}
+                      type="number"
                     />
                   ) : (
-                    station.chargeId
+                    `$${station.revenue.toFixed(2)}`
                   )}
                 </TableCell>
                 <TableCell>
                   {editChargeStation === station.chargeId ? (
-                    <Box>
-                      <Input
-                        value={editedData?.firstName}
-                        onChange={(e) =>
-                          handleChange("firstName", e.target.value)
-                        }
-                        sx={{ marginBottom: 1 }}
-                      />
-                      <Input
-                        value={editedData?.lastName}
-                        onChange={(e) =>
-                          handleChange("lastName", e.target.value)
-                        }
-                        sx={{ marginBottom: 1 }}
-                      />
-                    </Box>
-                  ) : (
-                    `${station.firstName} ${station.lastName}`
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editChargeStation === station.chargeId ? (
-                    <Input
-                      value={editedData?.email}
-                      onChange={(e) => handleChange("email", e.target.value)}
-                      sx={{ marginBottom: 1 }}
-                    />
-                  ) : (
-                    station.email
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editChargeStation === station.chargeId ? (
-                    <Input
-                      value={editedData?.location}
-                      onChange={(e) => handleChange("location", e.target.value)}
-                      sx={{ marginBottom: 1 }}
-                    />
-                  ) : (
-                    station.location
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editChargeStation === station.chargeId ? (
-                    <Input
-                      value={editedData?.phone}
-                      onChange={(e) => handleChange("phone", e.target.value)}
-                      sx={{ marginBottom: 1 }}
-                    />
-                  ) : (
-                    station.phone
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editChargeStation === station.chargeId ? (
-                    <div className="buttun">
-                      <button onClick={handleSaveEdit} className="schedule-btn">
-                        Save
-                      </button>
-                      <button
-                        onClick={handleCancelEdit}
-                        className="schedule-btn"
-                      >
-                        Cancel
-                      </button>
+                    <div>
+                      <button onClick={handleSaveEdit}>Save</button>
+                      <button onClick={handleCancelEdit}>Cancel</button>
                     </div>
                   ) : (
-                    <div className="buttun">
+                    <div>
                       <button
-                        onClick={() => handleEditChargeStation(station)}
-                        className="schedule-btn"
+                        onClick={() =>
+                          handleEditChargeStation(station.chargeId)
+                        }
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => deleteChargeStation(station.chargeId)}
-                        className="schedule-btn"
                       >
                         Delete
                       </button>

@@ -3,6 +3,13 @@ import "./PersonalArea.css";
 import GeneralInfoHeader from "../../src/components/GeneralInfoHeader";
 import ChargeInfo from "../../src/components/ChargeInfo";
 
+interface User {
+  firstName: string;
+  lastName: string;
+  picture: string;
+  email: string;
+}
+
 interface Comment {
   text: string;
 }
@@ -18,7 +25,7 @@ interface Charger {
   description?: string;
   comments: Comment[];
   userId: string;
-  _id: string; 
+  _id: string;
 }
 
 interface ChargeInfoRow {
@@ -28,7 +35,7 @@ interface ChargeInfoRow {
   Description: string;
   Price: string;
   picture: string;
-  userId: string; 
+  userId: string;
 }
 
 const PersonalArea: React.FC = () => {
@@ -37,19 +44,46 @@ const PersonalArea: React.FC = () => {
   const [carModel, setCarModel] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [rows, setRows] = useState<ChargeInfoRow[]>([]);
+  const [userInfo, setUserInfo] = useState<User | null>(null);
 
   useEffect(() => {
-    const fetchChargingStations = async () => {
+    const fetchData = async () => {
       const userId = localStorage.getItem("userId");
       const accessToken = localStorage.getItem("accessToken");
 
-      if (!userId) {
-        alert("User ID is required to fetch charging stations");
+      if (!userId || !accessToken) {
+        alert("User ID and Access Token are required");
         return;
       }
 
       try {
-        const response = await fetch(
+        const userResponse = await fetch(
+          `http://localhost:3000/auth/getUserById/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (!userResponse.ok) {
+          throw new Error("Failed to fetch user information");
+        }
+
+        const userData = await userResponse.json();
+        setUserInfo({
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          picture: userData.picture,
+          email: userData.email,
+        });
+      } catch (error) {
+        console.error("Error fetching user information:", error);
+        alert("Failed to fetch user information");
+      }
+
+      try {
+        const chargingResponse = await fetch(
           `http://localhost:3000/addChargingStation/getChargersByUserId/chargers/${userId}`,
           {
             headers: {
@@ -58,15 +92,13 @@ const PersonalArea: React.FC = () => {
           }
         );
 
-        if (!response.ok) {
+        if (!chargingResponse.ok) {
           throw new Error("Failed to fetch charging stations");
         }
 
-        const data = await response.json();
-        console.log(data);
-
-        const chargers = data.chargers.map((charger: Charger, index: number) => ({
-          id: `${charger._id}-${index}`, 
+        const chargingData = await chargingResponse.json();
+        const chargers = chargingData.chargers.map((charger: Charger, index: number) => ({
+          id: `${charger._id}-${index}`,
           Location: charger.location || "Unknown",
           ChargingRate: charger.chargingRate || 0,
           Description: charger.description || "No description",
@@ -75,14 +107,14 @@ const PersonalArea: React.FC = () => {
           userId: charger.userId,
         }));
 
-        setRows(chargers); 
+        setRows(chargers);
       } catch (error) {
         console.error("Error fetching charging stations:", error);
         alert("Failed to fetch charging stations");
       }
     };
 
-    fetchChargingStations();
+    fetchData();
   }, []);
 
   const handleCarBrandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,13 +189,13 @@ const PersonalArea: React.FC = () => {
   return (
     <div className="container">
       <div className="general-info">
-        <GeneralInfoHeader
-          name="Emilia Stewart Benjamin"
-          gender="Female"
-          age={27}
-          Email="example@gmail.com"
-          Phone="053-1222-333"
-        />
+        {userInfo && (
+          <GeneralInfoHeader
+            name={`${userInfo.firstName} ${userInfo.lastName}`}
+            Email={userInfo.email}
+            picturePath={userInfo.picture}
+          />
+        )}
       </div>
 
       <div className="charge-info">

@@ -1,3 +1,4 @@
+/* Global Reset */
 * {
   margin: 0;
   padding: 0;
@@ -6,39 +7,44 @@
 
 body {
   font-family: "Poppins", sans-serif;
-  background-color: #f9fafb;
-  overflow: hidden;
+  background-color: #f4f6f8;
+  color: #333;
+  line-height: 1.6;
+  /* margin-top: 23rem; */
 }
 
+/* Main Container */
 .container {
   display: flex;
-  flex-direction: column; /* Stack elements vertically */
+  flex-direction: column;
   padding: 20px;
-  max-width: 100%;
-  max-height: 100vh;
-  margin: 0 auto;
-  border-radius: 8px;
-  overflow: auto;
-  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 8rem auto 2rem auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-top: 16rem;
 }
 
+/* Section Styling */
 .general-info,
-.charge-info {
-  padding: 20px;
-  margin-bottom: 20px; 
-}
-
+.charge-info,
 .car-model-section {
-  display: flex;
-  flex-direction: column; 
-  align-items: stretch; 
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+  position: relative;
   padding: 20px;
-  margin-bottom: 20px; 
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
+h3 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  color: #1976d2;
+}
+
+/* Input Group */
 .input-group {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -46,16 +52,33 @@ body {
   margin-bottom: 20px;
 }
 
+input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 100%;
+  background-color: #f9fafc;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #1976d2;
+  background-color: #fff;
+}
+
+/* Buttons */
 button {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   background-color: #1976d2;
   color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 button:disabled {
@@ -65,4 +88,114 @@ button:disabled {
 
 button:hover:not(:disabled) {
   background-color: #145ca8;
+  transform: scale(1.03);
+}
+
+/* Charge Info Table */
+.charge-info {
+  padding: 0;
+  overflow-x: auto;
+}
+
+.charge-info table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.charge-info th,
+.charge-info td {
+  text-align: left;
+  padding: 12px 16px;
+  color: black;
+  border-bottom: 1px solid #ddd;
+}
+
+.charge-info th {
+  background-color: #f4f6f8;
+  font-weight: bold;
+}
+
+@media (max-width: 1024px) {
+  .table-container {
+    padding: 10px;
+  }
+
+  .table-title {
+    font-size: 18px;
+  }
+
+  .table-cell,
+  .table-header-cell {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .schedule-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    overflow-x: auto;
+    box-shadow: none; /* Simplify the design for small screens */
+    border-radius: 6px;
+  }
+
+  .table-title {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .table-header-cell {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .table-cell {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .schedule-btn {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
+  img {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-container {
+    padding: 8px;
+    box-shadow: none;
+  }
+
+  .table-title {
+    font-size: 14px;
+  }
+
+  .table-header-cell {
+    font-size: 10px;
+    padding: 6px;
+  }
+
+  .table-cell {
+    font-size: 10px;
+    padding: 6px;
+  }
+
+  .schedule-btn {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  img {
+    width: 30px;
+    height: 30px;
+  }
 }

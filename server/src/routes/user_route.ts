@@ -1,6 +1,10 @@
 import express from "express";
 const router = express.Router();
 import userControllerAuth from "../controllers/user_controller_auth";
+import { authMiddleware } from "../controllers/user_controller_auth";
+import upload from "../uploads";
+
+
 
 /**
 * @swagger
@@ -179,5 +183,11 @@ router.post("/refresh", userControllerAuth.refreshToken);
 
 
 router.post("/logInWithGoogle", userControllerAuth.googleSignIn);
+
+
+router.get("/getUserById/:id", authMiddleware, userControllerAuth.getUserById);
+
+router.put("/updateUser/:id", upload.single("image"), authMiddleware, userControllerAuth.updateUser);
+
 
 export default router;

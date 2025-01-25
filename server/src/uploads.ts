@@ -6,6 +6,7 @@ import { Request } from "express";
 const storage: StorageEngine = multer.diskStorage({
   destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
     const userId = req.body.userId;
+    console.log("uploads", userId);
 
     if (!userId) {
       return cb(new Error("UserId is required to save the image"), "");

@@ -63,10 +63,6 @@ export default function ManageUsers() {
     );
   };
 
-
-
-  
-
   const deleteUser = async (id: number) => {
     const accessToken = localStorage.getItem("accessToken");
     console.log("Deleting user with ID:", id);
@@ -112,20 +108,20 @@ export default function ManageUsers() {
               Authorization: `Bearer ${accessToken}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(editedData), 
+            body: JSON.stringify(editedData),
           }
         );
-  
+
         if (!response.ok) {
           throw new Error("Failed to update user");
         }
-  
+
         setUsers(
           users.map((user) =>
             user._id === editedData._id ? { ...editedData } : user
           )
         );
-  
+
         setEditUser(null); // Close the editing mode
         setEditedData(null); // Clear the edited data
       } catch (error) {
@@ -207,7 +203,7 @@ export default function ManageUsers() {
           <TableBody>
             {filterUsers().map((user) => (
               <TableRow
-                key={user._id} 
+                key={user._id}
                 sx={{ "&:hover": { backgroundColor: "#f1f1f1" } }}
               >
                 <TableCell key={`name-${user._id}`}>

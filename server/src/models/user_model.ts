@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
   },
   picture: {
     type: String,
-    required: false
+    required: false,
+    default: null,
   },
   selectedChargingStations: {
     type: [mongoose.Schema.Types.ObjectId],

@@ -25,8 +25,8 @@
   font-size: 16px;
 }
 .table-body-wrapper {
-  max-height: 400px; /* גובה מקסימלי עם גלילה */
-  overflow-y: auto; /* גלילה אנכית */
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .user-table {

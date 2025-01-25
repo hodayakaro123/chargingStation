@@ -1,4 +1,3 @@
-import React from "react";
 import "./Admin.css";
 import ManageUsers from "../../src/components/Admin/ManageUsers";
 import ManageChargeStations from "../../src/components/Admin/ManageChargingStations";

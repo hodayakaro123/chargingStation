@@ -67,6 +67,7 @@ const LoginPage: React.FC = () => {
       const data = await response.json();
 
       localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
       localStorage.setItem('userId', data._id);
       localStorage.setItem("firstName", data.firstName);
       localStorage.setItem("lastName", data.lastName);
@@ -100,6 +101,7 @@ const LoginPage: React.FC = () => {
       const data = await response.json();
 
       localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
       localStorage.setItem('userId', data.user.id);
       localStorage.setItem("firstName", data.user.firstName);
       localStorage.setItem("lastName", data.user.lastName);

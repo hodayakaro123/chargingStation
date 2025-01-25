@@ -1,9 +1,9 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Home.css";
+import React from "react";
 
 interface Comment {
   text: string;
@@ -23,20 +23,40 @@ interface ChargingStation {
   userId: string;
 }
 
-function MapUpdater({
-  coordinates,
+function ReturnToLocationButton({
+  userLocation,
 }: {
-  coordinates: { lat: number; lng: number } | null;
+  userLocation: { lat: number; lng: number } | null;
 }) {
   const map = useMap();
 
-  useEffect(() => {
-    if (coordinates) {
-      map.setView([coordinates.lat, coordinates.lng], map.getZoom());
+  const goToCurrentLocation = () => {
+    if (userLocation) {
+      map.flyTo([userLocation.lat, userLocation.lng], 14);
+    } else {
+      alert("Current location not available.");
     }
-  }, [coordinates, map]);
+  };
 
-  return null;
+  return (
+    <button
+      className="btn"
+      style={{
+        width: "250px",
+        position: "absolute",
+        right: 0,
+        zIndex: 1000,
+        backgroundColor: "#066C91",
+        color: "#fff",
+        border: "none",
+        borderRadius: "8px",
+        cursor: "pointer",
+      }}
+      onClick={goToCurrentLocation}
+    >
+      Return to Current Location
+    </button>
+  );
 }
 
 function calculateChargingTime(
@@ -56,6 +76,8 @@ function calculateChargingTime(
 
 export default function Home() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const message = location.state?.message;
 
   const [coordinates, setCoordinates] = useState<{
     lat: number;
@@ -83,16 +105,17 @@ export default function Home() {
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
-    console.log("The Access Token:", accessToken);
     if (!accessToken) {
+      navigate("/");
+      return;
+    }
+    if (!localStorage.getItem("refreshToken")) {
       navigate("/");
       return;
     }
 
     const firstName = localStorage.getItem("firstName");
     const lastName = localStorage.getItem("lastName");
-    console.log("The First Name:", firstName);
-    console.log("The Last Name:", lastName);
     if (firstName && lastName) {
       setUserName({ firstName, lastName });
     }
@@ -111,7 +134,7 @@ export default function Home() {
     } else {
       console.error("Geolocation is not supported by this browser.");
     }
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     const fetchChargingStations = async () => {
@@ -189,12 +212,7 @@ export default function Home() {
 
       if (data.length > 0) {
         const { lat, lon } = data[0];
-        const newLat = parseFloat(lat);
-        const newLng = parseFloat(lon);
-
-        setCoordinates({ lat: newLat, lng: newLng });
-        setUserLocation({ lat: newLat, lng: newLng });
-        console.log("Address coordinates:", { lat: newLat, lng: newLng });
+        setCoordinates({ lat: parseFloat(lat), lng: parseFloat(lon) });
       } else {
         alert("No results found for the entered address.");
       }
@@ -206,6 +224,7 @@ export default function Home() {
 
   return (
     <div className="map-page">
+      {message && <p>{message}</p>}
       <h2 className="title">
         Hi {userName ? `${userName.firstName} ${userName.lastName}` : "User"},
         Charging Station Map
@@ -222,7 +241,6 @@ export default function Home() {
           Find Charging Station by Address
         </button>
       </div>
-
       {!userLocation || !carData ? (
         <div className="spinner-container">
           <div className="spinner"></div>
@@ -248,7 +266,25 @@ export default function Home() {
               position={[charger.latitude, charger.longitude]}
             >
               <Popup>
+                {charger.picture ? (
+                  <img
+                    src={`http://localhost:3000${charger.picture}`}
+                    alt="Charging Station"
+                    style={{
+                      width: "100%",
+                      height: "150px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                    }}
+                  />
+                ) : (
+                  <p style={{ fontStyle: "italic", color: "gray" }}>
+                    No image available
+                  </p>
+                )}
                 <strong>{charger.location}</strong>
+                <br />
                 <br />
                 Price: ${charger.price}
                 <br />
@@ -257,7 +293,7 @@ export default function Home() {
                 Charging Speed: {charger.chargingRate}kW
                 <br />
                 Charging Time:{" "}
-                {carData.batteryCapacity && charger.chargingRate ? (
+                {carData?.batteryCapacity && charger.chargingRate ? (
                   <>
                     <strong>
                       {calculateChargingTime(
@@ -274,13 +310,10 @@ export default function Home() {
                   "N/A"
                 )}
                 <br />
-                <br />
-                {charger.description && <p>{charger.description}</p>}
-                <br />
                 <button
-                  onClick={() =>
-                    (window.location.href = "http://localhost:5173/Booking")
-                  }
+                  onClick={() => {
+                    navigate("/Booking", { state: { charger } });
+                  }}
                   style={{
                     backgroundColor: "#066C91",
                     color: "white",
@@ -288,6 +321,7 @@ export default function Home() {
                     border: "none",
                     borderRadius: "8px",
                     cursor: "pointer",
+                    marginTop: "10px",
                   }}
                 >
                   Book Now
@@ -295,7 +329,8 @@ export default function Home() {
               </Popup>
             </Marker>
           ))}
-          <MapUpdater coordinates={coordinates} /> {}
+
+          <ReturnToLocationButton userLocation={userLocation} />
         </MapContainer>
       )}
     </div>
