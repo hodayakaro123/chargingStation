@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -22,8 +22,6 @@ interface ChargingStation {
   comments?: Comment[];
   userId: string;
 }
-
-
 
 function ReturnToLocationButton({
   userLocation,
@@ -78,8 +76,9 @@ function calculateChargingTime(
 
 export default function Home() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const message = location.state?.message;
 
- 
   const [coordinates, setCoordinates] = useState<{
     lat: number;
     lng: number;
@@ -225,6 +224,7 @@ export default function Home() {
 
   return (
     <div className="map-page">
+      {message && <p>{message}</p>}
       <h2 className="title">
         Hi {userName ? `${userName.firstName} ${userName.lastName}` : "User"},
         Charging Station Map
@@ -266,7 +266,23 @@ export default function Home() {
               position={[charger.latitude, charger.longitude]}
             >
               <Popup>
-                <input style={{ fontSize: "5px", padding: "0" }} type="file" />
+                {charger.picture ? (
+                  <img
+                    src={`http://localhost:3000${charger.picture}`}
+                    alt="Charging Station"
+                    style={{
+                      width: "100%",
+                      height: "150px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                    }}
+                  />
+                ) : (
+                  <p style={{ fontStyle: "italic", color: "gray" }}>
+                    No image available
+                  </p>
+                )}
                 <strong>{charger.location}</strong>
                 <br />
                 <br />
@@ -278,20 +294,26 @@ export default function Home() {
                 <br />
                 Charging Time:{" "}
                 {carData?.batteryCapacity && charger.chargingRate ? (
-                  <strong>
-                    {calculateChargingTime(
-                      carData.batteryCapacity,
-                      charger.chargingRate
-                    )}
-                  </strong>
+                  <>
+                    <strong>
+                      {calculateChargingTime(
+                        carData.batteryCapacity,
+                        charger.chargingRate
+                      )}
+                    </strong>
+                    <div>
+                      (based on {carData.brandName} {carData.carModel}{" "}
+                      {carData.year})
+                    </div>
+                  </>
                 ) : (
                   "N/A"
                 )}
                 <br />
                 <button
-                  onClick={() =>
-                    (window.location.href = "http://localhost:5173/Booking")
-                  }
+                  onClick={() => {
+                    navigate("/Booking", { state: { charger } });
+                  }}
                   style={{
                     backgroundColor: "#066C91",
                     color: "white",
@@ -307,6 +329,7 @@ export default function Home() {
               </Popup>
             </Marker>
           ))}
+
           <ReturnToLocationButton userLocation={userLocation} />
         </MapContainer>
       )}

@@ -124,6 +124,15 @@ form {
   color: #333;
 }
 
+.image-preview {
+  margin-top: 10px;
+  max-width: 50%;
+  max-height: 200px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+
 .location-group {
   position: relative;
 }

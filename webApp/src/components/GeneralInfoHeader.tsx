@@ -53,7 +53,7 @@ export default function GeneralInfoHeader({
     formData.append("firstName", firstName.trim());
     formData.append("lastName", lastName.trim());
   
-    // Only append a new image if a file was selected
+
     if (picture && picture.startsWith("data:image")) {
       const file = await fetch(picture).then((res) => res.blob());
       formData.append("image", file, "profile.jpg");
@@ -65,9 +65,9 @@ export default function GeneralInfoHeader({
         {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${accessToken}`, // Include the access token
+            Authorization: `Bearer ${accessToken}`, 
           },
-          body: formData, // Send the formData
+          body: formData, 
         }
       );
   

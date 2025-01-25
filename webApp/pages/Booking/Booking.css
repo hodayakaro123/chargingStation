@@ -5,6 +5,7 @@
   justify-content: center;
   min-height: 100vh;
   padding: 20px;
+  margin-top: 18%;
   background: linear-gradient(135deg, #6a11cb, #2575fc);
   box-sizing: border-box;
   overflow: auto;

@@ -7,13 +7,16 @@ export default function NewChargingStation() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null); // State for image preview
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [showLocationOption, setShowLocationOption] = useState(false); // New state for dropdown
+  const [showLocationOption, setShowLocationOption] = useState(false);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setSelectedImage(event.target.files[0]);
+      const file = event.target.files[0];
+      setSelectedImage(file);
+      setImagePreview(URL.createObjectURL(file)); // Generate a preview URL
     }
   };
 
@@ -28,13 +31,13 @@ export default function NewChargingStation() {
             );
             const data = await response.json();
             if (data && data.display_name) {
-              setLocation(data.display_name); // Use human-readable address
+              setLocation(data.display_name);
             } else {
-              setLocation(`${latitude}, ${longitude}`); // Fallback to coordinates
+              setLocation(`${latitude}, ${longitude}`);
             }
           } catch (error) {
             console.error("Error fetching address:", error);
-            setLocation(`${latitude}, ${longitude}`); // Fallback to coordinates
+            setLocation(`${latitude}, ${longitude}`);
           }
         },
         (error) => {
@@ -48,7 +51,7 @@ export default function NewChargingStation() {
   };
 
   const handleInputFocus = () => {
-    setShowLocationOption(true); // Show the dropdown when the input is focused
+    setShowLocationOption(true);
   };
 
   const handleInputBlur = () => {
@@ -109,6 +112,7 @@ export default function NewChargingStation() {
       setPrice("");
       setDescription("");
       setSelectedImage(null);
+      setImagePreview(null); // Clear the preview
     } catch (error) {
       console.error("Error:", error);
       setError("An error occurred while adding the charging station.");
@@ -129,8 +133,8 @@ export default function NewChargingStation() {
                 placeholder="Location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                onFocus={handleInputFocus} // Trigger dropdown on focus
-                onBlur={handleInputBlur} // Hide dropdown when input loses focus
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
               />
               {showLocationOption && (
                 <div className="location-dropdown">
@@ -174,6 +178,13 @@ export default function NewChargingStation() {
               {selectedImage && (
                 <div>
                   <p>Selected image: {selectedImage.name}</p>
+                  {imagePreview && (
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="image-preview"
+                    />
+                  )}
                 </div>
               )}
             </div>

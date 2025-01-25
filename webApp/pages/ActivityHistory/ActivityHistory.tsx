@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -13,98 +13,84 @@ import "./ActivityHistory.css";
 
 type Status = "Pending" | "Approved" | "Declined";
 
-const rows = [
-  {
-    id: 1,
-    Date: "27/05/2001",
-    Time: 29,
-    location: "Houston",
-    cost: "$30",
-    more: "Details",
-    status: "Pending" as Status,
-  },
-  {
-    id: 2,
-    Date: "17/01/2023",
-    Time: 31,
-    location: "Dallas",
-    cost: "$14",
-    more: "Details",
-    status: "Approved" as Status,
-  },
-  {
-    id: 3,
-    Date: "09/11/2022",
-    Time: 33,
-    location: "Seattle",
-    cost: "$22",
-    more: "Details",
-    status: "Declined" as Status,
-  },
-  {
-    id: 4,
-    Date: "03/07/2021",
-    Time: 35,
-    location: "Portland",
-    cost: "$17",
-    more: "Details",
-    status: "Pending" as Status,
-  },
-  {
-    id: 5,
-    Date: "21/04/2020",
-    Time: 37,
-    location: "Las Vegas",
-    cost: "$28",
-    more: "Details",
-    status: "Approved" as Status,
-  },
-  {
-    id: 6,
-    Date: "11/02/2023",
-    Time: 39,
-    location: "Denver",
-    cost: "$11",
-    more: "Details",
-    status: "Pending" as Status,
-  },
-  {
-    id: 7,
-    Date: "01/12/2022",
-    Time: 41,
-    location: "Phoenix",
-    cost: "$19",
-    more: "Details",
-    status: "Declined" as Status,
-  },
-  {
-    id: 8,
-    Date: "13/10/2021",
-    Time: 43,
-    location: "San Diego",
-    cost: "$23",
-    more: "Details",
-    status: "Approved" as Status,
-  },
-];
+interface Booking {
+  _id: string;
+  Date: string;
+  StartTime: string;
+  EndTime: string;
+  Location: string;
+  Status: Status;
+  chargerId: string;
+  chargerPicture?: string; 
+}
 
-const statusStyles: Record<Status, { backgroundColor: string; color: string }> =
-  {
-    Pending: {
-      backgroundColor: "#FFA500",
-      color: "white",
-    },
-    Approved: {
-      backgroundColor: "#28a745",
-      color: "white",
-    },
-    Declined: {
-      backgroundColor: "#dc3545",
-      color: "white",
-    },
-  };
+const statusStyles: Record<Status, { backgroundColor: string; color: string }> = {
+  Pending: { backgroundColor: "#FFA500", color: "white" },
+  Approved: { backgroundColor: "#28a745", color: "white" },
+  Declined: { backgroundColor: "#dc3545", color: "white" },
+};
 
 export default function ActivityHistory() {
+  const [rows, setRows] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const userId = localStorage.getItem("userId");
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/bookings/getBookingByUserId/${userId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch bookings");
+        }
+
+        const data = await response.json();
+
+        const updatedBookings = await Promise.all(
+          data.map(async (booking: Booking) => {
+            const chargerResponse = await fetch(`http://localhost:3000/addChargingStation/getChargerById/${booking.chargerId}`, {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (!chargerResponse.ok) {
+              throw new Error("Failed to fetch charger location");
+            }
+
+            const chargerData = await chargerResponse.json();
+            console.log(chargerData.chargingStation.location);
+            return {
+              ...booking,
+              Location: chargerData.chargingStation.location,
+              chargerPicture: chargerData.chargingStation.picture, 
+            };
+          })
+        );
+
+        setRows(updatedBookings);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [userId]);
+
+  if (loading) {
+    return <Typography>Loading bookings...</Typography>;
+  }
+
   return (
     <div className="activity-history-container">
       <Typography variant="h5" className="table-title">
@@ -115,33 +101,36 @@ export default function ActivityHistory() {
           <TableHead>
             <TableRow className="table-header-row">
               <TableCell className="table-header-cell">Date</TableCell>
-              <TableCell className="table-header-cell">Time</TableCell>
+              <TableCell className="table-header-cell">Start Time</TableCell>
+              <TableCell className="table-header-cell">End Time</TableCell>
               <TableCell className="table-header-cell">Location</TableCell>
-              <TableCell className="table-header-cell">Cost</TableCell>
-              <TableCell className="table-header-cell">Status</TableCell>
+              <TableCell className="table-header-cell">Picture</TableCell> {}
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.id} className="table-row">
-                <TableCell className="table-cell">{row.Date}</TableCell>
-                <TableCell className="table-cell">{row.Time}</TableCell>
-                <TableCell className="table-cell">{row.location}</TableCell>
-                <TableCell className="table-cell">{row.cost}</TableCell>
-                <TableCell
-                  className={`table-cell status-cell ${row.status}`}
-                  style={{
-                    backgroundColor: statusStyles[row.status]?.backgroundColor,
-                    color: statusStyles[row.status]?.color,
-                    padding: "12px 15px",
-                    width: "30px",
-                    height: "10px",
-                    borderRadius: "10px",
-                    textAlign: "center",
-                  }}
-                >
-                  {row.status}
-                </TableCell>
+              <TableRow key={row._id} className="table-row">
+                <TableCell className="table-cell">{new Date(row.Date).toLocaleDateString()}</TableCell>
+                <TableCell className="table-cell">{new Date(row.StartTime).toLocaleTimeString()}</TableCell>
+                <TableCell className="table-cell">{new Date(row.EndTime).toLocaleTimeString()}</TableCell>
+                <TableCell className="table-cell">{row.Location}</TableCell>
+                <TableCell className="table-cell">
+                  {row.chargerPicture ? (
+                    <img
+                      src={`http://localhost:3000${row.chargerPicture}`}
+                      alt="Charging Station"
+                      style={{
+                        width: "150px",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        marginBottom: "10px",
+                      }}
+                    />
+                  ) : (
+                    <Typography>No Picture Available</Typography>
+                  )}
+                </TableCell> {}
               </TableRow>
             ))}
           </TableBody>

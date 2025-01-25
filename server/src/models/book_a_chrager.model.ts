@@ -18,7 +18,11 @@ const BookCharger = new mongoose.Schema({
         type: Date,
         required: true,
     },
-    Status: {
+    contactNumber: {
+        type: String,
+        required: true,
+    },
+    Message: {
         type: String,
         required: true,
     },
