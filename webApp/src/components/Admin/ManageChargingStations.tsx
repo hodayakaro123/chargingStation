@@ -21,7 +21,7 @@ interface ChargeStation {
   email: string;
   location: string;
   phone: string;
-  revenue: number; 
+  revenue: number; // New field for money earned
 }
 
 export default function ManageChargeStations() {
@@ -67,7 +67,7 @@ export default function ManageChargeStations() {
               email: station.email,
               location: station.location,
               phone: station.phone,
-              revenue: station.revenue || 0, 
+              revenue: station.revenue || 0, // Default revenue to 0 if missing
             })
           );
 

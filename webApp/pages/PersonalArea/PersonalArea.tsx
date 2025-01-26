@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./PersonalArea.css";
 import GeneralInfoHeader from "../../src/components/GeneralInfoHeader";
 import ChargeInfo from "../../src/components/ChargeInfo";
+import ReceivedBooking from "../../src/components/RecivedBooking";
 
 interface User {
   firstName: string;
@@ -97,15 +98,17 @@ const PersonalArea: React.FC = () => {
         }
 
         const chargingData = await chargingResponse.json();
-        const chargers = chargingData.chargers.map((charger: Charger, index: number) => ({
-          id: `${charger._id}-${index}`,
-          Location: charger.location || "Unknown",
-          ChargingRate: charger.chargingRate || 0,
-          Description: charger.description || "No description",
-          Price: charger.price.toString(),
-          picture: charger.picture || "",
-          userId: charger.userId,
-        }));
+        const chargers = chargingData.chargers.map(
+          (charger: Charger, index: number) => ({
+            id: `${charger._id}-${index}`,
+            Location: charger.location || "Unknown",
+            ChargingRate: charger.chargingRate || 0,
+            Description: charger.description || "No description",
+            Price: charger.price.toString(),
+            picture: charger.picture || "",
+            userId: charger.userId,
+          })
+        );
 
         setRows(chargers);
       } catch (error) {
@@ -117,39 +120,13 @@ const PersonalArea: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleCarBrandChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCarBrand(e.target.value);
-  };
-
-  const handleCarYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCarYear(e.target.value);
-  };
-
-  const handleCarModelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCarModel(e.target.value);
-  };
-
   const handleUpdateCarInfo = async () => {
     if (!carBrand || !carYear || !carModel) {
       alert("Please enter all car details.");
       return;
     }
 
-    const currentYear = new Date().getFullYear();
-    if (parseInt(carYear) > currentYear) {
-      alert("The car year cannot be greater than the current year.");
-      return;
-    }
-
     setLoading(true);
-
-    const userId = localStorage.getItem("userId");
-
-    if (!userId) {
-      alert("User ID is required");
-      setLoading(false);
-      return;
-    }
 
     try {
       const response = await fetch(
@@ -164,7 +141,6 @@ const PersonalArea: React.FC = () => {
             carBrand,
             carYear,
             carModel,
-            userId,
           }),
         }
       );
@@ -173,30 +149,26 @@ const PersonalArea: React.FC = () => {
         throw new Error("Failed to generate content");
       }
 
-      const result = await response.json();
-      console.log(result);
-
       alert("Car information sent successfully");
-
-      setLoading(false);
     } catch (error) {
       console.error("Error sending car information:", error);
       alert("Failed to send car information");
+    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div className="container">
-      <div className="general-info">
-        {userInfo && (
+      {userInfo && (
+        <div className="general-info">
           <GeneralInfoHeader
             name={`${userInfo.firstName} ${userInfo.lastName}`}
             Email={userInfo.email}
             picturePath={userInfo.picture}
           />
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="charge-info">
         <ChargeInfo rows={rows} />
@@ -208,31 +180,32 @@ const PersonalArea: React.FC = () => {
           <input
             type="text"
             value={carBrand}
-            onChange={handleCarBrandChange}
-            placeholder="Enter your car brand"
+            onChange={(e) => setCarBrand(e.target.value)}
+            placeholder="Car Brand"
           />
           <input
             type="number"
             value={carYear}
-            onChange={handleCarYearChange}
-            placeholder="Enter your car year"
+            onChange={(e) => setCarYear(e.target.value)}
+            placeholder="Car Year"
             min="1900"
             max={new Date().getFullYear()}
-            step="1"
           />
           <input
             type="text"
             value={carModel}
-            onChange={handleCarModelChange}
-            placeholder="Enter your car model"
+            onChange={(e) => setCarModel(e.target.value)}
+            placeholder="Car Model"
           />
         </div>
         <button onClick={handleUpdateCarInfo} disabled={loading}>
-          {loading ? "Sending..." : "Send Car Information"}
+          {loading ? "Sending..." : "Send Car Info"}
         </button>
       </div>
 
-      <div></div>
+      <div className="received-bookings">
+        <ReceivedBooking />
+      </div>
     </div>
   );
 };

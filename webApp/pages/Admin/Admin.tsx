@@ -1,5 +1,4 @@
 import "./Admin.css";
-import React from "react";
 import ManageUsers from "../../src/components/Admin/ManageUsers";
 import ManageChargeStations from "../../src/components/Admin/ManageChargingStations";
 export default function Admin() {

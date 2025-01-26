@@ -1,0 +1,86 @@
+.received-booking-container {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Arial", sans-serif;
+  max-width: 1200px;
+  margin: 40px auto;
+}
+
+h3 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  color: #1976d2;
+  text-align: center;
+}
+
+.booking-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.booking-table th,
+.booking-table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.booking-table th {
+  background-color: #f4f6f8;
+  color: #333;
+  font-weight: bold;
+}
+
+.status {
+  font-weight: bold;
+  text-transform: capitalize;
+  gap: 8px;
+}
+
+.status-icon {
+  font-size: 1.2rem;
+}
+
+.status-confirmed {
+  color: #4caf50;
+}
+
+.status-rejected {
+  color: #f44336;
+}
+
+.status-pending {
+  color: #ffa726;
+}
+
+.action-buttons button {
+  margin-right: 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.action-buttons button:hover {
+  transform: scale(1.05);
+}
+
+.action-buttons button:nth-child(1) {
+  background-color: #4caf50;
+  color: white;
+}
+
+.action-buttons button:nth-child(2) {
+  background-color: #f44336;
+  color: white;
+}
+
+.action-buttons button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

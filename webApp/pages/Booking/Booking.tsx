@@ -273,7 +273,7 @@ export default function Booking() {
               picture={
                 charger.picture
                   ? `http://localhost:3000${charger.picture}`
-                  : "https://randomuser.me/api/portraits/placeholder.jpg"
+                  : "https://www.revixpert.ch/app/uploads/portrait-placeholder.jpg"
               }
               
               charger={charger}
