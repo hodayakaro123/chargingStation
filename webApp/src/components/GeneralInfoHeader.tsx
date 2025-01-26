@@ -4,7 +4,7 @@ import "./generalinfoheader.css";
 type GeneralInfoHeaderProps = {
   name: string;
   Email: string;
-  picturePath?: string; // Optional prop for the image path from the server
+  picturePath?: string; 
 };
 
 export default function GeneralInfoHeader({
@@ -23,7 +23,7 @@ export default function GeneralInfoHeader({
   const [loading, setLoading] = useState(false);
   const [picture, setPicture] = useState(
     picturePath ? `http://localhost:3000${picturePath}` : ""
-  ); // Use server path for the picture
+  ); 
 
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
@@ -97,9 +97,9 @@ export default function GeneralInfoHeader({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPicture(reader.result as string); // Update picture with the new file
+        setPicture(reader.result as string); 
       };
-      reader.readAsDataURL(file); // Convert image to base64 string
+      reader.readAsDataURL(file); 
     }
   };
 

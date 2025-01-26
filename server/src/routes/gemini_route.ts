@@ -11,7 +11,7 @@ router.post("/generate-content", async (req, res) => {
   if (!carBrand || !carYear || !carModel || !userId) {
     return res.status(400).json({ error: "All car details (carBrand, carYear, carModel, userId) are required" });
   }
-
+  
   try {
     const carInfoText = `Car Brand: ${carBrand}, Car Year: ${carYear}, Car Model: ${carModel}`;
     

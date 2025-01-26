@@ -3,34 +3,12 @@ import "./PersonalArea.css";
 import GeneralInfoHeader from "../../src/components/GeneralInfoHeader";
 import ChargeInfo from "../../src/components/ChargeInfo";
 import ReceivedBooking from "../../src/components/RecivedBooking";
+import { Charger, User } from "../../src/types/types";
 
-interface User {
-  firstName: string;
-  lastName: string;
-  picture: string;
-  email: string;
-}
-
-interface Comment {
-  text: string;
-}
-
-interface Charger {
-  location?: string;
-  latitude?: number;
-  longitude?: number;
-  price: number;
-  rating?: number;
-  chargingRate?: number;
-  picture?: string;
-  description?: string;
-  comments: Comment[];
-  userId: string;
-  _id: string;
-}
 
 interface ChargeInfoRow {
   id: number;
+  chargerId: string;
   Location: string;
   ChargingRate: number;
   Description: string;
@@ -39,6 +17,7 @@ interface ChargeInfoRow {
   userId: string;
 }
 
+
 const PersonalArea: React.FC = () => {
   const [carBrand, setCarBrand] = useState<string>("");
   const [carYear, setCarYear] = useState<string>("");
@@ -46,6 +25,7 @@ const PersonalArea: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [rows, setRows] = useState<ChargeInfoRow[]>([]);
   const [userInfo, setUserInfo] = useState<User | null>(null);
+  const [chargers, setChargers] = useState<Charger[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,6 +80,7 @@ const PersonalArea: React.FC = () => {
         const chargingData = await chargingResponse.json();
         const chargers = chargingData.chargers.map(
           (charger: Charger, index: number) => ({
+            chargerId: charger._id,
             id: `${charger._id}-${index}`,
             Location: charger.location || "Unknown",
             ChargingRate: charger.chargingRate || 0,
@@ -109,12 +90,15 @@ const PersonalArea: React.FC = () => {
             userId: charger.userId,
           })
         );
-
+        setChargers(chargers);
         setRows(chargers);
+        
+
       } catch (error) {
         console.error("Error fetching charging stations:", error);
         alert("Failed to fetch charging stations");
       }
+      
     };
 
     fetchData();
@@ -129,6 +113,7 @@ const PersonalArea: React.FC = () => {
     setLoading(true);
 
     try {
+      const userId = localStorage.getItem("userId");
       const response = await fetch(
         "http://localhost:3000/gemini/generate-content",
         {
@@ -141,6 +126,7 @@ const PersonalArea: React.FC = () => {
             carBrand,
             carYear,
             carModel,
+            userId,
           }),
         }
       );
@@ -204,7 +190,7 @@ const PersonalArea: React.FC = () => {
       </div>
 
       <div className="received-bookings">
-        <ReceivedBooking />
+        <ReceivedBooking chargers={chargers} />
       </div>
     </div>
   );

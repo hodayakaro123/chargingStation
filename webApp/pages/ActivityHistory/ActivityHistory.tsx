@@ -10,24 +10,14 @@ import {
   Typography,
 } from "@mui/material";
 import "./ActivityHistory.css";
+import { Booking } from "../../src/types/types";
 
-type Status = "Pending" | "Approved" | "Declined";
-
-interface Booking {
-  _id: string;
-  Date: string;
-  StartTime: string;
-  EndTime: string;
-  Location: string;
-  Status: Status;
-  chargerId: string;
-  chargerPicture?: string; 
-}
+type Status = "Pending" | "Confirmed" | "Rejected";
 
 const statusStyles: Record<Status, { backgroundColor: string; color: string }> = {
   Pending: { backgroundColor: "#FFA500", color: "white" },
-  Approved: { backgroundColor: "#28a745", color: "white" },
-  Declined: { backgroundColor: "#dc3545", color: "white" },
+  Confirmed: { backgroundColor: "#28a745", color: "white" },
+  Rejected: { backgroundColor: "#dc3545", color: "white" },
 };
 
 export default function ActivityHistory() {
@@ -104,6 +94,7 @@ export default function ActivityHistory() {
               <TableCell className="table-header-cell">Start Time</TableCell>
               <TableCell className="table-header-cell">End Time</TableCell>
               <TableCell className="table-header-cell">Location</TableCell>
+              <TableCell className="table-header-cell">Status</TableCell> {}
               <TableCell className="table-header-cell">Picture</TableCell> {}
             </TableRow>
           </TableHead>
@@ -114,19 +105,20 @@ export default function ActivityHistory() {
                 <TableCell className="table-cell">{new Date(row.StartTime).toLocaleTimeString()}</TableCell>
                 <TableCell className="table-cell">{new Date(row.EndTime).toLocaleTimeString()}</TableCell>
                 <TableCell className="table-cell">{row.Location}</TableCell>
+                <TableCell className="table-cell" style={statusStyles[row.Status as Status] || {}} >{row.Status}</TableCell>
                 <TableCell className="table-cell">
                   {row.chargerPicture ? (
                     <img
-                      src={`http://localhost:3000${row.chargerPicture}`}
-                      alt="Charging Station"
-                      style={{
-                        width: "150px",
-                        height: "100%",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                        marginBottom: "10px",
-                      }}
-                    />
+                    src={row.chargerPicture ? `http://localhost:3000${row.chargerPicture}` : "defaultPicture"}
+                    alt="Charging Station"
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                    }}
+                  />
                   ) : (
                     <Typography>No Picture Available</Typography>
                   )}

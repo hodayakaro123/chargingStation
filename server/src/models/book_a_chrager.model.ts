@@ -26,6 +26,10 @@ const BookCharger = new mongoose.Schema({
         type: String,
         required: true,
     },
+    Status: {
+        type: String,
+        default: "Pending",
+    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Users",

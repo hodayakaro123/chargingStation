@@ -326,7 +326,7 @@ router.get("/getChargersByUserId/chargers/:userId", authMiddleware, (req, res) =
  */
 
 
-router.put("/updateCharger/:chargerId", authMiddleware, (req, res) => {
+router.put("/updateCharger/:chargerId", upload.single("image"), authMiddleware,  (req, res) => {
     add_charging_controller.updateCharger(req, res);
 });
 
