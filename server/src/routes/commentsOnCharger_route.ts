@@ -379,4 +379,11 @@ router.delete("/deleteComment/:chargerId/:commentId", authMiddleware, (req, res)
 
 
 
+
+router.get("/getCommentsByChargerId/:chargerId", authMiddleware, (req, res) => {
+    add_comments_controller.getCommentsByChargerId(req, res);
+});
+
+
+
 export default router;

@@ -280,6 +280,17 @@ export default function Home() {
                   />
                 ) : (
                   <p style={{ fontStyle: "italic", color: "gray" }}>
+                  <img
+                    src={`https://www.revixpert.ch/app/uploads/portrait-placeholder.jpg`}
+                    alt="Charging Station"
+                    style={{
+                      width: "100%",
+                      height: "150px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                    }}
+                  />
                     No image available
                   </p>
                 )}

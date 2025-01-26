@@ -1,9 +1,28 @@
 import mongoose from "mongoose";
 
 const commentSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Users",
+    },
     text: {
         type: String,
         required: true,
+    },
+    likes: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
+    Rating: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
+    Date: {
+        type: Date,
+        required: false,
+        default: Date.now,
     },
 });
 

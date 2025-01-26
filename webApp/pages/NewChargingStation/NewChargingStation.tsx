@@ -149,13 +149,13 @@ export default function NewChargingStation() {
               )}
             </div>
             <input
-              type="text"
+              type="number"
               placeholder="Charging rate"
               value={chargingRate}
               onChange={(e) => setChargingRate(e.target.value)}
             />
             <input
-              type="text"
+              type="number"
               placeholder="Price"
               value={price}
               onChange={(e) => setPrice(e.target.value)}

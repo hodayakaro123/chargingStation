@@ -3,7 +3,8 @@ import ChargingModel from "../models/add_charging_model";
 import userModel from "../models/user_model";
 import mongoose from "mongoose";
 import axios from 'axios';
-
+import fs from "fs";
+import path from "path";
 
 
 
@@ -124,29 +125,57 @@ const getAllChargers = async (req: Request, res: Response) => {
 
 const updateCharger = async (req: Request, res: Response) => {
     try {
-        const { chargerId } = req.params;
-        const updateData = req.body;
-
-        const chargingStation = await ChargingModel.findById(chargerId);
-        if (!chargingStation) {
-            return res.status(404).json({ message: "Charging station not found" });
+      const { chargerId } = req.params;
+  
+      const chargingStation = await ChargingModel.findById(chargerId);
+      if (!chargingStation) {
+        return res.status(404).json({ message: "Charging station not found" });
+      }
+  
+      if (req.body.Location && chargingStation.location !== req.body.Location) {
+        const coordinates = await getCoordinates(req.body.Location);
+        if (coordinates) {
+          chargingStation.latitude = coordinates.latitude;
+          chargingStation.longitude = coordinates.longitude;
+          chargingStation.location = req.body.Location;
+        } else {
+          return res.status(400).json({ message: "Invalid location" });
         }
-
-        Object.keys(updateData).forEach(key => {
-            (chargingStation as any)[key] = updateData[key];
-        });
-
-        await chargingStation.save();
-
-        res.status(200).json({ message: "Charging station updated successfully", chargingStation });
+      }
+  
+      if (req.body.ChargingRate) chargingStation.chargingRate = req.body.ChargingRate;
+      if (req.body.Price) chargingStation.price = req.body.Price;
+      if (req.body.Description) chargingStation.description = req.body.Description;
+  
+      if (req.file) {
+        if (chargingStation.picture) {
+          const existingPicturePath = path.resolve(__dirname, `../${chargingStation.picture}`);
+          if (fs.existsSync(existingPicturePath)) {
+            fs.unlinkSync(existingPicturePath);
+          }
+        }
+  
+        chargingStation.picture = `/uploads/${req.body.userId}/${req.file.filename}`;
+      }
+  
+      await chargingStation.save();
+  
+      res.status(200).json({
+        message: "Charging station updated successfully",
+        chargingStation,
+      });
     } catch (error) {
-        res.status(500).json({ message: "Failed to update charging station", error });
+      console.error("Error updating charging station:", error);
+      res.status(500).json({ message: "Failed to update charging station", error });
     }
-};
+  };
+
+
 
 const deleteChargerById = async (req: Request, res: Response) => {
     try {
         const { chargerId } = req.params;
+        console.log(chargerId);
 
         await ChargingModel.findByIdAndDelete(chargerId);
 
@@ -187,4 +216,30 @@ const addSelectedChargingStation = async (req: Request, res: Response) => {
     }
 };
 
-export default { addChargingStation, getChargerById, getAllChargers, updateCharger, deleteChargerById, addSelectedChargingStation, getChargersByUserId };
+
+
+
+const getUserByChargerId = async (req: Request, res: Response) => {
+    try {
+        const { chargerId } = req.params;
+
+        const chargingStation = await ChargingModel.findById(chargerId);
+        if (!chargingStation) {
+            return res.status(404).json({ message: "Charging station not found" });
+        }
+
+        const user = await userModel.findById(chargingStation.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({ user });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to get user", error });
+    }
+};
+
+
+
+export default { addChargingStation, getChargerById, getAllChargers, updateCharger, 
+    deleteChargerById, addSelectedChargingStation, getChargersByUserId, getUserByChargerId };
