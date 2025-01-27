@@ -2,10 +2,12 @@ import styles from "./Navbar.module.css";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaUser, FaHome } from "react-icons/fa";
 import { MdExitToApp } from "react-icons/md";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   const toggleMenu = () => {
@@ -45,14 +47,30 @@ export default function Navbar() {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("userId");
+      localStorage.clear();
       navigate("/");
     } catch (error) {
       console.error("Error during logout:", error);
       alert("Logout failed. Please try again later.");
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
+      localStorage.clear();
     }
   };
+
+  
+  useEffect(() => {
+    const firstName = localStorage.getItem("firstName");
+    const lastName = localStorage.getItem("lastName");
+    const email = localStorage.getItem("email");
+
+    if (firstName === "admin" &&lastName === "master" && email === "adminmaster@gmail.com"
+    ) {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false); 
+    }
+  }, []); 
 
   return (
     <nav className={styles.navbar}>
@@ -62,17 +80,19 @@ export default function Navbar() {
         <div></div>
       </div>
       <ul className={`${styles.navList} ${isMenuOpen ? styles.active : ""}`}>
-        <li className={styles.navItem}>
-          <NavLink
-            to="/Admin"
-            className={({ isActive }) =>
-              isActive ? styles.activeLink : styles.navLink
-            }
-            onClick={closeMenu}
-          >
-            Admin
-          </NavLink>
-        </li>
+        {isAdmin && ( // Only show "Admin" if isAdmin is true
+          <li className={styles.navItem}>
+            <NavLink
+              to="/Admin"
+              className={({ isActive }) =>
+                isActive ? styles.activeLink : styles.navLink
+              }
+              onClick={closeMenu}
+            >
+              Admin
+            </NavLink>
+          </li>
+        )}
         <li className={styles.navItem}>
           <NavLink
             to="/Home"

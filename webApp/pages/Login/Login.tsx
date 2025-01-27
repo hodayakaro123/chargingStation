@@ -71,6 +71,7 @@ const LoginPage: React.FC = () => {
       localStorage.setItem('userId', data._id);
       localStorage.setItem("firstName", data.firstName);
       localStorage.setItem("lastName", data.lastName);
+      localStorage.setItem("email", data.email);
       console.log("Login successful:", data.firstName, data.lastName);
 
 

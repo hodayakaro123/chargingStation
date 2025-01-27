@@ -107,7 +107,7 @@ const ReceivedBooking: React.FC<ReceivedBookingProps> = ({ chargers }) => {
           <option value="">--Select a charger--</option>
           {chargers.map((charger) => (
             <option key={charger._id} value={charger.chargerId}>
-              {charger.chargerId} {/* Display chargerId in dropdown */}
+              {charger.chargerId } { charger.location }
             </option>
           ))}
         </select>

@@ -154,6 +154,7 @@ const updateCharger = async (req: Request, res: Response) => {
     if (req.body.ChargingRate)
       chargingStation.chargingRate = req.body.ChargingRate;
     if (req.body.Price) chargingStation.price = req.body.Price;
+
     if (req.body.Description)
       chargingStation.description = req.body.Description;
 
@@ -190,6 +191,16 @@ const deleteChargerById = async (req: Request, res: Response) => {
     const { chargerId } = req.params;
     console.log(chargerId);
 
+    const charger = await ChargingModel.findById(chargerId);
+    if (!charger) {
+      return res.status(404).json({ message: "Charging station not found" });
+    }
+    if (charger.picture) {
+        const existingPicturePath = path.resolve(__dirname, `../${charger.picture}`);
+        if (fs.existsSync(existingPicturePath)) {
+          fs.unlinkSync(existingPicturePath);
+        }
+    }
     await ChargingModel.findByIdAndDelete(chargerId);
 
     await BookCharger.deleteMany({ chargerId });
