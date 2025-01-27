@@ -7,7 +7,7 @@ export default function NewChargingStation() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null); // State for image preview
+  const [imagePreview, setImagePreview] = useState<string | null>(null); 
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showLocationOption, setShowLocationOption] = useState(false);
@@ -16,7 +16,7 @@ export default function NewChargingStation() {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       setSelectedImage(file);
-      setImagePreview(URL.createObjectURL(file)); // Generate a preview URL
+      setImagePreview(URL.createObjectURL(file)); 
     }
   };
 

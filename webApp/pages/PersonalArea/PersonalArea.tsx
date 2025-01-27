@@ -12,7 +12,7 @@ interface ChargeInfoRow {
   Location: string;
   ChargingRate: number;
   Description: string;
-  Price: string;
+  Price: number;
   picture: string;
   userId: string;
 }

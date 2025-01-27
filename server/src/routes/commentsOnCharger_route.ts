@@ -384,6 +384,10 @@ router.get("/getCommentsByChargerId/:chargerId", authMiddleware, (req, res) => {
     add_comments_controller.getCommentsByChargerId(req, res);
 });
 
+router.post("/toggleLikeDislikeComment/", authMiddleware, (req, res) => {
+    add_comments_controller.toggleLikeDislikeComment(req, res);
+});
+
 
 
 export default router;

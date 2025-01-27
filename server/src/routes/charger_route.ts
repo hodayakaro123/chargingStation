@@ -334,6 +334,9 @@ router.put("/updateCharger/:chargerId", upload.single("image"), authMiddleware, 
 
 
 
+router.post("/toggleLikeDislikeCharger/", authMiddleware, (req, res) => {
+    add_charging_controller.toggleLikeDislikeCharger(req, res);
+});
 
 
 

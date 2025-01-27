@@ -119,5 +119,67 @@ const getCommentsByChargerId = async (req: Request, res: Response) => {
     }
 };
 
+
+
+const toggleLikeDislikeComment = async (req: Request, res: Response) => {
+    const { like, dislike } = req.body;
+    const userId = req.body.userId;
+    
+    try {
+        const charger = await chargingModel.findById(req.body.chargerId);
+        const comment = charger?.comments.find((comment) => comment._id.equals(req.body.commentId));
+
+        if (!comment) {
+            return res.status(404).json({ message: "Comment not found" });
+        }
+
+        comment.likes = comment.likes ?? 0;
+        comment.dislikes = comment.dislikes ?? 0;
+
+        if (like) {
+            if (comment.likedUsers.includes(userId)) {
+                comment.likes--;
+                comment.likedUsers = comment.likedUsers.filter((id) => !id.equals(userId));
+            } else {
+                comment.likes++;
+                comment.likedUsers.push(userId);
+
+                if (comment.dislikedUsers.includes(userId)) {
+                    comment.dislikes--;
+                    comment.dislikedUsers = comment.dislikedUsers.filter((id) => !id.equals(userId));
+                }
+            }
+        }
+
+        if (dislike) {
+            if (comment.dislikedUsers.includes(userId)) {
+                comment.dislikes--;
+                comment.dislikedUsers = comment.dislikedUsers.filter((id) => !id.equals(userId));
+            } else {
+                comment.dislikes++;
+                comment.dislikedUsers.push(userId);
+
+                if (comment.likedUsers.includes(userId)) {
+                    comment.likes--;
+                    comment.likedUsers = comment.likedUsers.filter((id) => !id.equals(userId));
+                }
+            }
+        }
+
+        if (charger) {
+            await charger.save();
+            res.json(comment);
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Server error");
+    }
+};
+
+
+
+
+
 export default { addComment, updateComment, deleteCommentById, 
-    getCommentById, getCommentsByChargerId };
+    getCommentById, getCommentsByChargerId, toggleLikeDislikeComment };
