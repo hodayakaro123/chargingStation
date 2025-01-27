@@ -57,6 +57,8 @@ export default function Comments({
         const accessToken = localStorage.getItem("accessToken");
         const userId = localStorage.getItem("userId");
         const userNameFromContext = localStorage.getItem("firstName");
+        const userPicture = localStorage.getItem("picture");
+ 
 
         if (!accessToken || !userId) {
           throw new Error("User is not authenticated.");
@@ -69,6 +71,7 @@ export default function Comments({
           text: newComment,
           likes: 0,
           rating: 5,
+          picture: `http://localhost:3000${userPicture}`,
         };
 
         const response = await fetch(
@@ -95,10 +98,10 @@ export default function Comments({
           userName: addedComment.userName,
           text: addedComment.text,
           user: {
-            firstName: "",
-            lastName: "",
+            firstName: localStorage.getItem("firstName") || "", 
+            lastName: localStorage.getItem("lastName") || "", 
             email: "",
-            picture: "",
+            picture:  localStorage.getItem("picture") || "",
           },
           Date: new Date().toLocaleDateString(),
           liked: false,
@@ -214,7 +217,7 @@ export default function Comments({
                   className="comment-user-picture"
                 />
                 <p>
-                  <strong>{comment.user.firstName}</strong> -{" "}
+                  <strong>{comment.user.firstName} {comment.user.lastName}</strong> -{" "}
                   {new Date(comment.Date).toLocaleDateString()}
                 </p>
               </div>

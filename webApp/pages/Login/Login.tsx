@@ -72,9 +72,8 @@ const LoginPage: React.FC = () => {
       localStorage.setItem("firstName", data.firstName);
       localStorage.setItem("lastName", data.lastName);
       localStorage.setItem("email", data.email);
-      console.log("Login successful:", data.firstName, data.lastName);
-
-
+      localStorage.setItem("picture", data.picture);
+      
       navigate("/Home"); 
     } catch (error) {
       console.error("Error:", error);

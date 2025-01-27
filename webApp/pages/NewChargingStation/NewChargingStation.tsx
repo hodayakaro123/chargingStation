@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./NewChargingStation.css";
 
+
 export default function NewChargingStation() {
   const [location, setLocation] = useState("");
   const [chargingRate, setChargingRate] = useState("");
@@ -112,7 +113,7 @@ export default function NewChargingStation() {
       setPrice("");
       setDescription("");
       setSelectedImage(null);
-      setImagePreview(null); // Clear the preview
+      setImagePreview(null); 
     } catch (error) {
       console.error("Error:", error);
       setError("An error occurred while adding the charging station.");
@@ -156,7 +157,7 @@ export default function NewChargingStation() {
             />
             <input
               type="number"
-              placeholder="Price"
+              placeholder="Price per hour"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
             />

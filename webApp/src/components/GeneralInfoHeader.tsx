@@ -4,7 +4,7 @@ import "./generalinfoheader.css";
 type GeneralInfoHeaderProps = {
   name: string;
   Email: string;
-  picturePath?: string; 
+  picturePath?: string;
 };
 
 export default function GeneralInfoHeader({
