@@ -55,7 +55,6 @@ export default function ActivityHistory() {
             if (!chargerResponse.ok) {
               throw new Error("Failed to fetch charger location");
             }
-
             const chargerData = await chargerResponse.json();
             console.log(chargerData.chargingStation.location);
             return {

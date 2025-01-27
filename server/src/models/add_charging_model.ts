@@ -14,6 +14,19 @@ const commentSchema = new mongoose.Schema({
         required: false,
         default: 0,
     },
+    dislikes: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
+    likedUsers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Users",
+    }],
+    dislikedUsers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Users",
+    }],
     Rating: {
         type: Number,
         required: false,
@@ -67,6 +80,24 @@ const chargingSchema = new mongoose.Schema({
         type: [commentSchema],
         default: [],
     },
+    likes: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
+    dislikes: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
+    likedUsers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Users",
+    }],
+    dislikedUsers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Users",
+    }],
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Users",

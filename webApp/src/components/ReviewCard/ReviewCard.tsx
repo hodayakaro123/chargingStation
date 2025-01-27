@@ -5,12 +5,15 @@ import {
   AiOutlineDislike,
   AiFillDislike,
 } from "react-icons/ai";
+import CommentCard from "../CommentCard";
 import "./ReviewCard.css";
 
 interface Charger {
   _id: string;
   name: string;
   location: string;
+  likes: number;
+  dislikes: number;
 }
 
 interface Comment {
@@ -27,8 +30,10 @@ interface Comment {
   Date: string;
   liked: boolean;
   disliked: boolean;
-  likeCount: number;
-  dislikeCount: number;
+  likes: number;
+  dislikes: number;
+  likedUsers: string[];
+  dislikedUsers: string[];
 }
 
 interface ReviewCardProps {
@@ -48,17 +53,15 @@ export default function ReviewCard({
   comments = [],
   charger,
 }: ReviewCardProps) {
-  const [newComment, setNewComment] = useState<string>("");
   const [commentsList, setCommentsList] = useState<Comment[]>(comments);
-  const [editCommentId, setEditCommentId] = useState<string | null>(null);
-  const [editText, setEditText] = useState<string>("");
-
   const [chargerLiked, setChargerLiked] = useState<boolean>(false);
   const [chargerDisliked, setChargerDisliked] = useState<boolean>(false);
   const [chargerLikeCount, setChargerLikeCount] = useState<number>(0);
   const [chargerDislikeCount, setChargerDislikeCount] = useState<number>(0);
 
   useEffect(() => {
+    console.log("charger", charger);
+
     const fetchComments = async () => {
       try {
         const response = await fetch(
@@ -99,7 +102,6 @@ export default function ReviewCard({
               }
 
               const userData = await userResponse.json();
-              console.log(userData.firstName);
               return { ...comment, user: userData };
             } catch (error) {
               console.error(
@@ -120,210 +122,151 @@ export default function ReviewCard({
     fetchComments();
   }, [charger._id]);
 
-  const handleToggleChargerLike = () => {
-    if (!chargerLiked) {
-      setChargerLikeCount((prev) => prev + 1);
-      if (chargerDisliked) {
-        setChargerDislikeCount((prev) => prev - 1);
-        setChargerDisliked(false);
-      }
-    } else {
-      setChargerLikeCount((prev) => prev - 1);
-    }
-    setChargerLiked(!chargerLiked);
-  };
-
-  const handleToggleChargerDislike = () => {
-    if (!chargerDisliked) {
-      setChargerDislikeCount((prev) => prev + 1);
-      if (chargerLiked) {
-        setChargerLikeCount((prev) => prev - 1);
-        setChargerLiked(false);
-      }
-    } else {
-      setChargerDislikeCount((prev) => prev - 1);
-    }
-    setChargerDisliked(!chargerDisliked);
-  };
-
-  const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNewComment(event.target.value);
-  };
-
-  const handleAddComment = async () => {
-    if (newComment.trim()) {
-      try {
-        const accessToken = localStorage.getItem("accessToken");
-        const userId = localStorage.getItem("userId");
-
-        if (!accessToken || !userId) {
-          throw new Error("User is not authenticated.");
-        }
-
-        const userNameFromContext = localStorage.getItem("firstName");
-
-        const newCommentPayload = {
-          chargerId: charger._id,
-          userId,
-          userName: userNameFromContext,
-          text: newComment,
-          likes: 0,
-          rating: 5,
-        };
-
-        const response = await fetch(
-          `http://localhost:3000/addComments/addComment/${charger._id}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(newCommentPayload),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to add comment.");
-        }
-
-        const addedComment = await response.json();
-
-        setCommentsList((prevComments) => [
-          ...prevComments,
-          {
-            userId: addedComment.userId,
-            _id: addedComment._id,
-            userName: addedComment.userName,
-            text: addedComment.text,
-            user: {
-              firstName: "",
-              lastName: "",
-              email: "",
-              picture: "",
-            },
-            Date: new Date().toLocaleDateString(),
-            liked: false,
-            disliked: false,
-            likeCount: 0,
-            dislikeCount: 0,
-          },
-        ]);
-
-        setNewComment("");
-      } catch (error) {
-        console.error("Error adding comment:", error);
-      }
-    }
-  };
-
-  const handleDeleteComment = async (commentId: string) => {
+  const handleToggleCharger = async (type: string) => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
+      const isLike = type === "like";
+      const isDislike = type === "dislike";
 
-      if (!accessToken) {
-        throw new Error("User is not authenticated.");
-      }
+      const data = {
+        chargerId: charger._id,
+        userId: localStorage.getItem("userId"),
+        like: isLike ? !chargerLiked : false,
+        dislike: isDislike ? !chargerDisliked : false,
+      };
+      console.log(localStorage.getItem("userId"));
 
       const response = await fetch(
-        `http://localhost:3000/addComments/deleteComment/${charger._id}/${commentId}`,
+        `http://localhost:3000/addChargingStation/toggleLikeDislikeCharger`,
         {
-          method: "DELETE",
+          method: "POST",
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify(data),
         }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to delete comment.");
+        throw new Error("Failed to update charger like/dislike");
       }
 
-      setCommentsList((prevComments) =>
-        prevComments.filter((comment) => comment._id !== commentId)
-      );
-    } catch (error) {
-      console.error("Error deleting comment:", error);
-    }
-  };
-
-  const handleEditComment = (commentId: string, currentText: string) => {
-    setEditCommentId(commentId);
-    setEditText(currentText);
-  };
-
-  const handleSaveComment = async () => {
-    if (editText.trim()) {
-      try {
-        const accessToken = localStorage.getItem("accessToken");
-
-        if (!accessToken) {
-          throw new Error("User is not authenticated.");
-        }
-
-        const response = await fetch(
-          `http://localhost:3000/addComments/updateComment/${charger._id}/${editCommentId}`,
-          {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ text: editText }),
+      if (isLike) {
+        if (!chargerLiked) {
+          setChargerLikeCount((prev) => prev + 1);
+          if (chargerDisliked) {
+            setChargerDislikeCount((prev) => prev - 1);
+            setChargerDisliked(false);
           }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to update comment.");
+        } else {
+          setChargerLikeCount((prev) => prev - 1);
         }
-
-        setCommentsList((prevComments) =>
-          prevComments.map((comment) =>
-            comment._id === editCommentId
-              ? { ...comment, text: editText }
-              : comment
-          )
-        );
-
-        setEditCommentId(null);
-        setEditText("");
-      } catch (error) {
-        console.error("Error updating comment:", error);
+        setChargerLiked(!chargerLiked);
       }
+
+      if (isDislike) {
+        if (!chargerDisliked) {
+          setChargerDislikeCount((prev) => prev + 1);
+          if (chargerLiked) {
+            setChargerLikeCount((prev) => prev - 1);
+            setChargerLiked(false);
+          }
+        } else {
+          setChargerDislikeCount((prev) => prev - 1);
+        }
+        setChargerDisliked(!chargerDisliked);
+      }
+    } catch (error) {
+      console.error("Error toggling charger like/dislike:", error);
     }
   };
 
-  const toggleLike = (commentId: string) => {
-    setCommentsList((prevComments) =>
-      prevComments.map((comment) =>
+  const toggleReaction = async (
+    commentId: string,
+    reaction: "like" | "dislike"
+  ) => {
+    const isLike = reaction === "like";
+
+    const updatedComments = commentsList.map((comment) =>
+      comment._id === commentId
+        ? {
+            ...comment,
+            liked: isLike ? !comment.liked : false,
+            disliked: isLike ? false : !comment.disliked,
+
+            likes: isLike
+              ? comment.liked
+                ? comment.likes - 1
+                : comment.likes + 1
+              : comment.likes,
+
+            dislikes: isLike
+              ? comment.dislikes
+              : comment.disliked
+              ? comment.dislikes - 1
+              : comment.dislikes + 1,
+          }
+        : comment
+    );
+
+    setCommentsList(updatedComments);
+
+    console.log("updatedComments", updatedComments);
+
+    try {
+      const userId = localStorage.getItem("userId");
+      const response = await fetch(
+        `http://localhost:3000/addComments/toggleLikeDislikeComment/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            [reaction]: true,
+            chargerId: charger._id,
+            commentId,
+            userId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to update ${reaction} status`);
+      }
+
+      const updatedCommentData = await response.json();
+      const updatedCommentsWithNewCount = commentsList.map((comment) =>
         comment._id === commentId
           ? {
               ...comment,
-              liked: !comment.liked,
-              disliked: false,
-              likeCount: comment.liked
-                ? comment.likeCount - 1
-                : comment.likeCount + 1,
+              likeCount: updatedCommentData.likeCount,
+              dislikeCount: updatedCommentData.dislikeCount,
             }
           : comment
-      )
-    );
-    console.log(commentsList);
+      );
+
+      // setCommentsList(updatedCommentsWithNewCount);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const toggleDislike = (commentId: string) => {
+  const handleAddComment = (comment: Comment) => {
+    setCommentsList((prevComments) => [...prevComments, comment]);
+  };
+
+  const handleDeleteComment = (commentId: string) => {
+    setCommentsList((prevComments) =>
+      prevComments.filter((comment) => comment._id !== commentId)
+    );
+  };
+
+  const handleUpdateComment = (commentId: string, newText: string) => {
     setCommentsList((prevComments) =>
       prevComments.map((comment) =>
-        comment._id === commentId
-          ? {
-              ...comment,
-              disliked: !comment.disliked,
-              liked: false,
-              dislikeCount: comment.disliked
-                ? comment.dislikeCount - 1
-                : comment.dislikeCount + 1,
-            }
-          : comment
+        comment._id === commentId ? { ...comment, text: newText } : comment
       )
     );
   };
@@ -361,124 +304,40 @@ export default function ReviewCard({
         <h4>{charger.name}</h4>
         <p>Location: {charger.location}</p>
         <div className="like-unlike-buttons">
-          <button onClick={handleToggleChargerLike} className="like-button">
-            {chargerLiked ? (
-              <AiFillLike size={20} color="#007bff" />
-            ) : (
-              <AiOutlineLike size={20} />
-            )}
-            {chargerLikeCount}
-          </button>
           <button
-            onClick={handleToggleChargerDislike}
+            onClick={() => handleToggleCharger("like")}
+            className="like-button"
+          >
+            {chargerLiked ? (
+              <AiFillLike size={25} color="#007bff" />
+            ) : (
+              <AiOutlineLike size={25} />
+            )}.
+            {charger.likes}
+          </button>
+
+          <button
+            onClick={() => handleToggleCharger("dislike")}
             className="dislike-button"
           >
             {chargerDisliked ? (
-              <AiFillDislike size={20} color="#dc3545" />
+              <AiFillDislike size={25} color="#dc3545" />
             ) : (
-              <AiOutlineDislike size={20} />
+              <AiOutlineDislike size={25} />
             )}
-            {chargerDislikeCount}
+            {charger.dislikes}
           </button>
         </div>
       </div>
 
-      <div className="comments-section">
-        <div className="add-comment">
-          <input
-            type="text"
-            value={newComment}
-            onChange={handleCommentChange}
-            placeholder="Add a comment"
-            className="comment-input"
-          />
-          <button onClick={handleAddComment} className="add-comment-button">
-            Add Comment
-          </button>
-        </div>
-
-        <div className="comments-list">
-          {commentsList.length > 0 ? (
-            commentsList.map((comment) => (
-              <div key={comment._id} className="comment">
-                <div className="comment-header">
-                  <img
-                     src={
-                      comment.user.picture
-                        ? `http://localhost:3000${comment.user.picture}`
-                        : "http://localhost:3000/default-profile-picture.png"
-                    }
-                    alt={`${comment.user.firstName}'s profile`}
-                    className="comment-user-picture"
-                  />
-                  <p>
-                    <strong>{comment.user.firstName}</strong> -{" "}
-                    {new Date(comment.Date).toLocaleDateString()}
-                  </p>
-                </div>
-                {editCommentId === comment._id ? (
-                  <div>
-                    <input
-                      type="text"
-                      value={editText}
-                      onChange={(e) => setEditText(e.target.value)}
-                      className="edit-comment-input"
-                    />
-                    <button
-                      onClick={handleSaveComment}
-                      className="save-comment-button"
-                    >
-                      Save
-                    </button>
-                  </div>
-                ) : (
-                  <p>{comment.text}</p>
-                )}
-                <div className="like-unlike-section">
-                  <button
-                    onClick={() => toggleLike(comment._id)}
-                    className="like-button"
-                  >
-                    {comment.liked ? (
-                      <AiFillLike size={20} color="#007bff" />
-                    ) : (
-                      <AiOutlineLike size={20} />
-                    )}
-                    {comment.likeCount}
-                  </button>
-                  <button
-                    onClick={() => toggleDislike(comment._id)}
-                    className="dislike-button"
-                  >
-                    {comment.disliked ? (
-                      <AiFillDislike size={20} color="#dc3545" />
-                    ) : (
-                      <AiOutlineDislike size={20} />
-                    )}
-                    {comment.dislikeCount}
-                  </button>
-                </div>
-                <div className="comment-actions">
-                  <button
-                    onClick={() => handleDeleteComment(comment._id)}
-                    className="delete-comment-button"
-                  >
-                    Delete
-                  </button>
-                  <button
-                    onClick={() => handleEditComment(comment._id, comment.text)}
-                    className="edit-comment-button"
-                  >
-                    Edit
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>No comments yet.</p>
-          )}
-        </div>
-      </div>
+      <CommentCard
+        comments={commentsList}
+        chargerId={charger._id}
+        onCommentAdded={handleAddComment}
+        onCommentDeleted={handleDeleteComment}
+        onCommentUpdated={handleUpdateComment}
+        onToggleReaction={toggleReaction}
+      />
     </div>
   );
 }
