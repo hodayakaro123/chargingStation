@@ -12,6 +12,7 @@ import {
 import "./ActivityHistory.css";
 import { Booking } from "../../src/types/types";
 
+
 type Status = "Pending" | "Confirmed" | "Rejected";
 
 const statusStyles: Record<Status, { backgroundColor: string; color: string }> = {

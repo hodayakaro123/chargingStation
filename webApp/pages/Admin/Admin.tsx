@@ -4,8 +4,8 @@ import ManageChargeStations from "../../src/components/Admin/ManageChargingStati
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Admin() {
 
+export default function Admin() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const navigate = useNavigate();

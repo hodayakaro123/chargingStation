@@ -18,6 +18,14 @@ import path from "path";
 const app = express();
 dotenv.config();
 
+
+app.use(
+  cors({
+    origin: 'http://localhost:5173', 
+    credentials: true,  
+  })
+);
+
 const ensureUploadDirectories = () => {
   const directories = ["uploads"];
   directories.forEach((dir) => {
@@ -32,7 +40,7 @@ ensureUploadDirectories();
 
 app.use("/uploads", express.static(path.resolve(__dirname, "uploads")));
 
-app.use(cors());
+
 
 const options = {
   definition: {

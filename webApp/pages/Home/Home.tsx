@@ -23,6 +23,10 @@ interface ChargingStation {
   userId: string;
 }
 
+
+
+
+
 function ReturnToLocationButton({
   userLocation,
 }: {
@@ -75,6 +79,7 @@ function calculateChargingTime(
 }
 
 export default function Home() {
+  
   const navigate = useNavigate();
   const location = useLocation();
   const message = location.state?.message;
@@ -227,7 +232,7 @@ export default function Home() {
       {message && <p>{message}</p>}
       <h2 className="title">
         Hi {userName ? `${userName.firstName} ${userName.lastName}` : "User"},
-        Charging Station Map
+        Find a Charging Station
       </h2>
       <div className="input-container">
         <input

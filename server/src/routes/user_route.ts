@@ -189,5 +189,6 @@ router.get("/getUserById/:id", authMiddleware, userControllerAuth.getUserById);
 
 router.put("/updateUser/:id", upload.single("image"), authMiddleware, userControllerAuth.updateUser);
 
+router.get("/verifyAccessToken", authMiddleware, userControllerAuth.verifyAccessToken);
 
 export default router;

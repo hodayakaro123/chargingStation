@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./Booking.css";
 import ReviewCard from "../../src/components/ReviewCard/ReviewCard";
 
+
 interface ChargerOwner {
   _id: string;
   firstName: string;

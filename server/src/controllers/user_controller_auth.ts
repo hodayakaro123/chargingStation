@@ -106,11 +106,12 @@ const login = async (req: Request, res: Response) => {
       lastName: user.lastName,
       email: user.email,
       _id: user._id,
+      picture: user.picture,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     });
   } catch (err) {
-    res.status(400);
+    res.status(400).send(err);
   }
 };
 
@@ -152,68 +153,69 @@ const logout = async (req: Request, res: Response) => {
 };
 
 
+
+
+
 const refreshToken = async (req: Request, res: Response) => {
-  
+  console.log("Refreshing token...");
+
   const refreshToken = req.body.refreshToken;
   if (!refreshToken) {
-    res.status(400).send("invalid token");
+    res.status(400).send("Invalid token");
     return;
   }
   if (!process.env.TOKEN_SECRET) {
-    res.status(400).send("missing auth configuration");
+    res.status(400).send("Missing auth configuration");
     return;
   }
+
   jwt.verify(
     refreshToken,
     process.env.TOKEN_SECRET,
     async (err: any, data: any) => {
       if (err) {
-        res.status(403).send("invalid token");
+        res.status(403).send("Invalid token");
         return;
       }
-      
+
       const payload = data as TokenPayload;
       try {
-        const user = await userModel.findOne({ _id: payload._id });
-        if (!user) {
-          res.status(400).send("invalid token access");
+        const user = await userModel.findOne({ _id: payload._id }).exec();
+        if (!user || !user.refreshTokens.includes(refreshToken)) {
+          res.status(400).send("Invalid token access");
           return;
         }
-        
-        if (!user.refreshTokens || !user.refreshTokens.includes(refreshToken)) {
-          user.refreshTokens = [];
-          await user.save();
-          res.status(400).send("invalid token access");
-          return;
-        }
-        
+
         const newTokens = generateTokens(user._id.toString());
         if (!newTokens) {
-          user.refreshTokens = [];
-          await user.save();
-          res.status(400).send("pwoblem with configuration");
+          res.status(500).send("Problem with token generation");
           return;
         }
 
-        
-        user.refreshTokens = user.refreshTokens.filter(
-          (token) => token !== refreshToken
+        await userModel.updateOne(
+          { _id: user._id },
+          { $pull: { refreshTokens: refreshToken } }
         );
-        
-        user.refreshTokens.push(newTokens.refreshToken);
-        await user.save();
 
-        
+        await userModel.updateOne(
+          { _id: user._id },
+          { $push: { refreshTokens: newTokens.refreshToken } }
+        );
+
+        console.log("Token refreshed successfully");
         res.status(200).send({
           accessToken: newTokens.accessToken,
           refreshToken: newTokens.refreshToken,
         });
       } catch (err) {
-        res.status(400).send("invalid token access");
+        console.error("Error during token refresh:", err);
+        res.status(500).send("Server error");
       }
     }
   );
 };
+
+
 
 type TokenPayload = {
   _id: string;
@@ -368,7 +370,7 @@ const deleteUser = async (req: Request, res: Response) => {
 
 
 const updateUser = async (req: Request, res: Response) => {
-  console.log("updateUser");
+
   try {
     const userId = req.params.id;
     const updateData = req.body;
@@ -397,4 +399,28 @@ const updateUser = async (req: Request, res: Response) => {
 
 
 
-export default { signUp, login, logout, refreshToken, googleSignIn, getAllUsers, getUserById, deleteUser, updateUser };
+
+const verifyAccessToken = async (req: Request, res: Response) => {
+  const token = req.headers['authorization']?.split(' ')[1];  
+
+  if (!token) {
+    return res.status(401).send({ message: 'Access token is missing' });  
+  }
+
+  const SECRET = process.env.TOKEN_SECRET || ''; 
+
+  try {
+    const decoded = jwt.verify(token, SECRET);
+
+    res.status(200).send({ message: 'Token is valid', decodedToken: decoded });
+
+  } catch (err) {
+    console.error('Error verifying access token:', err);
+    return res.status(401).send({ message: 'Invalid or expired access token' });
+  }
+};
+
+
+
+export default { signUp, login, logout, refreshToken, googleSignIn, getAllUsers,
+   getUserById, deleteUser, updateUser, verifyAccessToken };

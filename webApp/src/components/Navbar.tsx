@@ -1,14 +1,19 @@
-import styles from "./Navbar.module.css";
-import { NavLink, useNavigate } from "react-router-dom";
-import { FaUser, FaHome } from "react-icons/fa";
-import { MdExitToApp } from "react-icons/md";
-import { useState, useEffect } from "react";
-
+import styles from './Navbar.module.css';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { FaUser, FaHome } from 'react-icons/fa';
+import { MdExitToApp } from 'react-icons/md';
+import { useState, useEffect, useCallback } from 'react';
+import { useLogout } from '../api/useLogout'; 
+import { useAuthContext } from '../api/AuthContext'; 
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const { logout } = useLogout();
   const navigate = useNavigate();
+
+
+  const { isAuthenticated } = useAuthContext();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -19,58 +24,33 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    if (!accessToken) {
-      console.error("No access token found");
-      return;
-    }
-    if (!refreshToken) {
-      console.error("No refresh token found");
-      return;
-    }
-
-    try {
-      const response = await fetch("http://localhost:3000/auth/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refreshToken }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Logout failed with status: ${response.status}`);
-      }
-
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("userId");
-      localStorage.clear();
-      navigate("/");
-    } catch (error) {
-      console.error("Error during logout:", error);
-      alert("Logout failed. Please try again later.");
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.clear();
-    }
+    logout();
+    closeMenu(); 
   };
 
-  
   useEffect(() => {
-    const firstName = localStorage.getItem("firstName");
-    const lastName = localStorage.getItem("lastName");
-    const email = localStorage.getItem("email");
+    const firstName = localStorage.getItem('firstName');
+    const lastName = localStorage.getItem('lastName');
+    const email = localStorage.getItem('email');
 
-    if (firstName === "admin" &&lastName === "master" && email === "adminmaster@gmail.com"
-    ) {
+    if (firstName === 'admin' && lastName === 'master' && email === 'adminmaster@gmail.com') {
       setIsAdmin(true);
     } else {
-      setIsAdmin(false); 
+      setIsAdmin(false);
     }
-  }, []); 
+  }, []);
+
+  const handleNavLinkClick = useCallback(
+    (to: string) => {
+      if (isAuthenticated) {
+        navigate(to);
+        closeMenu();
+      } else {
+        navigate('/'); 
+      }
+    },
+    [isAuthenticated, navigate]
+  );
 
   return (
     <nav className={styles.navbar}>
@@ -79,15 +59,13 @@ export default function Navbar() {
         <div></div>
         <div></div>
       </div>
-      <ul className={`${styles.navList} ${isMenuOpen ? styles.active : ""}`}>
-        {isAdmin && ( // Only show "Admin" if isAdmin is true
+      <ul className={`${styles.navList} ${isMenuOpen ? styles.active : ''}`}>
+        {isAdmin && (
           <li className={styles.navItem}>
             <NavLink
               to="/Admin"
-              className={({ isActive }) =>
-                isActive ? styles.activeLink : styles.navLink
-              }
-              onClick={closeMenu}
+              className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
+              onClick={() => handleNavLinkClick('/Admin')}
             >
               Admin
             </NavLink>
@@ -96,22 +74,18 @@ export default function Navbar() {
         <li className={styles.navItem}>
           <NavLink
             to="/Home"
-            className={({ isActive }) =>
-              isActive ? styles.activeLink : styles.navLink
-            }
-            onClick={closeMenu}
+            className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
+            onClick={() => handleNavLinkClick('/Home')}
           >
-            <FaHome style={{ marginRight: "8px" }} />
+            <FaHome style={{ marginRight: '8px' }} />
             Home
           </NavLink>
         </li>
         <li className={styles.navItem}>
           <NavLink
             to="/newChargingStation"
-            className={({ isActive }) =>
-              isActive ? styles.activeLink : styles.navLink
-            }
-            onClick={closeMenu}
+            className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
+            onClick={() => handleNavLinkClick('/newChargingStation')}
           >
             Add my own charging station
           </NavLink>
@@ -119,10 +93,8 @@ export default function Navbar() {
         <li className={styles.navItem}>
           <NavLink
             to="/ActivityHistory"
-            className={({ isActive }) =>
-              isActive ? styles.activeLink : styles.navLink
-            }
-            onClick={closeMenu}
+            className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
+            onClick={() => handleNavLinkClick('/ActivityHistory')}
           >
             Activity history
           </NavLink>
@@ -130,12 +102,10 @@ export default function Navbar() {
         <li className={styles.navItem}>
           <NavLink
             to="/PersonalArea"
-            className={({ isActive }) =>
-              isActive ? styles.activeLink : styles.navLink
-            }
-            onClick={closeMenu}
+            className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
+            onClick={() => handleNavLinkClick('/PersonalArea')}
           >
-            <FaUser style={{ marginRight: "8px" }} />
+            <FaUser style={{ marginRight: '8px' }} />
             Personal area
           </NavLink>
         </li>
@@ -147,7 +117,7 @@ export default function Navbar() {
             }}
             className={styles.navLink}
           >
-            <MdExitToApp style={{ marginRight: "8px" }} />
+            <MdExitToApp style={{ marginRight: '8px' }} />
             Logout
           </button>
         </li>
