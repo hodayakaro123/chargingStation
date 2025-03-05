@@ -55,16 +55,6 @@ const newChargingStation = {
   comments: [],
 };
 
-const comment1 = {
-  userId: new mongoose.Types.ObjectId(), 
-  text: "Bad station!!!!",
-  likes: 0,
-  dislikes: 0,
-  likedUsers: [],
-  dislikedUsers: [],
-  Rating: 0,
-  Date: new Date(),
-};
 
 
 

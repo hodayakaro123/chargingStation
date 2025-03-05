@@ -33,16 +33,6 @@ const testUser: TestUser = {
   _id: new mongoose.Types.ObjectId(), 
 };
 
-const carData = {
-  brandName: "Tesla",
-  carModel: "Model 3",
-  year: 2024,
-  range: 500,
-  fastChargingSpeed: 250,
-  homeChargingSpeed: 11,
-  batteryCapacity: 75,
-  userId: new mongoose.Types.ObjectId(),
-};
 
 beforeAll(async () => {
     app = await moduleApp();
@@ -65,33 +55,28 @@ beforeAll(async () => {
 }); 
 
 afterAll(async () => {
-    await userModel.findOneAndDelete({ email: testUser.email })
-    await mongoose.connection.close();
+   await userModel.findOneAndDelete({ email: testUser.email });
+   await mongoose.connection.close();
 
 });
 
 describe("create gemini content", () => {
-  test("should return generated content for a valid text input", async () => {
+  test("should get car data", async () => {
     const response = await request(app)
-      .post("/gemini/generate-content")
-      .send({
-        carBrand: carData.brandName,
-        carYear: carData.year,
-        carModel: carData.carModel,
-        userId: carData.userId,
-      })
-      .set("Content-Type", "application/json");
-
-    expect(response.status).toBe(200);
-    console.log(response.body.result);
-  }, 20000);
+      .post("/carData/get-car-data")
+      .send({ userId: testUser._id });
+    expect(response.statusCode).toBe(200);
+    expect(response.body[0].userId).toEqual(testUser._id);
+  }, 5000);
 
   test("should delete car data", async () => {
-      const response = await request(app)
-        .delete("/carData/delete-car-data")
-        .send({ userId: testUser._id });
-      expect(response.statusCode).toBe(200);
-    }, 5000);
+    const response = await request(app)
+      .delete("/carData/delete-car-data")
+      .send({ userId: testUser._id });
+    expect(response.statusCode).toBe(200);
+  }, 5000);
+
+
 
   
 });

@@ -377,21 +377,6 @@ router.delete("/deleteChargerById/:chargerId/", authMiddleware, (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 router.get("/getAllChargers", (req, res) => {
     add_charging_controller.getAllChargers(req, res);
 });

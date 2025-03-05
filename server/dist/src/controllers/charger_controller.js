@@ -18,7 +18,6 @@ const user_model_1 = __importDefault(require("../models/user_model"));
 const axios_1 = __importDefault(require("axios"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-// import { Book } from "lucide-react";
 const getCoordinates = (address) => __awaiter(void 0, void 0, void 0, function* () {
     const apiKey = process.env.OPENCAGE_API_KEY;
     const url = `${process.env.OPENCAGE_API_URL}=${encodeURIComponent(address)}&key=${apiKey}`;

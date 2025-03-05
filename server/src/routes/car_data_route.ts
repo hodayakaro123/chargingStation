@@ -7,5 +7,9 @@ router.post("/get-car-data", async (req, res) => {
   carData.getCarData(req, res);
 });
 
+router.delete("/delete-car-data", async (req, res) => {
+  carData.deleteCarData(req, res);
+});
+
 
 export default router;

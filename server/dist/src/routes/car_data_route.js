@@ -18,5 +18,8 @@ const router = express_1.default.Router();
 router.post("/get-car-data", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     car_data_controller_1.default.getCarData(req, res);
 }));
+router.delete("/delete-car-data", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    car_data_controller_1.default.deleteCarData(req, res);
+}));
 exports.default = router;
 //# sourceMappingURL=car_data_route.js.map

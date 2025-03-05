@@ -23,7 +23,7 @@ router.post("/generate-content", (req, res) => __awaiter(void 0, void 0, void 0,
     try {
         const carInfoText = `Car Brand: ${carBrand}, Car Year: ${carYear}, Car Model: ${carModel}`;
         const result = yield (0, geminiService_1.default)(carInfoText, userId, carBrand, carModel, carYear);
-        console.log(result);
+        // console.log(result); 
         res.json(result);
     }
     catch (error) {

@@ -17,7 +17,7 @@ router.post("/generate-content", async (req, res) => {
     
     const result = await generateCarInfo(carInfoText, userId, carBrand, carModel, carYear);
 
-    console.log(result); 
+    // console.log(result); 
 
     res.json(result); 
   } catch (error) {

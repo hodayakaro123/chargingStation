@@ -2,11 +2,9 @@ import { Request, Response } from "express";
 import ChargingModel from "../models/add_charging_model";
 import BookCharger from "../models/book_a_chrager.model";
 import userModel from "../models/user_model";
-import mongoose from "mongoose";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-// import { Book } from "lucide-react";
 
 const getCoordinates = async (address: string) => {
   const apiKey = process.env.OPENCAGE_API_KEY;

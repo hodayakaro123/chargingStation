@@ -49,16 +49,6 @@ const newChargingStation = {
     dislikedUsers: [],
     comments: [],
 };
-const comment1 = {
-    userId: new mongoose_1.default.Types.ObjectId(),
-    text: "Bad station!!!!",
-    likes: 0,
-    dislikes: 0,
-    likedUsers: [],
-    dislikedUsers: [],
-    Rating: 0,
-    Date: new Date(),
-};
 beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     app = yield (0, server_1.default)();
     yield user_model_1.default.findOneAndDelete({ email: testUser.email });
