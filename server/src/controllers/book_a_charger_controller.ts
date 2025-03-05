@@ -13,7 +13,6 @@ const bookCharger = async (req: Request, res: Response) => {
       userId,
     } = req.body;
 
-    console.log(chargerId, startTime, endTime, date, message, contactNumber, userId);
 
     const parsedStartTime = new Date(`${date}T${startTime}:00`);
     const parsedEndTime = new Date(`${date}T${endTime}:00`);
@@ -88,8 +87,8 @@ const getBookingByUserId = async (req: Request, res: Response) => {
 
 const deleteBookingByID = async (req: Request, res: Response) => {
   try {
-    const bookingId = req.params.bookingId;
-    const booking = await BookCharger.findByIdAndDelete(bookingId);
+    const chargerId = req.params.bookingId;
+    const booking = await BookCharger.findOneAndDelete({ chargerId: chargerId });
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }

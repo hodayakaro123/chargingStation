@@ -17,7 +17,7 @@ router.get("/getBookingByUserId/:userId", authMiddleware, book_a_charger_control
 
 router.put("/updateBooking/:bookingId", authMiddleware, book_a_charger_controller.updateBooking);
 
-router.delete("/deleteBookingByID/:BookingId", authMiddleware, book_a_charger_controller.deleteBookingByID);
+router.delete("/deleteBookingByID/:bookingId", authMiddleware, book_a_charger_controller.deleteBookingByID);
 
 
 export default router;

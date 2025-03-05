@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 const user_controller_auth_1 = __importDefault(require("../controllers/user_controller_auth"));
+const user_controller_auth_2 = require("../controllers/user_controller_auth");
+const uploads_1 = __importDefault(require("../uploads"));
 /**
 * @swagger
 * tags:
@@ -170,5 +172,8 @@ router.post("/logout", user_controller_auth_1.default.logout);
  */
 router.post("/refresh", user_controller_auth_1.default.refreshToken);
 router.post("/logInWithGoogle", user_controller_auth_1.default.googleSignIn);
+router.get("/getUserById/:id", user_controller_auth_2.authMiddleware, user_controller_auth_1.default.getUserById);
+router.put("/updateUser/:id", uploads_1.default.single("image"), user_controller_auth_2.authMiddleware, user_controller_auth_1.default.updateUser);
+router.get("/verifyAccessToken", user_controller_auth_2.authMiddleware, user_controller_auth_1.default.verifyAccessToken);
 exports.default = router;
 //# sourceMappingURL=user_route.js.map

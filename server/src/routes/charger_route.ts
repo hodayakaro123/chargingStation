@@ -389,51 +389,8 @@ router.delete("/deleteChargerById/:chargerId/", authMiddleware, (req, res) => {
 
 
 
-/**
- * @swagger
- * /addChargingStation/addSelectedChargingStation/{userId}/{chargerId}:
- *   post:
- *     summary: Add a selected charging station to user's list
- *     description: Adds a charging station to a user's selected charging stations list based on the user ID and charger ID.
- *     tags:
- *       - Charging Stations
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The unique ID of the user to which the charging station will be added
- *       - in: path
- *         name: chargerId
- *         required: true
- *         schema:
- *           type: string
- *         description: The unique ID of the charging station to add
- *     responses:
- *       200:
- *         description: Charging station added to the user's list successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Charging station added to user's list successfully
- *                 user:
- *                   $ref: '#/components/schemas/User'
- *       404:
- *         description: User or charging station not found
- *       500:
- *         description: Server error
- */
 
-router.post("/addSelectedChargingStation/:userId/:chargerId", authMiddleware, (req, res) => {
-    add_charging_controller.addSelectedChargingStation(req, res);
-});
+
 
 router.get("/getAllChargers", (req, res) => {
     add_charging_controller.getAllChargers(req, res);

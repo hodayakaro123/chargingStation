@@ -341,5 +341,11 @@ router.put("/updateComment/:chargerId/:commentId", user_controller_auth_1.authMi
 router.delete("/deleteComment/:chargerId/:commentId", user_controller_auth_1.authMiddleware, (req, res) => {
     commentsOnCharger_controller_1.default.deleteCommentById(req, res);
 });
+router.get("/getCommentsByChargerId/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
+    commentsOnCharger_controller_1.default.getCommentsByChargerId(req, res);
+});
+router.post("/toggleLikeDislikeComment/", user_controller_auth_1.authMiddleware, (req, res) => {
+    commentsOnCharger_controller_1.default.toggleLikeDislikeComment(req, res);
+});
 exports.default = router;
 //# sourceMappingURL=commentsOnCharger_route.js.map

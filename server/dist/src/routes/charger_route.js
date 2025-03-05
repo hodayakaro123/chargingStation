@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const charger_controller_1 = __importDefault(require("../controllers/charger_controller"));
 const user_controller_auth_1 = require("../controllers/user_controller_auth");
+const uploads_1 = __importDefault(require("../uploads"));
 const router = (0, express_1.Router)();
 /**
  * @swagger
@@ -147,7 +148,7 @@ const router = (0, express_1.Router)();
  *       500:
  *         description: Server error
  */
-router.post("/addCharger", user_controller_auth_1.authMiddleware, (req, res) => {
+router.post("/addCharger", user_controller_auth_1.authMiddleware, uploads_1.default.single("image"), (req, res) => {
     charger_controller_1.default.addChargingStation(req, res);
 });
 /**
@@ -277,8 +278,11 @@ router.get("/getChargersByUserId/chargers/:userId", user_controller_auth_1.authM
  *       500:
  *         description: Server error
  */
-router.put("/updateCharger/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
+router.put("/updateCharger/:chargerId", uploads_1.default.single("image"), user_controller_auth_1.authMiddleware, (req, res) => {
     charger_controller_1.default.updateCharger(req, res);
+});
+router.post("/toggleLikeDislikeCharger/", user_controller_auth_1.authMiddleware, (req, res) => {
+    charger_controller_1.default.toggleLikeDislikeCharger(req, res);
 });
 /**
  * @swagger
@@ -308,52 +312,11 @@ router.put("/updateCharger/:chargerId", user_controller_auth_1.authMiddleware, (
 router.delete("/deleteChargerById/:chargerId/", user_controller_auth_1.authMiddleware, (req, res) => {
     charger_controller_1.default.deleteChargerById(req, res);
 });
-/**
- * @swagger
- * /addChargingStation/addSelectedChargingStation/{userId}/{chargerId}:
- *   post:
- *     summary: Add a selected charging station to user's list
- *     description: Adds a charging station to a user's selected charging stations list based on the user ID and charger ID.
- *     tags:
- *       - Charging Stations
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The unique ID of the user to which the charging station will be added
- *       - in: path
- *         name: chargerId
- *         required: true
- *         schema:
- *           type: string
- *         description: The unique ID of the charging station to add
- *     responses:
- *       200:
- *         description: Charging station added to the user's list successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Charging station added to user's list successfully
- *                 user:
- *                   $ref: '#/components/schemas/User'
- *       404:
- *         description: User or charging station not found
- *       500:
- *         description: Server error
- */
-router.post("/addSelectedChargingStation/:userId/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
-    charger_controller_1.default.addSelectedChargingStation(req, res);
-});
 router.get("/getAllChargers", (req, res) => {
     charger_controller_1.default.getAllChargers(req, res);
+});
+router.get("/getUserByChargerId/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
+    charger_controller_1.default.getUserByChargerId(req, res);
 });
 exports.default = router;
 //# sourceMappingURL=charger_route.js.map
