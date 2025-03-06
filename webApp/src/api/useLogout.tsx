@@ -31,7 +31,7 @@ export const useLogout = () => {
       localStorage.clear();
 
       console.log("Logout successful");
-      navigate("/", { replace: true }); 
+      navigate("/", { replace: true });
       return { message: "Logout successful" };
     } catch (error) {
       console.error("Error during logout:", error);
@@ -40,6 +40,7 @@ export const useLogout = () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.clear();
+      ////add also if cancel refresh token so i can press logout and it will be logged out
 
       if (error instanceof Error) {
         return { error: error.message || "Logout failed" };

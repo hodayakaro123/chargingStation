@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import { Book } from "lucide-react";
+// import { Book } from "lucide-react";
 
 const getCoordinates = async (address: string) => {
   const apiKey = process.env.OPENCAGE_API_KEY;
@@ -48,11 +48,9 @@ const addChargingStation = async (req: Request, res: Response) => {
       !description ||
       !imageFile
     ) {
-      return res
-        .status(400)
-        .json({
-          error: "All fields, including userId and an image, are required.",
-        });
+      return res.status(400).json({
+        error: "All fields, including userId and an image, are required.",
+      });
     }
 
     const coordinates = await getCoordinates(location);
@@ -86,7 +84,6 @@ const addChargingStation = async (req: Request, res: Response) => {
 };
 
 const getChargerById = async (req: Request, res: Response) => {
-
   try {
     const { chargerId } = req.params;
 
@@ -95,7 +92,9 @@ const getChargerById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Charging station not found" });
     }
 
-    res.status(200).json({ message: "Charger retrieved successfully", chargingStation });
+    res
+      .status(200)
+      .json({ message: "Charger retrieved successfully", chargingStation });
   } catch (error) {
     res.status(500).json({ message: "Failed to retrieve charger", error });
   }
@@ -196,10 +195,13 @@ const deleteChargerById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Charging station not found" });
     }
     if (charger.picture) {
-        const existingPicturePath = path.resolve(__dirname, `../${charger.picture}`);
-        if (fs.existsSync(existingPicturePath)) {
-          fs.unlinkSync(existingPicturePath);
-        }
+      const existingPicturePath = path.resolve(
+        __dirname,
+        `../${charger.picture}`
+      );
+      if (fs.existsSync(existingPicturePath)) {
+        fs.unlinkSync(existingPicturePath);
+      }
     }
     await ChargingModel.findByIdAndDelete(chargerId);
 
@@ -232,19 +234,15 @@ const addSelectedChargingStation = async (req: Request, res: Response) => {
       await user.save();
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Charging station added to user's list successfully",
-        user,
-      });
+    res.status(200).json({
+      message: "Charging station added to user's list successfully",
+      user,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Failed to add charging station to user's list",
-        error,
-      });
+    res.status(500).json({
+      message: "Failed to add charging station to user's list",
+      error,
+    });
   }
 };
 

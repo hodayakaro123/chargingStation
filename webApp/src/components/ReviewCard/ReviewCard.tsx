@@ -312,8 +312,8 @@ export default function ReviewCard({
               <AiFillLike size={25} color="#007bff" />
             ) : (
               <AiOutlineLike size={25} />
-            )}.
-            {charger.likes}
+            )}
+            .{charger.likes}
           </button>
 
           <button
