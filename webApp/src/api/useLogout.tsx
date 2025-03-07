@@ -40,6 +40,8 @@ export const useLogout = () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.clear();
+      navigate("/", { replace: true });
+
       ////add also if cancel refresh token so i can press logout and it will be logged out
 
       if (error instanceof Error) {
