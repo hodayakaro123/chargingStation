@@ -111,7 +111,6 @@ describe("add charging station Test Suite", () => {
 
   test("should add a new charging station", async () => {
     const imagePath = path.resolve(__dirname, "sedan_test.png");
-    console.log("imagePath", imagePath);
     if (!fs.existsSync(imagePath)) {
       throw new Error(`File not found: ${imagePath}`);
     }
@@ -149,6 +148,25 @@ describe("add charging station Test Suite", () => {
     expect(response.status).toBe(200);
   });
 
+  test("should fail to get charging station by id - invalid id", async () => {
+    const wrongId = "178b07b45241b1227ffe2b9a";
+    const response = await request(app)
+      .get(`/addChargingStation/getChargerById/${wrongId}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+
+    expect(response.status).toBe(404);
+  });
+
+  test("should fail to get charging station by user id - invalid id", async () => {
+    const wrongId = "178b07b45241b1227ffe2b9p";
+    const response = await request(app)
+    .get(`/addChargingStation/getChargersByUserId/chargers/${wrongId}`)
+    .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+
+    expect(response.status).toBe(500);
+    expect(response.body.message).toBe("Failed to get charging stations");
+  });
+  
   test("should get charging station by user id", async () => {
     const response = await request(app)
       .get(`/addChargingStation/getChargersByUserId/chargers/${testUser._id}`)
@@ -156,12 +174,13 @@ describe("add charging station Test Suite", () => {
 
     expect(response.status).toBe(200);
   });
+
   
   test("shuold update the charging station", async () => {
     const response = await request(app)
       .put(`/addChargingStation/updateCharger/${chargerId}`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
-      .send({ Description: "updated station" });
+      .send({ Description: "updated station", Price: 20 });
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Charging station updated successfully");
@@ -170,7 +189,7 @@ describe("add charging station Test Suite", () => {
     expect(charger?.description).toBe("updated station");
   });
 
-  test("should toggleLikeDislikeCharger - increase likes", async () => {
+  test("should toggleLikeDislikeCharger", async () => {
     let response = await request(app)
       .post(`/addChargingStation/toggleLikeDislikeCharger`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
@@ -199,6 +218,20 @@ describe("add charging station Test Suite", () => {
 
   });
 
+  test("should fail to toggleLikeDislikeCharger - invalid id", async () => {
+    const wrongId = "178b07b45241b1227ffe2rra";
+    const response = await request(app)
+      .post(`/addChargingStation/toggleLikeDislikeCharger`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+      .send({
+        chargerId: wrongId,
+        userId: testUser._id,
+        like: true
+    });
+    expect(response.status).toBe(500);
+    expect(response.body.message).toBe("Server error");
+  });
+
   test("should get all charging stations", async () => {
     const response = await request(app)
       .get(`/addChargingStation/getAllChargers`)
@@ -213,6 +246,16 @@ describe("add charging station Test Suite", () => {
       .get(`/addChargingStation/getUserByChargerId/${chargerId}`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
     expect(response.status).toBe(200);
+  });
+
+  test("should fail to get user by charger id - invalid id", async () => {
+    const wrongId = "178b07b45241b1227ffe2b9r";
+    const response = await request(app)
+      .get(`/addChargingStation/getUserByChargerId/${wrongId}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+
+    expect(response.status).toBe(500);
+    expect(response.body.message).toBe("Failed to get user");
   });
 
 
@@ -230,5 +273,15 @@ describe("add charging station Test Suite", () => {
 
 
   }, 5000);
+
+  test("should fail to delete the charging station - invalid id", async () => {
+    const wrongId = "178b07b45241b1227ffe2f6a";
+    const response = await request(app)
+      .delete(`/addChargingStation/deleteChargerById/${wrongId}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("Charging station not found");
+  });
 
 });

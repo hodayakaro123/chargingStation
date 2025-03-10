@@ -94,7 +94,6 @@ let chargerId;
 describe("add charging station Test Suite", () => {
     test("should add a new charging station", () => __awaiter(void 0, void 0, void 0, function* () {
         const imagePath = path_1.default.resolve(__dirname, "sedan_test.png");
-        console.log("imagePath", imagePath);
         if (!fs_1.default.existsSync(imagePath)) {
             throw new Error(`File not found: ${imagePath}`);
         }
@@ -124,6 +123,21 @@ describe("add charging station Test Suite", () => {
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
         expect(response.status).toBe(200);
     }));
+    test("should fail to get charging station by id - invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
+        const wrongId = "178b07b45241b1227ffe2b9a";
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addChargingStation/getChargerById/${wrongId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(404);
+    }));
+    test("should fail to get charging station by user id - invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
+        const wrongId = "178b07b45241b1227ffe2b9p";
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addChargingStation/getChargersByUserId/chargers/${wrongId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(500);
+        expect(response.body.message).toBe("Failed to get charging stations");
+    }));
     test("should get charging station by user id", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .get(`/addChargingStation/getChargersByUserId/chargers/${testUser._id}`)
@@ -134,13 +148,13 @@ describe("add charging station Test Suite", () => {
         const response = yield (0, supertest_1.default)(app)
             .put(`/addChargingStation/updateCharger/${chargerId}`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
-            .send({ Description: "updated station" });
+            .send({ Description: "updated station", Price: 20 });
         expect(response.status).toBe(200);
         expect(response.body.message).toBe("Charging station updated successfully");
         const charger = yield add_charging_model_1.default.findById(chargerId);
         expect(charger === null || charger === void 0 ? void 0 : charger.description).toBe("updated station");
     }));
-    test("should toggleLikeDislikeCharger - increase likes", () => __awaiter(void 0, void 0, void 0, function* () {
+    test("should toggleLikeDislikeCharger", () => __awaiter(void 0, void 0, void 0, function* () {
         let response = yield (0, supertest_1.default)(app)
             .post(`/addChargingStation/toggleLikeDislikeCharger`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
@@ -164,6 +178,19 @@ describe("add charging station Test Suite", () => {
         expect(response.body.likes).toBe(0);
         expect(response.body.dislikes).toBe(1);
     }));
+    test("should fail to toggleLikeDislikeCharger - invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
+        const wrongId = "178b07b45241b1227ffe2rra";
+        const response = yield (0, supertest_1.default)(app)
+            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: wrongId,
+            userId: testUser._id,
+            like: true
+        });
+        expect(response.status).toBe(500);
+        expect(response.body.message).toBe("Server error");
+    }));
     test("should get all charging stations", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .get(`/addChargingStation/getAllChargers`);
@@ -176,6 +203,14 @@ describe("add charging station Test Suite", () => {
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
         expect(response.status).toBe(200);
     }));
+    test("should fail to get user by charger id - invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
+        const wrongId = "178b07b45241b1227ffe2b9r";
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addChargingStation/getUserByChargerId/${wrongId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(500);
+        expect(response.body.message).toBe("Failed to get user");
+    }));
     test("should delete the charging station", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .delete(`/addChargingStation/deleteChargerById/${chargerId}`)
@@ -185,5 +220,13 @@ describe("add charging station Test Suite", () => {
         const charger = yield add_charging_model_1.default.findById(chargerId);
         expect(charger).toBeNull();
     }), 5000);
+    test("should fail to delete the charging station - invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
+        const wrongId = "178b07b45241b1227ffe2f6a";
+        const response = yield (0, supertest_1.default)(app)
+            .delete(`/addChargingStation/deleteChargerById/${wrongId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(404);
+        expect(response.body.message).toBe("Charging station not found");
+    }));
 });
 //# sourceMappingURL=add_charger.test.js.map

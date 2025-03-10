@@ -141,7 +141,6 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }));
 });
 const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("Refreshing token...");
     const refreshToken = req.body.refreshToken;
     if (!refreshToken) {
         res.status(400).send("Invalid token");

@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const add_charging_model_1 = __importDefault(require("../models/add_charging_model"));
 const book_a_chrager_model_1 = __importDefault(require("../models/book_a_chrager.model"));
-const user_model_1 = __importDefault(require("../models/user_model"));
 const axios_1 = __importDefault(require("axios"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -202,7 +201,7 @@ const getUserByChargerId = (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (!chargingStation) {
             return res.status(404).json({ message: "Charging station not found" });
         }
-        const user = yield user_model_1.default.findById(chargingStation.userId);
+        const user = chargingStation.userId;
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -256,7 +255,6 @@ const toggleLikeDislikeCharger = (req, res) => __awaiter(void 0, void 0, void 0,
         res.json(charger);
     }
     catch (error) {
-        console.error("Error updating charger like/dislike:", error);
         res.status(500).json({ message: "Server error" });
     }
 });

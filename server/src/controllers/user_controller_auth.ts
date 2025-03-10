@@ -157,7 +157,6 @@ const logout = async (req: Request, res: Response) => {
 
 
 const refreshToken = async (req: Request, res: Response) => {
-  console.log("Refreshing token...");
 
   const refreshToken = req.body.refreshToken;
   if (!refreshToken) {
@@ -370,7 +369,6 @@ const deleteUser = async (req: Request, res: Response) => {
 
 
 const updateUser = async (req: Request, res: Response) => {
-
   try {
     const userId = req.params.id;
     const updateData = req.body;

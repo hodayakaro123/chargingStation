@@ -5,11 +5,10 @@
   "scripts": {
     "dev": "nodemon ./src/app.ts",
     "start": "tsc && node ./dist/app.js",
-    "test": "tsc && jest --detectOpenHandles --forceExit --runInBand",
-    "testAuth": "tsc && jest --detectOpenHandles --forceExit user_auth.test.ts",
-    "chargingStation": "tsc && jest --detectOpenHandles --forceExit add_charger.test.ts",
+    "test": "tsc && jest --detectOpenHandles --forceExit --runInBand --coverage",
+    "testAuth": "tsc && jest --detectOpenHandles --forceExit user_auth.test.ts --runInBand --coverage",
+    "chargingStation": "tsc && jest --detectOpenHandles --forceExit add_charger.test.ts --runInBand --coverage",
     "commentsOnCharger": "tsc && jest --detectOpenHandles --forceExit add_comments.test.ts",
-    "geminiTest": "tsc && jest --detectOpenHandles --forceExit gemini.test.ts",
     "bookCharger": "tsc && jest --detectOpenHandles --forceExit book_a_charger.test.ts",
     "carDataTest": "tsc && jest --detectOpenHandles --forceExit car_data.test.ts",
     "lint": "eslint . --ext .ts"

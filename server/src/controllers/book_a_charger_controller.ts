@@ -87,8 +87,8 @@ const getBookingByUserId = async (req: Request, res: Response) => {
 
 const deleteBookingByID = async (req: Request, res: Response) => {
   try {
-    const chargerId = req.params.bookingId;
-    const booking = await BookCharger.findOneAndDelete({ chargerId: chargerId });
+    const bookingId = req.params.bookingId;
+    const booking = await BookCharger.findOneAndDelete({ _id: bookingId });
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }

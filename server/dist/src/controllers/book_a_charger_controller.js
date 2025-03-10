@@ -85,8 +85,8 @@ const getBookingByUserId = (req, res) => __awaiter(void 0, void 0, void 0, funct
 });
 const deleteBookingByID = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const chargerId = req.params.bookingId;
-        const booking = yield book_a_chrager_model_1.default.findOneAndDelete({ chargerId: chargerId });
+        const bookingId = req.params.bookingId;
+        const booking = yield book_a_chrager_model_1.default.findOneAndDelete({ _id: bookingId });
         if (!booking) {
             return res.status(404).json({ message: "Booking not found" });
         }
