@@ -46,7 +46,9 @@ beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     testUser._id = loginResponse.body._id;
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
-    yield user_model_1.default.findOneAndDelete({ email: testUser.email });
+    yield (0, supertest_1.default)(app)
+        .delete(`/auth/deleteUser/${testUser._id}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
     yield mongoose_1.default.connection.close();
 }));
 describe("create gemini content", () => {
@@ -56,12 +58,65 @@ describe("create gemini content", () => {
             .send({ userId: testUser._id });
         expect(response.statusCode).toBe(200);
         expect(response.body[0].userId).toEqual(testUser._id);
-    }), 5000);
-    test("should delete car data", () => __awaiter(void 0, void 0, void 0, function* () {
+    }));
+    test("should fail to get car data - missing user ID", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
-            .delete("/carData/delete-car-data")
+            .post("/carData/get-car-data")
+            .send({});
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toHaveProperty("message", "User ID is required");
+    }));
+    test("should fail to get car data - user not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentUserId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .post("/carData/get-car-data")
+            .send({ userId: nonExistentUserId });
+        expect(response.statusCode).toBe(404);
+        expect(response.body).toHaveProperty("message", "User not found");
+    }));
+    test("should fail to get car data - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindById = user_model_1.default.findById;
+        user_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const response = yield (0, supertest_1.default)(app)
+            .post("/carData/get-car-data")
             .send({ userId: testUser._id });
-        expect(response.statusCode).toBe(200);
-    }), 5000);
+        expect(response.statusCode).toBe(500);
+        expect(response.body).toHaveProperty("message", "Internal server error");
+        user_model_1.default.findById = originalFindById;
+    }));
+    describe("delete car data", () => {
+        test("should delete car data successfully", () => __awaiter(void 0, void 0, void 0, function* () {
+            const response = yield (0, supertest_1.default)(app)
+                .delete("/carData/delete-car-data")
+                .send({ userId: testUser._id });
+            expect(response.statusCode).toBe(200);
+            expect(response.body).toHaveProperty("deletedCount");
+        }));
+        test("should fail to delete car data - missing user ID", () => __awaiter(void 0, void 0, void 0, function* () {
+            const response = yield (0, supertest_1.default)(app)
+                .delete("/carData/delete-car-data")
+                .send({});
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toHaveProperty("message", "User ID is required");
+        }));
+        test("should fail to delete car data - user not found", () => __awaiter(void 0, void 0, void 0, function* () {
+            const nonExistentUserId = new mongoose_1.default.Types.ObjectId();
+            const response = yield (0, supertest_1.default)(app)
+                .delete("/carData/delete-car-data")
+                .send({ userId: nonExistentUserId });
+            expect(response.statusCode).toBe(404);
+            expect(response.body).toHaveProperty("message", "User not found");
+        }));
+        test("should fail to delete car data - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+            const originalFindById = user_model_1.default.findById;
+            user_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+            const response = yield (0, supertest_1.default)(app)
+                .delete("/carData/delete-car-data")
+                .send({ userId: testUser._id });
+            expect(response.statusCode).toBe(500);
+            expect(response.body).toHaveProperty("message", "Internal server error");
+            user_model_1.default.findById = originalFindById;
+        }));
+    });
 });
 //# sourceMappingURL=car_data.test.js.map

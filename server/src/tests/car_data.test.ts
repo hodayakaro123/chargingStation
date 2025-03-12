@@ -55,7 +55,10 @@ beforeAll(async () => {
 }); 
 
 afterAll(async () => {
-   await userModel.findOneAndDelete({ email: testUser.email });
+   await request(app)
+     .delete(`/auth/deleteUser/${testUser._id}`)
+     .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+     
    await mongoose.connection.close();
 
 });
@@ -67,14 +70,79 @@ describe("create gemini content", () => {
       .send({ userId: testUser._id });
     expect(response.statusCode).toBe(200);
     expect(response.body[0].userId).toEqual(testUser._id);
-  }, 5000);
+  });
 
-  test("should delete car data", async () => {
+  test("should fail to get car data - missing user ID", async () => {
     const response = await request(app)
-      .delete("/carData/delete-car-data")
+      .post("/carData/get-car-data")
+      .send({});
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty("message", "User ID is required");
+  });
+
+  test("should fail to get car data - user not found", async () => {
+    const nonExistentUserId = new mongoose.Types.ObjectId();
+    const response = await request(app)
+      .post("/carData/get-car-data")
+      .send({ userId: nonExistentUserId });
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toHaveProperty("message", "User not found");
+  });
+
+  test("should fail to get car data - internal server error", async () => {
+    const originalFindById = userModel.findById;
+    userModel.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+
+    const response = await request(app)
+      .post("/carData/get-car-data")
       .send({ userId: testUser._id });
-    expect(response.statusCode).toBe(200);
-  }, 5000);
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty("message", "Internal server error");
+
+    userModel.findById = originalFindById;
+  });
+
+  describe("delete car data", () => {
+    test("should delete car data successfully", async () => {
+      const response = await request(app)
+        .delete("/carData/delete-car-data")
+        .send({ userId: testUser._id });
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toHaveProperty("deletedCount");
+    });
+  
+    test("should fail to delete car data - missing user ID", async () => {
+      const response = await request(app)
+        .delete("/carData/delete-car-data")
+        .send({});
+      expect(response.statusCode).toBe(400);
+      expect(response.body).toHaveProperty("message", "User ID is required");
+    });
+  
+    test("should fail to delete car data - user not found", async () => {
+      const nonExistentUserId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .delete("/carData/delete-car-data")
+        .send({ userId: nonExistentUserId });
+      expect(response.statusCode).toBe(404);
+      expect(response.body).toHaveProperty("message", "User not found");
+    });
+  
+    test("should fail to delete car data - internal server error", async () => {
+      const originalFindById = userModel.findById;
+      userModel.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+  
+      const response = await request(app)
+        .delete("/carData/delete-car-data")
+        .send({ userId: testUser._id });
+  
+      expect(response.statusCode).toBe(500);
+      expect(response.body).toHaveProperty("message", "Internal server error");
+  
+      userModel.findById = originalFindById;
+    });
+  });
 
 
 

@@ -247,6 +247,37 @@ router.post("/logInWithGoogle", user_controller_auth_1.default.googleSignIn);
 router.get("/getUserById/:id", user_controller_auth_2.authMiddleware, user_controller_auth_1.default.getUserById);
 /**
  * @swagger
+ * /auth/getAllUsers:
+ *   get:
+ *     summary: Get all users
+ *     description: Retrieve a list of all users.
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved list of users.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+router.get("/getAllUsers", user_controller_auth_2.authMiddleware, user_controller_auth_1.default.getAllUsers);
+/**
+ * @swagger
  * /auth/updateUser/{id}:
  *   put:
  *     summary: Update user by ID

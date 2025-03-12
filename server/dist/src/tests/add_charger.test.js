@@ -39,37 +39,15 @@ const newChargingStation = {
     price: 10,
     rating: 4.5,
     chargingRate: 5,
-    picture: "http://example.com/picture.jpg",
+    picture: "",
     description: "A new charging station",
     userId: new mongoose_1.default.Types.ObjectId(),
     likes: 0,
     dislikes: 0,
     likedUsers: [],
     dislikedUsers: [],
-    comments: [
-        {
-            userId: new mongoose_1.default.Types.ObjectId(),
-            text: "Great station!!!!",
-            likes: 0,
-            dislikes: 0,
-            likedUsers: [],
-            dislikedUsers: [],
-            Rating: 0,
-            Date: new Date(),
-        },
-    ],
+    comments: [],
 };
-const comment1 = {
-    userId: new mongoose_1.default.Types.ObjectId(),
-    text: "Bad station!!!!",
-    likes: 0,
-    dislikes: 0,
-    likedUsers: [],
-    dislikedUsers: [],
-    Rating: 0,
-    Date: new Date(),
-};
-newChargingStation.comments.push(comment1);
 beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     app = yield (0, server_1.default)();
     yield user_model_1.default.findOneAndDelete({ email: testUser.email });
@@ -88,6 +66,9 @@ beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     newChargingStation.userId = testUser._id;
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, supertest_1.default)(app)
+        .delete(`/auth/deleteUser/${testUser._id}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
     yield mongoose_1.default.connection.close();
 }));
 let chargerId;
@@ -117,10 +98,18 @@ describe("add charging station Test Suite", () => {
         expect(response.body.chargingStation).toHaveProperty("_id");
         chargerId = response.body.chargingStation._id;
     }));
+    test("should fail to add a new charging station - missing fields", () => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield (0, supertest_1.default)(app)
+            .post("/addChargingStation/addCharger")
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("All fields, including userId and an image, are required.");
+    }));
     test("should get charging station by id", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .get(`/addChargingStation/getChargerById/${chargerId}`)
-            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .field("test", "test");
         expect(response.status).toBe(200);
     }));
     test("should fail to get charging station by id - invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
@@ -129,6 +118,16 @@ describe("add charging station Test Suite", () => {
             .get(`/addChargingStation/getChargerById/${wrongId}`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
         expect(response.status).toBe(404);
+    }));
+    test("should fail to get charging station by id - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindById = add_charging_model_1.default.findById;
+        add_charging_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addChargingStation/getChargerById/${chargerId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(500);
+        expect(response.body).toHaveProperty("message", "Failed to retrieve charger");
+        add_charging_model_1.default.findById = originalFindById;
     }));
     test("should fail to get charging station by user id - invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
         const wrongId = "178b07b45241b1227ffe2b9p";
@@ -148,14 +147,91 @@ describe("add charging station Test Suite", () => {
         const response = yield (0, supertest_1.default)(app)
             .put(`/addChargingStation/updateCharger/${chargerId}`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
-            .send({ Description: "updated station", Price: 20 });
+            .send({ Description: "updated station", Price: 20, ChargingRate: 10 });
         expect(response.status).toBe(200);
         expect(response.body.message).toBe("Charging station updated successfully");
         const charger = yield add_charging_model_1.default.findById(chargerId);
         expect(charger === null || charger === void 0 ? void 0 : charger.description).toBe("updated station");
     }));
-    test("should toggleLikeDislikeCharger", () => __awaiter(void 0, void 0, void 0, function* () {
+    test("should fail to update the charging station - invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
+        const wrongChargerId = "178b07b45241b1227ffe2b9a";
+        const response = yield (0, supertest_1.default)(app)
+            .put(`/addChargingStation/updateCharger/${wrongChargerId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({ Description: "updated station", Price: 20 });
+        expect(response.status).toBe(404);
+        expect(response.body.message).toBe("Charging station not found");
+    }));
+    test("should fail to update the charging station - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindById = add_charging_model_1.default.findById;
+        add_charging_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const response = yield (0, supertest_1.default)(app)
+            .put(`/addChargingStation/updateCharger/${chargerId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({ Description: "updated station", Price: 20, ChargingRate: 10 });
+        expect(response.status).toBe(500);
+        expect(response.body).toHaveProperty("message", "Failed to update charging station");
+        add_charging_model_1.default.findById = originalFindById;
+    }), 5000);
+    test("should toggleLikeDislikeCharger - situation 1", () => __awaiter(void 0, void 0, void 0, function* () {
         let response = yield (0, supertest_1.default)(app)
+            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            userId: testUser._id,
+            like: true
+        });
+        expect(response.status).toBe(200);
+        expect(response.body.likes).toBe(1);
+        expect(response.body.dislikes).toBe(0);
+        response = yield (0, supertest_1.default)(app)
+            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            userId: testUser._id,
+            like: true
+        });
+        expect(response.status).toBe(200);
+        expect(response.body.likes).toBe(0);
+        expect(response.body.dislikes).toBe(0);
+        response = yield (0, supertest_1.default)(app)
+            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            userId: testUser._id,
+            dislike: true
+        });
+        expect(response.status).toBe(200);
+        expect(response.body.likes).toBe(0);
+        expect(response.body.dislikes).toBe(1);
+        response = yield (0, supertest_1.default)(app)
+            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            userId: testUser._id,
+            dislike: true
+        });
+        expect(response.status).toBe(200);
+        expect(response.body.likes).toBe(0);
+        expect(response.body.dislikes).toBe(0);
+    }), 5000);
+    test("should toggleLikeDislikeCharger - situation 2", () => __awaiter(void 0, void 0, void 0, function* () {
+        let response = yield (0, supertest_1.default)(app)
+            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            userId: testUser._id,
+            dislike: true
+        });
+        expect(response.status).toBe(200);
+        expect(response.body.likes).toBe(0);
+        expect(response.body.dislikes).toBe(1);
+        response = yield (0, supertest_1.default)(app)
             .post(`/addChargingStation/toggleLikeDislikeCharger`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
             .send({
@@ -177,6 +253,19 @@ describe("add charging station Test Suite", () => {
         expect(response.status).toBe(200);
         expect(response.body.likes).toBe(0);
         expect(response.body.dislikes).toBe(1);
+    }), 5000);
+    test("should fail to toggle like/dislike - charger not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentChargerId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: nonExistentChargerId,
+            userId: testUser._id,
+            like: true
+        });
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Charger not found");
     }));
     test("should fail to toggleLikeDislikeCharger - invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
         const wrongId = "178b07b45241b1227ffe2rra";
@@ -197,6 +286,24 @@ describe("add charging station Test Suite", () => {
         expect(response.status).toBe(200);
         expect(response.body.chargers.length).toBeGreaterThan(0);
     }));
+    test("should fail to get all charging stations - no charging stations found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFind = add_charging_model_1.default.find;
+        add_charging_model_1.default.find = jest.fn().mockResolvedValue([]);
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addChargingStation/getAllChargers`);
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "No charging stations found");
+        add_charging_model_1.default.find = originalFind;
+    }));
+    test("should fail to get all charging stations - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFind = add_charging_model_1.default.find;
+        add_charging_model_1.default.find = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addChargingStation/getAllChargers`);
+        expect(response.status).toBe(500);
+        expect(response.body).toHaveProperty("message", "Failed to get charging stations");
+        add_charging_model_1.default.find = originalFind;
+    }));
     test("should get user by charger id", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .get(`/addChargingStation/getUserByChargerId/${chargerId}`)
@@ -211,6 +318,43 @@ describe("add charging station Test Suite", () => {
         expect(response.status).toBe(500);
         expect(response.body.message).toBe("Failed to get user");
     }));
+    test("should fail to get user by charger id - charging station not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentChargerId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addChargingStation/getUserByChargerId/${nonExistentChargerId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Charging station not found");
+    }));
+    test("should fail to get user by charger id - user not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const chargerWithoutUser = new add_charging_model_1.default({
+            location: "Test Location",
+            latitude: 0,
+            longitude: 0,
+            price: 0,
+            chargingRate: 0,
+            description: "Test Description",
+            picture: "test.jpg",
+            userId: null,
+        });
+        yield chargerWithoutUser.save();
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addChargingStation/getUserByChargerId/${chargerWithoutUser._id}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "User not found");
+        yield add_charging_model_1.default.findByIdAndDelete(chargerWithoutUser._id);
+    }));
+    test("should fail to get user by charger id - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindById = add_charging_model_1.default.findById;
+        add_charging_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addChargingStation/getUserByChargerId/${chargerId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(500);
+        expect(response.body).toHaveProperty("message", "Failed to get user");
+        add_charging_model_1.default.findById = originalFindById;
+    }));
     test("should delete the charging station", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .delete(`/addChargingStation/deleteChargerById/${chargerId}`)
@@ -221,12 +365,27 @@ describe("add charging station Test Suite", () => {
         expect(charger).toBeNull();
     }), 5000);
     test("should fail to delete the charging station - invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const wrongId = "178b07b45241b1227ffe2f6a";
         const response = yield (0, supertest_1.default)(app)
-            .delete(`/addChargingStation/deleteChargerById/${wrongId}`)
+            .delete(`/addChargingStation/deleteChargerById/${chargerId}`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
         expect(response.status).toBe(404);
         expect(response.body.message).toBe("Charging station not found");
-    }));
+    }), 5000);
+    test("should fail to delete the charging station - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindById = add_charging_model_1.default.findById;
+        add_charging_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const response = yield (0, supertest_1.default)(app)
+            .delete(`/addChargingStation/deleteChargerById/${chargerId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(500);
+        expect(response.body).toHaveProperty("message", "Failed to delete comment");
+        add_charging_model_1.default.findById = originalFindById;
+    }), 5000);
+    test("should fail to get charging stations by user id - no charging stations found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addChargingStation/getChargersByUserId/chargers/${testUser._id}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(404);
+    }), 5000);
 });
 //# sourceMappingURL=add_charger.test.js.map

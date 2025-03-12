@@ -56,7 +56,9 @@ beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     testUser._id = loginResponse.body._id;
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
-    yield user_model_1.default.findOneAndDelete({ email: testUser.email });
+    yield (0, supertest_1.default)(app)
+        .delete(`/auth/deleteUser/${testUser._id}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
     yield mongoose_1.default.connection.close();
 }));
 describe("create gemini content", () => {

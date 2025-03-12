@@ -129,7 +129,7 @@ router.post("/login", userControllerAuth.login);
  *             properties:
  *               refreshToken:
  *                 type: string
- *                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 example: ""
  *     responses:
  *       200:
  *         description: Successful logout
@@ -263,6 +263,38 @@ router.post("/logInWithGoogle", userControllerAuth.googleSignIn);
 router.get("/getUserById/:id", authMiddleware, userControllerAuth.getUserById);
 
 
+
+/**
+ * @swagger
+ * /auth/getAllUsers:
+ *   get:
+ *     summary: Get all users
+ *     description: Retrieve a list of all users.
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved list of users.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+router.get("/getAllUsers", authMiddleware, userControllerAuth.getAllUsers);
 
 
 

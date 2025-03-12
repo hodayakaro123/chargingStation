@@ -104,7 +104,7 @@ const getChargersByUserId = (req, res) => __awaiter(void 0, void 0, void 0, func
     try {
         const { userId } = req.params;
         const chargers = yield add_charging_model_1.default.find({ userId });
-        if (!chargers) {
+        if (!chargers || chargers.length == 0) {
             return res
                 .status(404)
                 .json({ message: "No charging stations found for this user" });
@@ -118,7 +118,7 @@ const getChargersByUserId = (req, res) => __awaiter(void 0, void 0, void 0, func
 const getAllChargers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const chargers = yield add_charging_model_1.default.find();
-        if (!chargers) {
+        if (!chargers || chargers.length == 0) {
             return res.status(404).json({ message: "No charging stations found" });
         }
         res.status(200).json({ chargers });

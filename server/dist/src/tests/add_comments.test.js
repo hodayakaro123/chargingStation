@@ -68,6 +68,9 @@ beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     newChargingStation.userId = testUser._id;
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, supertest_1.default)(app)
+        .delete(`/auth/deleteUser/${testUser._id}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
     yield mongoose_1.default.connection.close();
 }));
 let chargerId;
@@ -125,6 +128,32 @@ describe("add charging station Test Suite", () => {
         expect(response.body.message).toBe("Comment retrieved successfully");
         expect(response.body.comment.text).toBe("This is a test comment");
     }));
+    test("should fail to get comment by id - charging station not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentChargerId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addComments/getComment/${nonExistentChargerId}/${comment1Id}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Charging station not found");
+    }));
+    test("should fail to get comment by id - comment not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentCommentId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addComments/getComment/${chargerId}/${nonExistentCommentId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Comment not found");
+    }));
+    test("should fail to get comment by id - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindById = add_charging_model_1.default.findById;
+        add_charging_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addComments/getComment/${chargerId}/${comment1Id}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(500);
+        expect(response.body).toHaveProperty("message", "Failed to retrieve comment");
+        add_charging_model_1.default.findById = originalFindById;
+    }));
     test("should update the comment", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .put(`/addComments/updateComment/${chargerId}/${comment1Id}`)
@@ -135,6 +164,35 @@ describe("add charging station Test Suite", () => {
         const charger = yield add_charging_model_1.default.findById(chargerId);
         expect(charger === null || charger === void 0 ? void 0 : charger.comments[0].text).toBe("This is an updated comment");
     }));
+    test("should fail to update comment - charging station not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentChargerId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .put(`/addComments/updateComment/${nonExistentChargerId}/${comment1Id}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({ text: "Updated comment text" });
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Charging station not found");
+    }));
+    test("should fail to update comment - comment not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentCommentId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .put(`/addComments/updateComment/${chargerId}/${nonExistentCommentId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({ text: "Updated comment text" });
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Comment not found");
+    }));
+    test("should fail to update comment - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindById = add_charging_model_1.default.findById;
+        add_charging_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const response = yield (0, supertest_1.default)(app)
+            .put(`/addComments/updateComment/${chargerId}/${comment1Id}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({ text: "Updated comment text" });
+        expect(response.status).toBe(500);
+        expect(response.body).toHaveProperty("message", "Failed to update comment");
+        add_charging_model_1.default.findById = originalFindById;
+    }));
     test("should get comment by charger id", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .get(`/addComments/getCommentsByChargerId/${chargerId}`)
@@ -143,8 +201,88 @@ describe("add charging station Test Suite", () => {
         expect(response.body.comments[0].likes).toBe(0);
         expect(response.body.comments[0].text).toBe("This is an updated comment");
     }));
-    test("should toggleLikeDislikeComment", () => __awaiter(void 0, void 0, void 0, function* () {
+    test("should fail to get comments by charger id - charging station not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentChargerId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addComments/getCommentsByChargerId/${nonExistentChargerId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Charging station not found");
+    }));
+    test("should fail to get comments by charger id - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindById = add_charging_model_1.default.findById;
+        add_charging_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/addComments/getCommentsByChargerId/${chargerId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(500);
+        expect(response.body).toHaveProperty("message", "Failed to retrieve comments");
+        add_charging_model_1.default.findById = originalFindById;
+    }));
+    test("should toggleLikeDislikeComment - situation 1", () => __awaiter(void 0, void 0, void 0, function* () {
         let response = yield (0, supertest_1.default)(app)
+            .post(`/addComments/toggleLikeDislikeComment`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            commentId: comment1Id,
+            userId: testUser._id,
+            like: true
+        });
+        expect(response.status).toBe(200);
+        expect(response.body.likes).toBe(1);
+        expect(response.body.dislikes).toBe(0);
+        response = yield (0, supertest_1.default)(app)
+            .post(`/addComments/toggleLikeDislikeComment`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            commentId: comment1Id,
+            userId: testUser._id,
+            like: true
+        });
+        expect(response.status).toBe(200);
+        expect(response.body.likes).toBe(0);
+        expect(response.body.dislikes).toBe(0);
+        response = yield (0, supertest_1.default)(app)
+            .post(`/addComments/toggleLikeDislikeComment`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            commentId: comment1Id,
+            userId: testUser._id,
+            dislike: true
+        });
+        expect(response.status).toBe(200);
+        expect(response.body.likes).toBe(0);
+        expect(response.body.dislikes).toBe(1);
+        response = yield (0, supertest_1.default)(app)
+            .post(`/addComments/toggleLikeDislikeComment`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            commentId: comment1Id,
+            userId: testUser._id,
+            dislike: true
+        });
+        expect(response.status).toBe(200);
+        expect(response.body.likes).toBe(0);
+        expect(response.body.dislikes).toBe(0);
+    }));
+    test("should toggleLikeDislikeComment - situation 2", () => __awaiter(void 0, void 0, void 0, function* () {
+        let response = yield (0, supertest_1.default)(app)
+            .post(`/addComments/toggleLikeDislikeComment`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            commentId: comment1Id,
+            userId: testUser._id,
+            dislike: true
+        });
+        expect(response.status).toBe(200);
+        expect(response.body.likes).toBe(0);
+        expect(response.body.dislikes).toBe(1);
+        response = yield (0, supertest_1.default)(app)
             .post(`/addComments/toggleLikeDislikeComment`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
             .send({
@@ -169,6 +307,50 @@ describe("add charging station Test Suite", () => {
         expect(response.body.likes).toBe(0);
         expect(response.body.dislikes).toBe(1);
     }));
+    test("should fail to toggle like/dislike - comment not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentCommentId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .post(`/addComments/toggleLikeDislikeComment`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            commentId: nonExistentCommentId,
+            userId: testUser._id,
+            like: true
+        });
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Comment not found");
+    }));
+    test("should fail to toggle like/dislike - charger not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentChargerId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .post(`/addComments/toggleLikeDislikeComment`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: nonExistentChargerId,
+            commentId: comment1Id,
+            userId: testUser._id,
+            like: true
+        });
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Comment not found");
+    }));
+    test("should fail to toggle like/dislike - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindById = add_charging_model_1.default.findById;
+        add_charging_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const response = yield (0, supertest_1.default)(app)
+            .post(`/addComments/toggleLikeDislikeComment`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: chargerId,
+            commentId: comment1Id,
+            userId: testUser._id,
+            like: true
+        });
+        expect(response.status).toBe(500);
+        expect(response.text).toBe("Server error");
+        add_charging_model_1.default.findById = originalFindById;
+    }));
     test("should delete the comment", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
             .delete(`/addComments/deleteComment/${chargerId}/${comment1Id}`)
@@ -177,6 +359,32 @@ describe("add charging station Test Suite", () => {
         expect(response.body.message).toBe("Comment deleted successfully");
         const charger = yield add_charging_model_1.default.findById(chargerId);
         expect(charger === null || charger === void 0 ? void 0 : charger.comments.length).toBe(0);
+    }));
+    test("should fail to delete comment by id - charging station not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentChargerId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .delete(`/addComments/deleteComment/${nonExistentChargerId}/${comment1Id}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Charging station not found");
+    }));
+    test("should fail to delete comment by id - comment not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentCommentId = new mongoose_1.default.Types.ObjectId();
+        const response = yield (0, supertest_1.default)(app)
+            .delete(`/addComments/deleteComment/${chargerId}/${nonExistentCommentId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("message", "Comment not found");
+    }));
+    test("should fail to delete comment by id - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindById = add_charging_model_1.default.findById;
+        add_charging_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const response = yield (0, supertest_1.default)(app)
+            .delete(`/addComments/deleteComment/${chargerId}/${comment1Id}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(response.status).toBe(500);
+        expect(response.body).toHaveProperty("message", "Failed to delete comment");
+        add_charging_model_1.default.findById = originalFindById;
     }));
     test("should delete the charging station", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)

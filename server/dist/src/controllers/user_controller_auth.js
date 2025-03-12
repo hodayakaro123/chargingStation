@@ -131,7 +131,8 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 yield user.save();
                 return res.status(400).send("invalid token");
             }
-            user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
+            user.refreshTokens = [];
+            // user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
             yield user.save();
             return res.status(200).send("logged out");
         }
@@ -176,7 +177,6 @@ const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             });
         }
         catch (err) {
-            console.error("Error during token refresh:", err);
             res.status(500).send("Server error");
         }
     }));
@@ -189,7 +189,7 @@ const authMiddleware = (req, res, next) => {
         return;
     }
     if (!process.env.TOKEN_SECRET) {
-        res.status(400).send("mprobelm with configuration");
+        res.status(400).send("problem with configuration");
         return;
     }
     jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET, (err, data) => {
@@ -300,6 +300,16 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const user = yield user_model_1.default.findByIdAndDelete(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
+        }
+        if (user.picture) {
+            const picturePath = path_1.default.resolve(__dirname, `../${user.picture}`);
+            if (fs_1.default.existsSync(picturePath)) {
+                fs_1.default.unlinkSync(picturePath);
+            }
+        }
+        const userFolderPath = path_1.default.resolve(__dirname, `../uploads/${userId}`);
+        if (fs_1.default.existsSync(userFolderPath)) {
+            fs_1.default.rmdirSync(userFolderPath, { recursive: true });
         }
         res.status(200).json({ message: "User deleted successfully" });
     }

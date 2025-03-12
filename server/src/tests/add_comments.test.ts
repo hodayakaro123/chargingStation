@@ -84,6 +84,10 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await request(app)
+    .delete(`/auth/deleteUser/${testUser._id}`)
+    .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+    
   await mongoose.connection.close();
 });
 
@@ -159,6 +163,41 @@ describe("add charging station Test Suite", () => {
 
     });
 
+    test("should fail to get comment by id - charging station not found", async () => {
+      const nonExistentChargerId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .get(`/addComments/getComment/${nonExistentChargerId}/${comment1Id}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty("message", "Charging station not found");
+    });
+
+    test("should fail to get comment by id - comment not found", async () => {
+      const nonExistentCommentId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .get(`/addComments/getComment/${chargerId}/${nonExistentCommentId}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty("message", "Comment not found");
+    });
+
+    test("should fail to get comment by id - internal server error", async () => {
+      const originalFindById = chargingStationModel.findById;
+      chargingStationModel.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+  
+      const response = await request(app)
+        .get(`/addComments/getComment/${chargerId}/${comment1Id}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+      expect(response.status).toBe(500);
+      expect(response.body).toHaveProperty("message", "Failed to retrieve comment");
+  
+      chargingStationModel.findById = originalFindById;
+    });
+    
+
     test("should update the comment", async () => {
       const response = await request(app)
         .put(`/addComments/updateComment/${chargerId}/${comment1Id}`)
@@ -170,8 +209,45 @@ describe("add charging station Test Suite", () => {
 
       const charger = await chargingStationModel.findById(chargerId);
       expect(charger?.comments[0].text).toBe("This is an updated comment");
-
     });
+
+    test("should fail to update comment - charging station not found", async () => {
+      const nonExistentChargerId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .put(`/addComments/updateComment/${nonExistentChargerId}/${comment1Id}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+        .send({ text: "Updated comment text" });
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty("message", "Charging station not found");
+    });
+
+    test("should fail to update comment - comment not found", async () => {
+      const nonExistentCommentId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .put(`/addComments/updateComment/${chargerId}/${nonExistentCommentId}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+        .send({ text: "Updated comment text" });
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty("message", "Comment not found");
+    });
+
+    test("should fail to update comment - internal server error", async () => {
+      const originalFindById = chargingStationModel.findById;
+      chargingStationModel.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+  
+      const response = await request(app)
+        .put(`/addComments/updateComment/${chargerId}/${comment1Id}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+        .send({ text: "Updated comment text" });
+  
+      expect(response.status).toBe(500);
+      expect(response.body).toHaveProperty("message", "Failed to update comment");
+  
+      chargingStationModel.findById = originalFindById;
+    });
+  
 
     test("should get comment by charger id", async () => {
       const response = await request(app)
@@ -184,8 +260,105 @@ describe("add charging station Test Suite", () => {
 
     });
 
-    test("should toggleLikeDislikeComment", async () => {
+    test("should fail to get comments by charger id - charging station not found", async () => {
+      const nonExistentChargerId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .get(`/addComments/getCommentsByChargerId/${nonExistentChargerId}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty("message", "Charging station not found");
+    });
+
+    test("should fail to get comments by charger id - internal server error", async () => {
+      const originalFindById = chargingStationModel.findById;
+      chargingStationModel.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+  
+      const response = await request(app)
+        .get(`/addComments/getCommentsByChargerId/${chargerId}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+      expect(response.status).toBe(500);
+      expect(response.body).toHaveProperty("message", "Failed to retrieve comments");
+  
+      chargingStationModel.findById = originalFindById;
+    });
+
+    test("should toggleLikeDislikeComment - situation 1", async () => {
       let response = await request(app)
+        .post(`/addComments/toggleLikeDislikeComment`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+        .send({
+          chargerId: chargerId,
+          commentId: comment1Id,
+          userId: testUser._id,
+          like: true
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.likes).toBe(1);
+      expect(response.body.dislikes).toBe(0);
+
+      response = await request(app)
+        .post(`/addComments/toggleLikeDislikeComment`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+        .send({
+          chargerId: chargerId,
+          commentId: comment1Id,
+          userId: testUser._id,
+          like: true
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.likes).toBe(0);
+      expect(response.body.dislikes).toBe(0);
+
+      response = await request(app)
+        .post(`/addComments/toggleLikeDislikeComment`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+        .send({
+          chargerId: chargerId,
+          commentId: comment1Id,
+          userId: testUser._id,
+          dislike: true
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.likes).toBe(0);
+      expect(response.body.dislikes).toBe(1);
+
+      response = await request(app)
+        .post(`/addComments/toggleLikeDislikeComment`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+        .send({
+          chargerId: chargerId,
+          commentId: comment1Id,
+          userId: testUser._id,
+          dislike: true
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.likes).toBe(0);
+      expect(response.body.dislikes).toBe(0);
+
+    });
+
+    test("should toggleLikeDislikeComment - situation 2", async () => {
+      let response = await request(app)
+        .post(`/addComments/toggleLikeDislikeComment`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+        .send({
+          chargerId: chargerId,
+          commentId: comment1Id,
+          userId: testUser._id,
+          dislike: true
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.likes).toBe(0);
+      expect(response.body.dislikes).toBe(1);
+
+      response = await request(app)
         .post(`/addComments/toggleLikeDislikeComment`)
         .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
         .send({
@@ -215,6 +388,58 @@ describe("add charging station Test Suite", () => {
 
     });
 
+    test("should fail to toggle like/dislike - comment not found", async () => {
+      const nonExistentCommentId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .post(`/addComments/toggleLikeDislikeComment`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+        .send({
+          chargerId: chargerId,
+          commentId: nonExistentCommentId,
+          userId: testUser._id,
+          like: true
+        });
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty("message", "Comment not found");
+    });
+
+    test("should fail to toggle like/dislike - charger not found", async () => {
+      const nonExistentChargerId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .post(`/addComments/toggleLikeDislikeComment`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+        .send({
+          chargerId: nonExistentChargerId,
+          commentId: comment1Id,
+          userId: testUser._id,
+          like: true
+        });
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty("message", "Comment not found");
+    });
+
+    test("should fail to toggle like/dislike - internal server error", async () => {
+      const originalFindById = chargingStationModel.findById;
+      chargingStationModel.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+  
+      const response = await request(app)
+        .post(`/addComments/toggleLikeDislikeComment`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+        .send({
+          chargerId: chargerId,
+          commentId: comment1Id,
+          userId: testUser._id,
+          like: true
+        });
+  
+      expect(response.status).toBe(500);
+      expect(response.text).toBe("Server error");
+  
+      chargingStationModel.findById = originalFindById;
+    });
+
     test("should delete the comment", async () => {
       const response = await request(app)
         .delete(`/addComments/deleteComment/${chargerId}/${comment1Id}`)
@@ -227,6 +452,41 @@ describe("add charging station Test Suite", () => {
       expect(charger?.comments.length).toBe(0);
 
     });
+
+    test("should fail to delete comment by id - charging station not found", async () => {
+      const nonExistentChargerId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .delete(`/addComments/deleteComment/${nonExistentChargerId}/${comment1Id}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty("message", "Charging station not found");
+    });
+
+    test("should fail to delete comment by id - comment not found", async () => {
+      const nonExistentCommentId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .delete(`/addComments/deleteComment/${chargerId}/${nonExistentCommentId}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty("message", "Comment not found");
+    });
+
+    test("should fail to delete comment by id - internal server error", async () => {
+      const originalFindById = chargingStationModel.findById;
+      chargingStationModel.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+  
+      const response = await request(app)
+        .delete(`/addComments/deleteComment/${chargerId}/${comment1Id}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+      expect(response.status).toBe(500);
+      expect(response.body).toHaveProperty("message", "Failed to delete comment");
+  
+      chargingStationModel.findById = originalFindById;
+    });
+
 
     test("should delete the charging station", async () => {
       const response = await request(app)

@@ -110,7 +110,7 @@ const getChargersByUserId = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
     const chargers = await ChargingModel.find({ userId });
-    if (!chargers) {
+    if (!chargers || chargers.length == 0) {
       return res
         .status(404)
         .json({ message: "No charging stations found for this user" });
@@ -125,7 +125,7 @@ const getChargersByUserId = async (req: Request, res: Response) => {
 const getAllChargers = async (req: Request, res: Response) => {
   try {
     const chargers = await ChargingModel.find();
-    if (!chargers) {
+    if (!chargers || chargers.length == 0) {
       return res.status(404).json({ message: "No charging stations found" });
     }
 

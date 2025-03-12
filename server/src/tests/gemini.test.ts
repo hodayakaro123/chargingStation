@@ -65,8 +65,11 @@ beforeAll(async () => {
 }); 
 
 afterAll(async () => {
-    await userModel.findOneAndDelete({ email: testUser.email })
-    await mongoose.connection.close();
+  await request(app)
+    .delete(`/auth/deleteUser/${testUser._id}`)
+    .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+
+  await mongoose.connection.close();
 
 });
 

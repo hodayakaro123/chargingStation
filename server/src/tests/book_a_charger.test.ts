@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import userModel from "../models/user_model";
 import { Express } from "express";
 import chargingStationModel from "../models/add_charging_model";
-import bookChargerModel from "../models/book_a_chrager.model";
+import BookCharger from "../models/book_a_chrager.model";
 import path from "path";
 import fs from "fs";
 
@@ -103,10 +103,15 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await request(app)
+    .delete(`/auth/deleteUser/${testUser._id}`)
+    .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+    
   await mongoose.connection.close();
 });
 
 let chargerId: string;
+let bookingId: string;
 
 describe("Book a charger", () => {
   test("should add a new charging station", async () => {
@@ -158,9 +163,25 @@ describe("Book a charger", () => {
       });
 
     expect(bookChargerResponse.statusCode).toBe(201);
-    expect(bookChargerResponse.body.message).toBe(
-      "Charger booked successfully"
-    );
+    expect(bookChargerResponse.body.message).toBe("Charger booked successfully");
+  });
+
+  test("should fail to book a charger with invalid charger id", async () => {
+    const bookChargerResponse = await request(app)
+      .post("/bookings/bookCharger")
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+      .send({
+        chargerId: "invalid-charger-id",
+        startTime: bookingCharger.StartTime,
+        endTime: bookingCharger.EndTime,
+        date: bookingCharger.Date,
+        message: bookingCharger.Message,
+        contactNumber: bookingCharger.contactNumber,
+        userId: bookingCharger.userId,
+      });
+    
+    expect(bookChargerResponse.statusCode).toBe(500);
+    expect(bookChargerResponse.body.message).toBe("Failed to book charger");
   });
 
   test("should get all bookings", async () => {
@@ -170,6 +191,20 @@ describe("Book a charger", () => {
 
     expect(getAllBookingsResponse.statusCode).toBe(200);
     expect(getAllBookingsResponse.body.length).toBeGreaterThan(0);
+  });
+
+  test("should fail to get all bookings - internal server error", async () => {
+    const originalFind = BookCharger.find;
+    BookCharger.find = jest.fn().mockRejectedValue(new Error("Internal server error"));
+  
+    const getAllBookingsResponse = await request(app)
+      .get("/bookings/getAllBookings")
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+    expect(getAllBookingsResponse.statusCode).toBe(500);
+    expect(getAllBookingsResponse.body).toHaveProperty("message", "Failed to fetch bookings");
+  
+    BookCharger.find = originalFind;
   });
 
   test("should get booking by charger id", async () => {
@@ -182,6 +217,21 @@ describe("Book a charger", () => {
   });
 
 
+  test("should fail to get booking by charger id - internal server error", async () => {
+    const originalFind = BookCharger.find;
+    BookCharger.find = jest.fn().mockRejectedValue(new Error("Internal server error"));
+  
+    const getBookingByChargerIdResponse = await request(app)
+      .get(`/bookings/getBookingByChargerId/${chargerId}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+    expect(getBookingByChargerIdResponse.statusCode).toBe(500);
+    expect(getBookingByChargerIdResponse.body).toHaveProperty("message", "Failed to fetch booking");
+  
+    BookCharger.find = originalFind;
+  });
+
+
   test("should get booking by userId", async () => {
     const getBookingByUserIdResponse = await request(app)
       .get(`/bookings/getBookingByUserId/${testUser._id}`)
@@ -189,6 +239,67 @@ describe("Book a charger", () => {
 
     expect(getBookingByUserIdResponse.statusCode).toBe(200);
     expect(getBookingByUserIdResponse.body.length).toBeGreaterThan(0);
+  });
+
+
+  test("should fail to get booking by user id - internal server error", async () => {
+    const originalFind = BookCharger.find;
+    BookCharger.find = jest.fn().mockRejectedValue(new Error("Internal server error"));
+  
+    const getBookingByUserIdResponse = await request(app)
+      .get(`/bookings/getBookingByUserId/${testUser._id}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+    expect(getBookingByUserIdResponse.statusCode).toBe(500);
+    expect(getBookingByUserIdResponse.body).toHaveProperty("message", "Failed to fetch booking");
+  
+    BookCharger.find = originalFind;
+  });
+
+  test("should get booking by id successfully", async () => {
+    const getBookingByUserIdResponse = await request(app)
+      .get(`/bookings/getBookingByUserId/${testUser._id}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+    
+    bookingId = getBookingByUserIdResponse.body[0]._id;
+    
+  
+    const getBookingByIdResponse = await request(app)
+      .get(`/bookings/getBookingById/${bookingId}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+    expect(getBookingByIdResponse.statusCode).toBe(200);
+    expect(getBookingByIdResponse.body).toHaveProperty("_id", bookingId);
+  });
+
+  test("should fail to get booking by id - booking not found", async () => {
+    const nonExistentBookingId = new mongoose.Types.ObjectId();
+    const getBookingByIdResponse = await request(app)
+      .get(`/bookings/getBookingById/${nonExistentBookingId}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+    expect(getBookingByIdResponse.statusCode).toBe(404);
+    expect(getBookingByIdResponse.body).toHaveProperty("message", "Booking not found");
+  });
+
+  test("should fail to get booking by id - internal server error", async () => {
+    const originalFindById = BookCharger.findById;
+    BookCharger.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+  
+    const getBookingByUserIdResponse = await request(app)
+      .get(`/bookings/getBookingByUserId/${testUser._id}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+    
+    const bookingId = getBookingByUserIdResponse.body[0]._id;
+  
+    const getBookingByIdResponse = await request(app)
+      .get(`/bookings/getBookingById/${bookingId}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+    expect(getBookingByIdResponse.statusCode).toBe(500);
+    expect(getBookingByIdResponse.body).toHaveProperty("message", "Failed to fetch booking");
+  
+    BookCharger.findById = originalFindById;
   });
 
   test("should update booking", async () => {
@@ -215,19 +326,38 @@ describe("Book a charger", () => {
       expect(updateBookingResponse.body.message).toBe("Booking updated successfully");
   });
 
-  test("Should delete the created booking", async () => {
-
-
+  test("should delete booking by id successfully", async () => {
+  
     const deleteBookingResponse = await request(app)
-        .delete(`/bookings/deleteBookingByID/${chargerId}`)
-        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+      .delete(`/bookings/deleteBookingByID/${bookingId}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+    expect(deleteBookingResponse.statusCode).toBe(200);
+    expect(deleteBookingResponse.body).toHaveProperty("message", "Booking deleted successfully");
+  });
 
-    if (deleteBookingResponse.statusCode === 404) {
-        expect(deleteBookingResponse.body.message).toBe("Booking not found");
-    } else {
-        expect(deleteBookingResponse.statusCode).toBe(200);
-        expect(deleteBookingResponse.body.message).toBe("Booking deleted successfully");
-    }
+  test("should fail to delete booking by id - booking not found", async () => {
+    const nonExistentBookingId = new mongoose.Types.ObjectId();
+    const deleteBookingResponse = await request(app)
+      .delete(`/bookings/deleteBookingByID/${nonExistentBookingId}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+    expect(deleteBookingResponse.statusCode).toBe(404);
+    expect(deleteBookingResponse.body).toHaveProperty("message", "Booking not found");
+  });
+
+  test("should fail to delete booking by id - internal server error", async () => {
+    const originalFindOneAndDelete = BookCharger.findOneAndDelete;
+    BookCharger.findOneAndDelete = jest.fn().mockRejectedValue(new Error("Internal server error"));
+  
+    const deleteBookingResponse = await request(app)
+      .delete(`/bookings/deleteBookingByID/${bookingId}`)
+      .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+  
+    expect(deleteBookingResponse.statusCode).toBe(500);
+    expect(deleteBookingResponse.body).toHaveProperty("message", "Failed to delete booking");
+  
+    BookCharger.findOneAndDelete = originalFindOneAndDelete;
   });
 
 });

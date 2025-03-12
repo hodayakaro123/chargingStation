@@ -17,6 +17,7 @@ const server_1 = __importDefault(require("../server"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const user_model_1 = __importDefault(require("../models/user_model"));
 const add_charging_model_1 = __importDefault(require("../models/add_charging_model"));
+const book_a_chrager_model_1 = __importDefault(require("../models/book_a_chrager.model"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 let app;
@@ -91,9 +92,13 @@ beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     bookingCharger.userId = testUser._id;
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, supertest_1.default)(app)
+        .delete(`/auth/deleteUser/${testUser._id}`)
+        .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
     yield mongoose_1.default.connection.close();
 }));
 let chargerId;
+let bookingId;
 describe("Book a charger", () => {
     test("should add a new charging station", () => __awaiter(void 0, void 0, void 0, function* () {
         const imagePath = path_1.default.resolve(__dirname, "sedan_test.png");
@@ -139,12 +144,38 @@ describe("Book a charger", () => {
         expect(bookChargerResponse.statusCode).toBe(201);
         expect(bookChargerResponse.body.message).toBe("Charger booked successfully");
     }));
+    test("should fail to book a charger with invalid charger id", () => __awaiter(void 0, void 0, void 0, function* () {
+        const bookChargerResponse = yield (0, supertest_1.default)(app)
+            .post("/bookings/bookCharger")
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
+            .send({
+            chargerId: "invalid-charger-id",
+            startTime: bookingCharger.StartTime,
+            endTime: bookingCharger.EndTime,
+            date: bookingCharger.Date,
+            message: bookingCharger.Message,
+            contactNumber: bookingCharger.contactNumber,
+            userId: bookingCharger.userId,
+        });
+        expect(bookChargerResponse.statusCode).toBe(500);
+        expect(bookChargerResponse.body.message).toBe("Failed to book charger");
+    }));
     test("should get all bookings", () => __awaiter(void 0, void 0, void 0, function* () {
         const getAllBookingsResponse = yield (0, supertest_1.default)(app)
             .get("/bookings/getAllBookings")
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
         expect(getAllBookingsResponse.statusCode).toBe(200);
         expect(getAllBookingsResponse.body.length).toBeGreaterThan(0);
+    }));
+    test("should fail to get all bookings - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFind = book_a_chrager_model_1.default.find;
+        book_a_chrager_model_1.default.find = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const getAllBookingsResponse = yield (0, supertest_1.default)(app)
+            .get("/bookings/getAllBookings")
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(getAllBookingsResponse.statusCode).toBe(500);
+        expect(getAllBookingsResponse.body).toHaveProperty("message", "Failed to fetch bookings");
+        book_a_chrager_model_1.default.find = originalFind;
     }));
     test("should get booking by charger id", () => __awaiter(void 0, void 0, void 0, function* () {
         const getBookingByChargerIdResponse = yield (0, supertest_1.default)(app)
@@ -153,12 +184,65 @@ describe("Book a charger", () => {
         expect(getBookingByChargerIdResponse.statusCode).toBe(200);
         expect(getBookingByChargerIdResponse.body.length).toBeGreaterThan(0);
     }));
+    test("should fail to get booking by charger id - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFind = book_a_chrager_model_1.default.find;
+        book_a_chrager_model_1.default.find = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const getBookingByChargerIdResponse = yield (0, supertest_1.default)(app)
+            .get(`/bookings/getBookingByChargerId/${chargerId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(getBookingByChargerIdResponse.statusCode).toBe(500);
+        expect(getBookingByChargerIdResponse.body).toHaveProperty("message", "Failed to fetch booking");
+        book_a_chrager_model_1.default.find = originalFind;
+    }));
     test("should get booking by userId", () => __awaiter(void 0, void 0, void 0, function* () {
         const getBookingByUserIdResponse = yield (0, supertest_1.default)(app)
             .get(`/bookings/getBookingByUserId/${testUser._id}`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
         expect(getBookingByUserIdResponse.statusCode).toBe(200);
         expect(getBookingByUserIdResponse.body.length).toBeGreaterThan(0);
+    }));
+    test("should fail to get booking by user id - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFind = book_a_chrager_model_1.default.find;
+        book_a_chrager_model_1.default.find = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const getBookingByUserIdResponse = yield (0, supertest_1.default)(app)
+            .get(`/bookings/getBookingByUserId/${testUser._id}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(getBookingByUserIdResponse.statusCode).toBe(500);
+        expect(getBookingByUserIdResponse.body).toHaveProperty("message", "Failed to fetch booking");
+        book_a_chrager_model_1.default.find = originalFind;
+    }));
+    test("should get booking by id successfully", () => __awaiter(void 0, void 0, void 0, function* () {
+        const getBookingByUserIdResponse = yield (0, supertest_1.default)(app)
+            .get(`/bookings/getBookingByUserId/${testUser._id}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        bookingId = getBookingByUserIdResponse.body[0]._id;
+        const getBookingByIdResponse = yield (0, supertest_1.default)(app)
+            .get(`/bookings/getBookingById/${bookingId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(getBookingByIdResponse.statusCode).toBe(200);
+        expect(getBookingByIdResponse.body).toHaveProperty("_id", bookingId);
+    }));
+    test("should fail to get booking by id - booking not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentBookingId = new mongoose_1.default.Types.ObjectId();
+        const getBookingByIdResponse = yield (0, supertest_1.default)(app)
+            .get(`/bookings/getBookingById/${nonExistentBookingId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(getBookingByIdResponse.statusCode).toBe(404);
+        expect(getBookingByIdResponse.body).toHaveProperty("message", "Booking not found");
+    }));
+    test("should fail to get booking by id - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindById = book_a_chrager_model_1.default.findById;
+        book_a_chrager_model_1.default.findById = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const getBookingByUserIdResponse = yield (0, supertest_1.default)(app)
+            .get(`/bookings/getBookingByUserId/${testUser._id}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        const bookingId = getBookingByUserIdResponse.body[0]._id;
+        const getBookingByIdResponse = yield (0, supertest_1.default)(app)
+            .get(`/bookings/getBookingById/${bookingId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(getBookingByIdResponse.statusCode).toBe(500);
+        expect(getBookingByIdResponse.body).toHaveProperty("message", "Failed to fetch booking");
+        book_a_chrager_model_1.default.findById = originalFindById;
     }));
     test("should update booking", () => __awaiter(void 0, void 0, void 0, function* () {
         const getBookingByUserIdResponse = yield (0, supertest_1.default)(app)
@@ -182,17 +266,30 @@ describe("Book a charger", () => {
         expect(updateBookingResponse.statusCode).toBe(200);
         expect(updateBookingResponse.body.message).toBe("Booking updated successfully");
     }));
-    test("Should delete the created booking", () => __awaiter(void 0, void 0, void 0, function* () {
+    test("should delete booking by id successfully", () => __awaiter(void 0, void 0, void 0, function* () {
         const deleteBookingResponse = yield (0, supertest_1.default)(app)
-            .delete(`/bookings/deleteBookingByID/${chargerId}`)
+            .delete(`/bookings/deleteBookingByID/${bookingId}`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
-        if (deleteBookingResponse.statusCode === 404) {
-            expect(deleteBookingResponse.body.message).toBe("Booking not found");
-        }
-        else {
-            expect(deleteBookingResponse.statusCode).toBe(200);
-            expect(deleteBookingResponse.body.message).toBe("Booking deleted successfully");
-        }
+        expect(deleteBookingResponse.statusCode).toBe(200);
+        expect(deleteBookingResponse.body).toHaveProperty("message", "Booking deleted successfully");
+    }));
+    test("should fail to delete booking by id - booking not found", () => __awaiter(void 0, void 0, void 0, function* () {
+        const nonExistentBookingId = new mongoose_1.default.Types.ObjectId();
+        const deleteBookingResponse = yield (0, supertest_1.default)(app)
+            .delete(`/bookings/deleteBookingByID/${nonExistentBookingId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(deleteBookingResponse.statusCode).toBe(404);
+        expect(deleteBookingResponse.body).toHaveProperty("message", "Booking not found");
+    }));
+    test("should fail to delete booking by id - internal server error", () => __awaiter(void 0, void 0, void 0, function* () {
+        const originalFindOneAndDelete = book_a_chrager_model_1.default.findOneAndDelete;
+        book_a_chrager_model_1.default.findOneAndDelete = jest.fn().mockRejectedValue(new Error("Internal server error"));
+        const deleteBookingResponse = yield (0, supertest_1.default)(app)
+            .delete(`/bookings/deleteBookingByID/${bookingId}`)
+            .set("authorization", `Bearer ${testUser.refreshTokens[0]}`);
+        expect(deleteBookingResponse.statusCode).toBe(500);
+        expect(deleteBookingResponse.body).toHaveProperty("message", "Failed to delete booking");
+        book_a_chrager_model_1.default.findOneAndDelete = originalFindOneAndDelete;
     }));
 });
 //# sourceMappingURL=book_a_charger.test.js.map
