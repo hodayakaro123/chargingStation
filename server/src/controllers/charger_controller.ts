@@ -1,12 +1,9 @@
 import { Request, Response } from "express";
 import ChargingModel from "../models/add_charging_model";
 import BookCharger from "../models/book_a_chrager.model";
-import userModel from "../models/user_model";
-import mongoose from "mongoose";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-// import { Book } from "lucide-react";
 
 const getCoordinates = async (address: string) => {
   const apiKey = process.env.OPENCAGE_API_KEY;
@@ -40,6 +37,7 @@ const addChargingStation = async (req: Request, res: Response) => {
     const { userId, location, chargingRate, price, description } = req.body;
     const imageFile = req.file;
 
+
     if (
       !userId ||
       !location ||
@@ -48,12 +46,20 @@ const addChargingStation = async (req: Request, res: Response) => {
       !description ||
       !imageFile
     ) {
-      return res.status(400).json({
-        error: "All fields, including userId and an image, are required.",
-      });
+      return res
+        .status(400)
+        .json({
+          error: "All fields, including userId and an image, are required.",
+        });
     }
 
-    const coordinates = await getCoordinates(location);
+    let coordinates;
+    if (req.body.test) {
+      coordinates = { latitude: req.body.latitude, longitude: req.body.longitude };
+    } else {
+      coordinates = await getCoordinates(location);
+    }
+
     if (!coordinates) {
       return res.status(400).json({ error: "Invalid location" });
     }
@@ -84,6 +90,7 @@ const addChargingStation = async (req: Request, res: Response) => {
 };
 
 const getChargerById = async (req: Request, res: Response) => {
+
   try {
     const { chargerId } = req.params;
 
@@ -92,9 +99,7 @@ const getChargerById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Charging station not found" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Charger retrieved successfully", chargingStation });
+    res.status(200).json({ message: "Charger retrieved successfully", chargingStation });
   } catch (error) {
     res.status(500).json({ message: "Failed to retrieve charger", error });
   }
@@ -105,7 +110,7 @@ const getChargersByUserId = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
     const chargers = await ChargingModel.find({ userId });
-    if (!chargers) {
+    if (!chargers || chargers.length == 0) {
       return res
         .status(404)
         .json({ message: "No charging stations found for this user" });
@@ -120,7 +125,7 @@ const getChargersByUserId = async (req: Request, res: Response) => {
 const getAllChargers = async (req: Request, res: Response) => {
   try {
     const chargers = await ChargingModel.find();
-    if (!chargers) {
+    if (!chargers || chargers.length == 0) {
       return res.status(404).json({ message: "No charging stations found" });
     }
 
@@ -188,20 +193,18 @@ const updateCharger = async (req: Request, res: Response) => {
 const deleteChargerById = async (req: Request, res: Response) => {
   try {
     const { chargerId } = req.params;
-    console.log(chargerId);
 
     const charger = await ChargingModel.findById(chargerId);
     if (!charger) {
       return res.status(404).json({ message: "Charging station not found" });
     }
+
+
     if (charger.picture) {
-      const existingPicturePath = path.resolve(
-        __dirname,
-        `../${charger.picture}`
-      );
-      if (fs.existsSync(existingPicturePath)) {
-        fs.unlinkSync(existingPicturePath);
-      }
+        const existingPicturePath = path.resolve(__dirname, `../${charger.picture}`);
+        if (fs.existsSync(existingPicturePath)) {
+          fs.unlinkSync(existingPicturePath);
+        }
     }
     await ChargingModel.findByIdAndDelete(chargerId);
 
@@ -213,38 +216,6 @@ const deleteChargerById = async (req: Request, res: Response) => {
   }
 };
 
-const addSelectedChargingStation = async (req: Request, res: Response) => {
-  try {
-    const { userId, chargerId } = req.params;
-
-    const user = await userModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const chargingStation = await ChargingModel.findById(chargerId);
-    if (!chargingStation) {
-      return res.status(404).json({ message: "Charging station not found" });
-    }
-
-    const chargerObjectId = new mongoose.Types.ObjectId(chargerId);
-
-    if (!user.selectedChargingStations.includes(chargerObjectId)) {
-      user.selectedChargingStations.push(chargerObjectId);
-      await user.save();
-    }
-
-    res.status(200).json({
-      message: "Charging station added to user's list successfully",
-      user,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to add charging station to user's list",
-      error,
-    });
-  }
-};
 
 const getUserByChargerId = async (req: Request, res: Response) => {
   try {
@@ -255,7 +226,7 @@ const getUserByChargerId = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Charging station not found" });
     }
 
-    const user = await userModel.findById(chargingStation.userId);
+    const user = chargingStation.userId;
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -322,7 +293,6 @@ const toggleLikeDislikeCharger = async (req: Request, res: Response) => {
 
     res.json(charger);
   } catch (error) {
-    console.error("Error updating charger like/dislike:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -333,7 +303,6 @@ export default {
   getAllChargers,
   updateCharger,
   deleteChargerById,
-  addSelectedChargingStation,
   getChargersByUserId,
   getUserByChargerId,
   toggleLikeDislikeCharger,

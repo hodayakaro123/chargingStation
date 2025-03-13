@@ -31,13 +31,12 @@ const PersonalArea: React.FC = () => {
       const accessToken = localStorage.getItem("accessToken");
 
       if (!userId || !accessToken) {
-        alert("User ID and Access Token are required");
         return;
       }
 
       try {
         const userResponse = await fetch(
-          `http://localhost:3000/auth/getUserById/${userId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/auth/getUserById/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -63,7 +62,7 @@ const PersonalArea: React.FC = () => {
 
       try {
         const chargingResponse = await fetch(
-          `http://localhost:3000/addChargingStation/getChargersByUserId/chargers/${userId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/getChargersByUserId/chargers/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -92,7 +91,6 @@ const PersonalArea: React.FC = () => {
         setRows(chargers);
       } catch (error) {
         console.error("Error fetching charging stations:", error);
-        alert("Failed to fetch charging stations");
       }
     };
 
@@ -110,7 +108,7 @@ const PersonalArea: React.FC = () => {
     try {
       const userId = localStorage.getItem("userId");
       const response = await fetch(
-        "http://localhost:3000/gemini/generate-content",
+        `${import.meta.env.VITE_BACKEND_URL}/gemini/generate-content`,
         {
           method: "POST",
           headers: {

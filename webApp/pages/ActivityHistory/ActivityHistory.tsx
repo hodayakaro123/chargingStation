@@ -30,7 +30,7 @@ export default function ActivityHistory() {
     const fetchBookings = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/bookings/getBookingByUserId/${userId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/bookings/getBookingByUserId/${userId}`,
           {
             method: "GET",
             headers: {
@@ -49,7 +49,7 @@ export default function ActivityHistory() {
         const updatedBookings = await Promise.all(
           data.map(async (booking: Booking) => {
             const chargerResponse = await fetch(
-              `http://localhost:3000/addChargingStation/getChargerById/${booking.chargerId}`,
+              `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/getChargerById/${booking.chargerId}`,
               {
                 method: "GET",
                 headers: {

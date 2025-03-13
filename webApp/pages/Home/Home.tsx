@@ -23,6 +23,18 @@ interface ChargingStation {
   userId: string;
 }
 
+function MapUpdater({ coordinates }: { coordinates: { lat: number; lng: number } | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (coordinates) {
+      map.flyTo([coordinates.lat, coordinates.lng], 14); 
+    }
+  }, [coordinates, map]);
+
+  return null; 
+}
+
 function ReturnToLocationButton({
   userLocation,
 }: {
@@ -141,7 +153,7 @@ export default function Home() {
     const fetchChargingStations = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/addChargingStation/getAllChargers"
+          `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/getAllChargers`
         );
         const data = await response.json();
         if (data.chargers) {
@@ -163,7 +175,7 @@ export default function Home() {
         }
 
         const response = await fetch(
-          "http://localhost:3000/carData/get-car-data",
+          `${import.meta.env.VITE_BACKEND_URL}/carData/get-car-data`,
           {
             method: "POST",
             headers: {
@@ -343,6 +355,8 @@ export default function Home() {
           ))}
 
           <ReturnToLocationButton userLocation={userLocation} />
+          <MapUpdater coordinates={coordinates} />
+
         </MapContainer>
       )}
     </div>

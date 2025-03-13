@@ -65,7 +65,7 @@ export default function ReviewCard({
     const fetchComments = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/addComments/getCommentsByChargerId/${charger._id}`,
+          `${import.meta.env.VITE_BACKEND_URL}/addComments/getCommentsByChargerId/${charger._id}`,
           {
             method: "GET",
             headers: {
@@ -84,7 +84,7 @@ export default function ReviewCard({
           fetchedComments.comments.map(async (comment: Comment) => {
             try {
               const userResponse = await fetch(
-                `http://localhost:3000/auth/getUserById/${comment.userId}`,
+                `${import.meta.env.VITE_BACKEND_URL}/auth/getUserById/${comment.userId}`,
                 {
                   method: "GET",
                   headers: {
@@ -136,7 +136,7 @@ export default function ReviewCard({
       console.log(localStorage.getItem("userId"));
 
       const response = await fetch(
-        `http://localhost:3000/addChargingStation/toggleLikeDislikeCharger`,
+        `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/toggleLikeDislikeCharger`,
         {
           method: "POST",
           headers: {
@@ -216,7 +216,7 @@ export default function ReviewCard({
     try {
       const userId = localStorage.getItem("userId");
       const response = await fetch(
-        `http://localhost:3000/addComments/toggleLikeDislikeComment/`,
+        `${import.meta.env.VITE_BACKEND_URL}/addComments/toggleLikeDislikeComment/`,
         {
           method: "POST",
           headers: {

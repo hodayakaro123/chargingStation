@@ -91,7 +91,7 @@ export default function NewChargingStation() {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/addChargingStation/addCharger",
+        `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/addCharger`,
         {
           method: "POST",
           headers: {
