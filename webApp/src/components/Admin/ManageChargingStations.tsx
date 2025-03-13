@@ -161,7 +161,7 @@ export default function ManageChargingStations() {
       reader.onloadend = () => {
         setPictureUrls((prev) => ({
           ...prev,
-          [rowId]: reader.result as string, 
+          [rowId]: reader.result as string,
         }));
       };
       reader.readAsDataURL(file);
@@ -222,7 +222,6 @@ export default function ManageChargingStations() {
             Authorization: `Bearer ${accessToken}`,
           },
           body: formData,
-
         }
       );
 
@@ -288,13 +287,13 @@ export default function ManageChargingStations() {
         Total Charging Stations: {totalChargingStations}
       </Typography>
 
-      <Typography
+      {/* <Typography
         variant="subtitle1"
         gutterBottom
         sx={{ marginBottom: 2, fontWeight: "medium", color: "#555" }}
       >
         Total Money Earned: ${totalRevenue.toFixed(2)}
-      </Typography>
+      </Typography> */}
 
       <TextField
         label="Search by location, email, or owner's name"
@@ -320,7 +319,6 @@ export default function ManageChargingStations() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead
             sx={{
-              backgroundColor: "#1976d2",
               color: "#fff",
               position: "sticky",
               top: "0",
@@ -412,7 +410,7 @@ export default function ManageChargingStations() {
                   {/* Display current or new image */}
                   {pictureUrls[station.charherRowId] ? (
                     <img
-                      src={pictureUrls[station.charherRowId]} 
+                      src={pictureUrls[station.charherRowId]}
                       alt="Charger"
                       style={{
                         width: "50px",
@@ -423,7 +421,7 @@ export default function ManageChargingStations() {
                     />
                   ) : (
                     <img
-                      src={`http://localhost:3000${station.picture}`} 
+                      src={`http://localhost:3000${station.picture}`}
                       alt="Charger"
                       style={{
                         width: "50px",
@@ -441,7 +439,7 @@ export default function ManageChargingStations() {
                       accept="image/*"
                       onChange={(e) =>
                         handlePictureChange(e, String(station.charherRowId))
-                      } 
+                      }
                     />
                   )}
                 </TableCell>

@@ -283,23 +283,6 @@ export default function ReviewCard({
         </div>
       </div>
 
-      <div className="review-rating">
-        <span className="rating-text">Rating: </span>
-        {[...Array(5)].map((_, index) => (
-          <svg
-            key={index}
-            className={`star ${index < rating ? "filled" : ""}`}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            width="20"
-            height="20"
-          >
-            <path d="M10 15l-5.5 3 1-6-4.5-4 6-1L10 0l2.5 5 6 1-4.5 4 1 6z" />
-          </svg>
-        ))}
-      </div>
-
       <div className="charger-like-section">
         <h4>{charger.name}</h4>
         <p>Location: {charger.location}</p>
@@ -312,8 +295,8 @@ export default function ReviewCard({
               <AiFillLike size={25} color="#007bff" />
             ) : (
               <AiOutlineLike size={25} />
-            )}.
-            {charger.likes}
+            )}
+            .{charger.likes}
           </button>
 
           <button

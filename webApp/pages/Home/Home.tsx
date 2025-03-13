@@ -23,10 +23,6 @@ interface ChargingStation {
   userId: string;
 }
 
-
-
-
-
 function ReturnToLocationButton({
   userLocation,
 }: {
@@ -49,8 +45,9 @@ function ReturnToLocationButton({
         width: "250px",
         position: "absolute",
         right: 0,
+        bottom: 0,
         zIndex: 1000,
-        backgroundColor: "#066C91",
+        backgroundColor: "red",
         color: "#fff",
         border: "none",
         borderRadius: "8px",
@@ -79,7 +76,6 @@ function calculateChargingTime(
 }
 
 export default function Home() {
-  
   const navigate = useNavigate();
   const location = useLocation();
   const message = location.state?.message;
@@ -285,17 +281,17 @@ export default function Home() {
                   />
                 ) : (
                   <p style={{ fontStyle: "italic", color: "gray" }}>
-                  <img
-                    src={`https://www.revixpert.ch/app/uploads/portrait-placeholder.jpg`}
-                    alt="Charging Station"
-                    style={{
-                      width: "100%",
-                      height: "150px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                      marginBottom: "10px",
-                    }}
-                  />
+                    <img
+                      src={`https://www.revixpert.ch/app/uploads/portrait-placeholder.jpg`}
+                      alt="Charging Station"
+                      style={{
+                        width: "100%",
+                        height: "150px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        marginBottom: "10px",
+                      }}
+                    />
                     No image available
                   </p>
                 )}
