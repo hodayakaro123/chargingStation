@@ -137,7 +137,19 @@ export default function Booking() {
 
   return (
     <div className="booking-row">
-      <h2 className="booking-form-title">Charging Station Booking</h2>
+      <h2
+        className="booking-form-title"
+        style={{
+          fontSize: "40px",
+          fontWeight: "bold",
+          textAlign: "center",
+          color: "black",
+          WebkitBackgroundClip: "text",
+        }}
+      >
+        Charging Station <br />
+        Booking
+      </h2>
       <form className="booking-form" onSubmit={handleSubmit}>
         <div className="form-row">
           <div className="form-group">

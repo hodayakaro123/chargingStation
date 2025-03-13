@@ -175,7 +175,7 @@ export default function ManageUsers() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead
             sx={{
-              backgroundColor: "#1976d2",
+              backgroundColor: "black",
               color: "#fff",
               position: "sticky",
               top: "0",

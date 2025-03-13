@@ -2,12 +2,12 @@
   padding: 20px;
   font-family: "Roboto", sans-serif;
   position: relative;
-  height: 650px;
+  height: 600px;
   margin-top: 12rem;
   width: 900px;
   border-radius: 10px;
   margin: 12rem auto;
-  margin-top: 100px;
+  margin-top: 25px;
 }
 body {
   overflow: hidden;
@@ -100,12 +100,12 @@ body {
 @media (max-width: 1024px) {
   .map-page {
     width: 90%;
-    top: 100px;
-    padding: 15px;
+    top: 114px;
+    padding: 146px;
   }
 
   .input-container {
-    flex-direction: column;
+    flex-direction: row;
     align-items: stretch;
     gap: 10px;
   }
