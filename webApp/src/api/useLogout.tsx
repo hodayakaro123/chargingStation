@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "http://localhost:3000"; // Adjust to your API base URL
 
 export const useLogout = () => {
   const navigate = useNavigate();
@@ -13,7 +12,7 @@ export const useLogout = () => {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/auth/logout`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

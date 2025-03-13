@@ -19,7 +19,7 @@ const ReceivedBooking: React.FC<ReceivedBookingProps> = ({ chargers }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/bookings/updateBooking/${id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/bookings/updateBooking/${id}`,
         {
           method: "PUT",
           headers: {
@@ -59,7 +59,7 @@ const ReceivedBooking: React.FC<ReceivedBookingProps> = ({ chargers }) => {
     setLoading(true);
     try {
       const bookingsResponse = await fetch(
-        `http://localhost:3000/bookings/getBookingByChargerId/${chargerId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/bookings/getBookingByChargerId/${chargerId}`,
         {
           method: "GET",
           headers: {

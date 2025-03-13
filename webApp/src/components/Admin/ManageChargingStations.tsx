@@ -47,7 +47,7 @@ export default function ManageChargingStations() {
 
       try {
         const response = await fetch(
-          `http://localhost:3000/admin/getAllChargers`,
+          `${import.meta.env.VITE_BACKEND_URL}/admin/getAllChargers`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -120,7 +120,7 @@ export default function ManageChargingStations() {
       }
 
       const response = await fetch(
-        `http://localhost:3000/addChargingStation/deleteChargerById/${stationToDelete._id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/deleteChargerById/${stationToDelete._id}`,
         {
           method: "DELETE",
           headers: {
@@ -215,7 +215,7 @@ export default function ManageChargingStations() {
       }
 
       const response = await fetch(
-        `http://localhost:3000/addChargingStation/updateCharger/${editedStation._id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/updateCharger/${editedStation._id}`,
         {
           method: "PUT",
           headers: {

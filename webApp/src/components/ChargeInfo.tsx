@@ -65,7 +65,7 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/addChargingStation/updateCharger/${editData.chargerId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/updateCharger/${editData.chargerId}`,
         {
           method: "PUT",
           headers: {
@@ -103,7 +103,7 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
       if (confirmed) {
         try {
           const response = await fetch(
-            `http://localhost:3000/addChargingStation/deleteChargerById/${charger.chargerId}`,
+            `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/deleteChargerById/${charger.chargerId}`,
             {
               method: "DELETE",
               headers: {

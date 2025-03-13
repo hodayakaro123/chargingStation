@@ -60,7 +60,7 @@ export default function GeneralInfoHeader({
 
     try {
       const response = await fetch(
-        `http://localhost:3000/auth/updateUser/${userId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/auth/updateUser/${userId}`,
         {
           method: "PUT",
           headers: {

@@ -4,6 +4,7 @@ import styles from "./Login.module.css";
 import { GoogleLogin } from "@react-oauth/google";
 import { CredentialResponse } from "@react-oauth/google";
 
+
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,7 +53,7 @@ const LoginPage: React.FC = () => {
     const loginData = { email, password };
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +87,7 @@ const LoginPage: React.FC = () => {
   ) => {
     try {
       const response = await fetch(
-        "http://localhost:3000/auth/logInWithGoogle",
+        `${import.meta.env.VITE_BACKEND_URL}/auth/logInWithGoogle`,
         {
           method: "POST",
           headers: {

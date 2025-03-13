@@ -43,7 +43,7 @@ export default function Booking() {
         try {
           const accessToken = localStorage.getItem("accessToken");
           const response = await fetch(
-            `http://localhost:3000/addChargingStation/getUserByChargerId/${charger._id}`,
+            `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/getUserByChargerId/${charger._id}`,
             {
               method: "GET",
               headers: {
@@ -99,7 +99,7 @@ export default function Booking() {
     try {
       const accessToken = localStorage.getItem("accessToken");
       const response = await fetch(
-        "http://localhost:3000/bookings/bookCharger",
+        `${import.meta.env.VITE_BACKEND_URL}/bookings/bookCharger`,
         {
           method: "POST",
           headers: {
