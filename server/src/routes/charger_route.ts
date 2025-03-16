@@ -5,17 +5,12 @@ import upload from "../uploads";
 
 const router = Router();
 
-
 /**
  * @swagger
  * tags:
  *   name: Charging Stations
  *   description: The Charging Stations API
  */
-
-
-
-
 
 /**
  * @swagger
@@ -71,16 +66,11 @@ const router = Router();
  *           type: string
  *           description: The ID of the user who added the charging station
  *       example:
- *         Location: 
- *         Price: 
- *         rating: 
- *         Description: 
+ *         Location:
+ *         Price:
+ *         rating:
+ *         Description:
  */
-
-
-
-
-
 
 /**
  * @swagger
@@ -143,17 +133,14 @@ const router = Router();
  *       500:
  *         description: Server error
  */
-router.post("/addCharger", authMiddleware,  upload.single("image"), (req, res) => {
-      add_charging_controller.addChargingStation(req, res);
-    }
-  );
-
-
-
-
-
-
-
+router.post(
+  "/addCharger",
+  authMiddleware,
+  upload.single("image"),
+  (req, res) => {
+    add_charging_controller.addChargingStation(req, res);
+  }
+);
 
 /**
  * @swagger
@@ -200,20 +187,8 @@ router.post("/addCharger", authMiddleware,  upload.single("image"), (req, res) =
  */
 
 router.get("/getChargerById/:chargerId", (req, res) => {
-    add_charging_controller.getChargerById(req, res);
+  add_charging_controller.getChargerById(req, res);
 });
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * @swagger
@@ -263,13 +238,13 @@ router.get("/getChargerById/:chargerId", (req, res) => {
  *                   example: Failed to retrieve charging stations
  */
 
-router.get("/getChargersByUserId/chargers/:userId", authMiddleware, (req, res) => {
+router.get(
+  "/getChargersByUserId/chargers/:userId",
+  authMiddleware,
+  (req, res) => {
     add_charging_controller.getChargersByUserId(req, res);
-});
-
-
-
-
+  }
+);
 
 /**
  * @swagger
@@ -303,23 +278,18 @@ router.get("/getChargersByUserId/chargers/:userId", authMiddleware, (req, res) =
  *         description: Server error
  */
 
-
-router.put("/updateCharger/:chargerId", upload.single("image"), authMiddleware,  (req, res) => {
+router.put(
+  "/updateCharger/:chargerId",
+  upload.single("image"),
+  authMiddleware,
+  (req, res) => {
     add_charging_controller.updateCharger(req, res);
+  }
+);
+
+router.put("/toggleLikeDislikeCharger/", authMiddleware, (req, res) => {
+  add_charging_controller.toggleLikeDislikeCharger(req, res);
 });
-
-
-
-
-
-router.post("/toggleLikeDislikeCharger/", authMiddleware, (req, res) => {
-    add_charging_controller.toggleLikeDislikeCharger(req, res);
-});
-
-
-
-
-
 
 /**
  * @swagger
@@ -348,11 +318,8 @@ router.post("/toggleLikeDislikeCharger/", authMiddleware, (req, res) => {
  */
 
 router.delete("/deleteChargerById/:chargerId/", authMiddleware, (req, res) => {
-    add_charging_controller.deleteChargerById(req, res);
+  add_charging_controller.deleteChargerById(req, res);
 });
-
-
-
 
 /**
  * @swagger
@@ -383,13 +350,8 @@ router.delete("/deleteChargerById/:chargerId/", authMiddleware, (req, res) => {
  *                   example: "Failed to retrieve charging stations"
  */
 router.get("/getAllChargers", (req, res) => {
-    add_charging_controller.getAllChargers(req, res);
+  add_charging_controller.getAllChargers(req, res);
 });
-
-
-
-
-
 
 /**
  * @swagger
@@ -456,8 +418,7 @@ router.get("/getAllChargers", (req, res) => {
  *                   example: "Server error"
  */
 router.get("/getUserByChargerId/:chargerId", authMiddleware, (req, res) => {
-    add_charging_controller.getUserByChargerId(req, res);
+  add_charging_controller.getUserByChargerId(req, res);
 });
-
 
 export default router;
