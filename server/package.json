@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "app.ts",
   "scripts": {
-    "dev": "copy .\\.env_dev .env && nodemon ./src/app.ts",
+   "dev": "cp .env_dev .env && nodemon ./src/app.ts",
     "start": "copy .\\.env_dev .env && tsc && node ./dist/app.ts",
     "test": "copy .\\.env_test .env && tsc && jest --detectOpenHandles --forceExit --runInBand --coverage",
     "testAuth": "copy .\\.env_test .env && tsc && jest --detectOpenHandles --forceExit user_auth.test.ts --runInBand --coverage",
