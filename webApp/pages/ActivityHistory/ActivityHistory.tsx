@@ -129,7 +129,7 @@ export default function ActivityHistory() {
                     <img
                       src={
                         row.chargerPicture
-                          ? `http://localhost:3000${row.chargerPicture}`
+                          ? `${import.meta.env.VITE_BACKEND_URL}${row.chargerPicture}`
                           : "defaultPicture"
                       }
                       alt="Charging Station"

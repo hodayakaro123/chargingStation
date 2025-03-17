@@ -210,7 +210,7 @@ export default function Comments({
                 <img
                   src={
                     comment.user.picture
-                      ? `http://localhost:3000${comment.user.picture}`
+                      ? `${import.meta.env.VITE_BACKEND_URL}${comment.user.picture}`
                       : "http://localhost:3000/default-profile-picture.png"
                   }
                   alt={`${comment.user.firstName}'s profile`}

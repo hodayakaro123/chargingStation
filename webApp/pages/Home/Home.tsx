@@ -281,7 +281,7 @@ export default function Home() {
               <Popup>
                 {charger.picture ? (
                   <img
-                    src={`http://localhost:3000${charger.picture}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}${charger.picture}`}
                     alt="Charging Station"
                     style={{
                       width: "100%",

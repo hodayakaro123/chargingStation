@@ -226,7 +226,7 @@ describe("add charging station Test Suite", () => {
 
   test("should toggleLikeDislikeCharger - situation 1", async () => {
     let response = await request(app)
-      .post(`/addChargingStation/toggleLikeDislikeCharger`)
+      .put(`/addChargingStation/toggleLikeDislikeCharger`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
       .send({
         chargerId: chargerId,
@@ -239,7 +239,7 @@ describe("add charging station Test Suite", () => {
     expect(response.body.dislikes).toBe(0);
 
     response = await request(app)
-      .post(`/addChargingStation/toggleLikeDislikeCharger`)
+      .put(`/addChargingStation/toggleLikeDislikeCharger`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
       .send({
         chargerId: chargerId,
@@ -252,7 +252,7 @@ describe("add charging station Test Suite", () => {
     expect(response.body.dislikes).toBe(0);
 
     response = await request(app)
-      .post(`/addChargingStation/toggleLikeDislikeCharger`)
+      .put(`/addChargingStation/toggleLikeDislikeCharger`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
       .send({
         chargerId: chargerId,
@@ -265,7 +265,7 @@ describe("add charging station Test Suite", () => {
     expect(response.body.dislikes).toBe(1);
 
     response = await request(app)
-      .post(`/addChargingStation/toggleLikeDislikeCharger`)
+      .put(`/addChargingStation/toggleLikeDislikeCharger`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
       .send({
         chargerId: chargerId,
@@ -281,7 +281,7 @@ describe("add charging station Test Suite", () => {
 
   test("should toggleLikeDislikeCharger - situation 2", async () => {
     let response = await request(app)
-      .post(`/addChargingStation/toggleLikeDislikeCharger`)
+      .put(`/addChargingStation/toggleLikeDislikeCharger`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
       .send({
         chargerId: chargerId,
@@ -294,7 +294,7 @@ describe("add charging station Test Suite", () => {
     expect(response.body.dislikes).toBe(1);
 
     response = await request(app)
-      .post(`/addChargingStation/toggleLikeDislikeCharger`)
+      .put(`/addChargingStation/toggleLikeDislikeCharger`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
       .send({
         chargerId: chargerId,
@@ -307,7 +307,7 @@ describe("add charging station Test Suite", () => {
     expect(response.body.dislikes).toBe(0);
 
     response = await request(app)
-      .post(`/addChargingStation/toggleLikeDislikeCharger`)
+      .put(`/addChargingStation/toggleLikeDislikeCharger`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
       .send({
         chargerId: chargerId,
@@ -324,7 +324,7 @@ describe("add charging station Test Suite", () => {
   test("should fail to toggle like/dislike - charger not found", async () => {
     const nonExistentChargerId = new mongoose.Types.ObjectId();
     const response = await request(app)
-      .post(`/addChargingStation/toggleLikeDislikeCharger`)
+      .put(`/addChargingStation/toggleLikeDislikeCharger`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
       .send({
         chargerId: nonExistentChargerId,
@@ -339,7 +339,7 @@ describe("add charging station Test Suite", () => {
   test("should fail to toggleLikeDislikeCharger - invalid id", async () => {
     const wrongId = "178b07b45241b1227ffe2rra";
     const response = await request(app)
-      .post(`/addChargingStation/toggleLikeDislikeCharger`)
+      .put(`/addChargingStation/toggleLikeDislikeCharger`)
       .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
       .send({
         chargerId: wrongId,

@@ -281,7 +281,7 @@ export default function Booking() {
             rating={charger.rating || 0}
             picture={
               charger.picture
-                ? `http://localhost:3000${charger.picture}`
+                ? `${import.meta.env.VITE_BACKEND_URL}${charger.picture}`
                 : "https://www.revixpert.ch/app/uploads/portrait-placeholder.jpg"
             }
             charger={charger}
