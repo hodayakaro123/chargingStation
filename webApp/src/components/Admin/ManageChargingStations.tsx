@@ -421,7 +421,7 @@ export default function ManageChargingStations() {
                     />
                   ) : (
                     <img
-                      src={`http://localhost:3000${station.picture}`}
+                      src={`${import.meta.env.VITE_BACKEND_URL}${station.picture}`}
                       alt="Charger"
                       style={{
                         width: "50px",

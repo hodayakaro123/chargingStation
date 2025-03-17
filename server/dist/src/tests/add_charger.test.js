@@ -175,7 +175,7 @@ describe("add charging station Test Suite", () => {
     }), 5000);
     test("should toggleLikeDislikeCharger - situation 1", () => __awaiter(void 0, void 0, void 0, function* () {
         let response = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .put(`/addChargingStation/toggleLikeDislikeCharger`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
             .send({
             chargerId: chargerId,
@@ -186,7 +186,7 @@ describe("add charging station Test Suite", () => {
         expect(response.body.likes).toBe(1);
         expect(response.body.dislikes).toBe(0);
         response = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .put(`/addChargingStation/toggleLikeDislikeCharger`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
             .send({
             chargerId: chargerId,
@@ -197,7 +197,7 @@ describe("add charging station Test Suite", () => {
         expect(response.body.likes).toBe(0);
         expect(response.body.dislikes).toBe(0);
         response = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .put(`/addChargingStation/toggleLikeDislikeCharger`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
             .send({
             chargerId: chargerId,
@@ -208,7 +208,7 @@ describe("add charging station Test Suite", () => {
         expect(response.body.likes).toBe(0);
         expect(response.body.dislikes).toBe(1);
         response = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .put(`/addChargingStation/toggleLikeDislikeCharger`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
             .send({
             chargerId: chargerId,
@@ -221,7 +221,7 @@ describe("add charging station Test Suite", () => {
     }), 5000);
     test("should toggleLikeDislikeCharger - situation 2", () => __awaiter(void 0, void 0, void 0, function* () {
         let response = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .put(`/addChargingStation/toggleLikeDislikeCharger`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
             .send({
             chargerId: chargerId,
@@ -232,7 +232,7 @@ describe("add charging station Test Suite", () => {
         expect(response.body.likes).toBe(0);
         expect(response.body.dislikes).toBe(1);
         response = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .put(`/addChargingStation/toggleLikeDislikeCharger`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
             .send({
             chargerId: chargerId,
@@ -243,7 +243,7 @@ describe("add charging station Test Suite", () => {
         expect(response.body.likes).toBe(1);
         expect(response.body.dislikes).toBe(0);
         response = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .put(`/addChargingStation/toggleLikeDislikeCharger`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
             .send({
             chargerId: chargerId,
@@ -257,7 +257,7 @@ describe("add charging station Test Suite", () => {
     test("should fail to toggle like/dislike - charger not found", () => __awaiter(void 0, void 0, void 0, function* () {
         const nonExistentChargerId = new mongoose_1.default.Types.ObjectId();
         const response = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .put(`/addChargingStation/toggleLikeDislikeCharger`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
             .send({
             chargerId: nonExistentChargerId,
@@ -270,7 +270,7 @@ describe("add charging station Test Suite", () => {
     test("should fail to toggleLikeDislikeCharger - invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
         const wrongId = "178b07b45241b1227ffe2rra";
         const response = yield (0, supertest_1.default)(app)
-            .post(`/addChargingStation/toggleLikeDislikeCharger`)
+            .put(`/addChargingStation/toggleLikeDislikeCharger`)
             .set("authorization", `Bearer ${testUser.refreshTokens[0]}`)
             .send({
             chargerId: wrongId,

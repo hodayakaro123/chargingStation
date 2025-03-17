@@ -22,7 +22,7 @@ export default function GeneralInfoHeader({
   });
   const [loading, setLoading] = useState(false);
   const [picture, setPicture] = useState(
-    picturePath ? `http://localhost:3000${picturePath}` : ""
+    picturePath ? `${import.meta.env.VITE_BACKEND_URL}${picturePath}` : ""
   );
 
   const toggleEditMode = () => {
